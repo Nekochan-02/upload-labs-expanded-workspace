@@ -1,0 +1,13 @@
+# Ignore vanilla game reference files
+/vanilla-reference/
+
+# Ignore logs
+/logs/
+
+# Ignore temporary research downloads / extractions
+/research/workshop_mod_temp/
+
+# Ignore any packages, executables, or PCKs
+*.zip
+*.pck
+*.exe
