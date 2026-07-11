@@ -1,0 +1,16 @@
+{
+	"name": "ExpandedWorkspace",
+	"namespace": "Nekochan",
+	"version_number": "0.1.0",
+	"website_url": "",
+	"description": "Phase 2A: Raises the total workspace node limit from 500 to 1000. Does not affect per-type limits or workspace bounds.",
+	"dependencies": [],
+	"extra": {
+		"godot": {
+			"authors": ["Nekochan"],
+			"compatible_mod_loader_version": ["7.0.1"],
+			"compatible_game_version": ["2.2.11"],
+			"config_schema": {}
+		}
+	}
+}
