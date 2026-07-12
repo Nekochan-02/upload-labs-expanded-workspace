@@ -73,20 +73,29 @@ Notes:
 | Test | Result | Evidence |
 |---|---|---|
 | Old live Mod removed/disabled | NOT TESTED | |
-| RC ZIP installed | NOT TESTED | |
+| RC ZIP installed | PASS | User clean install verification used the v0.2.9 RC artifact. |
 | Mod detected | NOT TESTED | |
-| Game starts | NOT TESTED | |
+| Game starts | PASS | User reached the game and exercised expanded-area placement. |
 | Existing save loads | NOT TESTED | |
 | Normal placement | NOT TESTED | |
 | 500+ placement capability retained | NOT TESTED | |
 | Camera expanded area | NOT TESTED | |
 | Zoomed-out grid/background | NOT TESTED | |
-| Click placement in expanded area | NOT TESTED | |
+| Click placement in expanded area | PASS | Nodes can exist in the expanded area during the same game session. |
 | Drag placement in expanded area | NOT TESTED | |
-| Existing node movement | NOT TESTED | |
-| Group-selection movement | NOT TESTED | |
-| Save | NOT TESTED | |
-| Restart / reload | NOT TESTED | |
+| Existing node movement | PARTIAL | Expanded-area runtime placement/movement works before restart, but persistence is not retained. |
+| Group-selection movement | PARTIAL | Grouped nodes can be placed/moved in the expanded area during the same game session, but persistence is not retained. |
+| Save operation completes | NOT TESTED | User did not report a save-operation error separately from position persistence. |
+| Expanded-area position persistence | FAIL | Nodes placed in the expanded area are relocated to the old workspace boundary after game restart/load. Observed for individually placed nodes and nodes placed/moved as a group. |
+| Restart / reload | FAIL | After restart/load, expanded-area nodes are no longer at their saved expanded-area positions. |
+
+## Release Blockers
+
+- `BLOCKED_POSITION_PERSISTENCE`: Expanded-area node positions are not retained across save, game exit, restart, and load.
+- Failed RC artifact retained as evidence: `Nekochan-ExpandedWorkspace-0.2.9.zip`, SHA-256 `fc8ddab1a3f73c468eb5a1fbb2702a683629c703d67498c983ad0e52f8a038af`.
+- The GitHub Draft Release must not be published until a fixed artifact is built and clean-install verified.
+- Root-cause analysis: `docs/PHASE_2C_F1_POSITION_PERSISTENCE_ROOT_CAUSE.md`
+- Implementation plan: `docs/PHASE_2C_F1_IMPLEMENTATION_PLAN.md`
 
 ## Known Limitations
 
@@ -101,4 +110,4 @@ Notes:
 
 ## Release Decision
 
-`RC_READY_FOR_USER_TEST`
+`BLOCKED_POSITION_PERSISTENCE`

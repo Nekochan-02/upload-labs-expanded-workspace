@@ -176,6 +176,9 @@ Phase 2A-R4では、種類別配置可能数に関わる `space` アップグレ
   * `tools/build_release.ps1 -Version 0.2.9` により、公開repository sourceから `dist/Nekochan-ExpandedWorkspace-0.2.9.zip` を再生成できる。
   * 生成済みRC artifact: SHA-256 `fc8ddab1a3f73c468eb5a1fbb2702a683629c703d67498c983ad0e52f8a038af`, size `9770 bytes`, file count `13`, ZIP root `mods-unpacked/`。
   * RC ZIP安全監査では、vanilla-reference、game binary、`.pck`、scene/resource実ファイル、save、secret、third-party Mod code、generated hook packの混入は検出0。
-  * clean install verificationは未実施。`docs/PHASE_2C_RC_TEST_REPORT.md` のUser Verification Matrixをユーザー実機で埋めるまでRelease publish禁止。
+  * Phase 2C-F1 clean install verificationでrelease blockerを確認。拡張領域へ配置した単体ノードおよびグループ配置/移動ノードが、save・終了・再起動・load後に旧領域と新領域の境界付近へ移動する。
+  * 現在のrelease decisionは `BLOCKED_POSITION_PERSISTENCE`。v0.2.9 Draft Releaseをpublishしてはならない。v0.2.9 RC artifactはfailed RC evidenceとして保持する。
+  * root causeは `docs/PHASE_2C_F1_POSITION_PERSISTENCE_ROOT_CAUSE.md` を参照。保存側では `position` を直接保存し、load時にraw positionを代入した後、`scenes/windows/window_container.gd::_ready()` が旧 `10000` boundsで共通clampする可能性が高い。
+  * 修正する場合は `docs/PHASE_2C_F1_IMPLEMENTATION_PLAN.md` をユーザー承認後に実施する。v0.2.9を再利用せず、`0.2.10-dev` 等のdevelopment buildで検証する。
 3. **パフォーマンスフットプリントの計測**:
    * グリッドを `MultiMesh` で描画する際、インスタンス数が16万個に増えたとき（2倍サイズ）の起動時プチフリーズの有無を確認する。
