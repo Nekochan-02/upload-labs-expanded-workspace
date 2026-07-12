@@ -1,9 +1,9 @@
 {
 	"name": "ExpandedWorkspace",
 	"namespace": "Nekochan",
-	"version_number": "0.1.0",
+	"version_number": "0.2.9",
 	"website_url": "",
-	"description": "Phase 2A: Raises the total workspace node limit from 500 to 1000. Does not affect per-type limits or workspace bounds.",
+	"description": "Phase 2B-R3 canary G: group-selection movement sync test for expanded area movement.",
 	"dependencies": [],
 	"extra": {
 		"godot": {
