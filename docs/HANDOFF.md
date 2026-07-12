@@ -172,5 +172,10 @@ Phase 2A-R4では、種類別配置可能数に関わる `space` アップグレ
   * `0.2.9` ユーザー実機結果: 成功。グループ枠と中身ノードが一緒に旧境界を越えて移動でき、通常ノード移動・クリック配置・ドラッグ新規配置も壊れていない。
   * Phase 2B-R3 status: `STAGE_4D_GROUP_SELECTION_MOVEMENT_VERIFIED`。
   * 基本的な配置領域拡張操作は、カメラ移動、ズームアウト時グリッド/背景、クリック配置、ドラッグ新規配置、既存ノード移動、グループ選択移動までユーザー実機で確認済み。
+  * Phase 2Cでは新機能を追加せず、ユーザー実機で確認済みの `0.2.9` をRelease Candidateとして固定する。
+  * `tools/build_release.ps1 -Version 0.2.9` により、公開repository sourceから `dist/Nekochan-ExpandedWorkspace-0.2.9.zip` を再生成できる。
+  * 生成済みRC artifact: SHA-256 `fc8ddab1a3f73c468eb5a1fbb2702a683629c703d67498c983ad0e52f8a038af`, size `9770 bytes`, file count `13`, ZIP root `mods-unpacked/`。
+  * RC ZIP安全監査では、vanilla-reference、game binary、`.pck`、scene/resource実ファイル、save、secret、third-party Mod code、generated hook packの混入は検出0。
+  * clean install verificationは未実施。`docs/PHASE_2C_RC_TEST_REPORT.md` のUser Verification Matrixをユーザー実機で埋めるまでRelease publish禁止。
 3. **パフォーマンスフットプリントの計測**:
    * グリッドを `MultiMesh` で描画する際、インスタンス数が16万個に増えたとき（2倍サイズ）の起動時プチフリーズの有無を確認する。

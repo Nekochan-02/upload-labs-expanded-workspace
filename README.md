@@ -8,7 +8,7 @@ This project explores a mod for the Steam version of Upload Labs that may eventu
 
 ## Current Status
 
-Work in progress.
+Experimental release candidate preparation.
 
 Phase 2A is currently `LIMIT_RELAXATION_COMPLETE_USER_VERIFIED`.
 
@@ -18,7 +18,9 @@ Phase 2A-R3 extends normal manual placement, template/schematic placement, and t
 
 Phase 2A-R4 raises the `space` upgrade cap from 100 to 200 while preserving the existing cost progression. The user confirmed it works as expected in game testing.
 
-The node-count and `space` upgrade limit relaxation work is considered complete for the current local goal. Basic expanded-area interaction is also verified through Phase 2B-R3 `0.2.9`. The project is still work in progress because large-save behavior, performance, packaging, compatibility, and configuration UI are not yet complete release criteria.
+The node-count and `space` upgrade limit relaxation work is considered complete for the current local goal. Basic expanded-area interaction is also verified through Phase 2B-R3 `0.2.9`.
+
+Phase 2C packages the user-verified `0.2.9` source as a reproducible Release Candidate. Clean install verification of the RC ZIP itself is still pending and must not be treated as complete until tested from `dist/Nekochan-ExpandedWorkspace-0.2.9.zip`.
 
 ## Target Game
 
@@ -32,7 +34,10 @@ Godot Mod Loader v7.
 
 - Phase 1 analysis documents exist under `docs/`.
 - A Phase 2A-R4 and Phase 2B-R3 minimal Script Extension implementation exists under `mod/source/`.
-- Core node-limit and basic expanded-area interaction paths are user-verified locally, but this should still be treated as an experimental development build.
+- Core node-limit and basic expanded-area interaction paths are user-verified locally.
+- The reproducible release build process is documented in `docs/RELEASE_PROCESS.md`.
+- The v0.2.9 RC clean install matrix is tracked in `docs/PHASE_2C_RC_TEST_REPORT.md`.
+- This should still be treated as experimental until clean install verification of the RC artifact is complete.
 
 ## Known Issue
 
@@ -65,7 +70,18 @@ Do not use or package `0.2.0` or `0.2.1`.
 
 After rollback to `0.1.4`, node placement works again. Lost nodes from the affected save are not being restored by user decision.
 
-Save schema hardening, long-running large-save behavior, performance profiling, packaging automation, compatibility checks, and configuration UI are not part of the current implementation.
+Save schema hardening, long-running large-save behavior, performance profiling, compatibility checks beyond the manifest, and configuration UI are not part of the current implementation.
+
+Release Candidate `0.2.9` intentionally keeps these known limitations:
+
+- Template/schematic paste may still be clamped by vanilla paste internals.
+- Group window resizing may still be clamped by vanilla group bounds.
+- Connector-point movement in the expanded area is not verified.
+- Grid/background is scaled to cover the expanded area and is not regenerated at original density.
+- Large-save behavior is not fully validated.
+- Long-running performance is not profiled.
+- Compatibility with future Upload Labs versions is not guaranteed.
+- Configuration UI does not exist.
 
 ## Repository Structure
 
