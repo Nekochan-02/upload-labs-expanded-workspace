@@ -57,14 +57,18 @@
   * Final F6 log evidence covers three non-group targets. For `download_manager0` `(18300.0, 18000.0)`, `download_text0` `(18700.0, 18800.0)`, and `network0` `(17850.0, 17700.0)`, `clamp_delta` is zero and both AFTER and STABILITY local positions exactly equal SAVED_LOCAL. Details are in the F6 report.
   * F6 has verified individual-node exact local persistence only. Group persistence is deliberately not a F6 PASS criterion. `GRID_DENSITY_SCALE_MISMATCH` remains isolated; grid code is unchanged. Do not start grid, group, full regression, or release integration without a new approved plan.
 * **Phase 2C-F7 / v0.2.14 vanilla-density grid canary**:
-  * **Status: `F7_CANARY_READY_FOR_USER_TEST`**
+  * **Status: `F7_GRID_DENSITY_VERIFIED_CLICK_ALIGNMENT_FAIL`**
   * F7 plan is `docs/PHASE_2C_F7_GRID_DENSITY_RESTORATION_PLAN.md`; canary report is `docs/PHASE_2C_F7_GRID_DENSITY_RESTORATION_REPORT.md`.
   * Root cause is `GRID_DENSITY_SCALE_MISMATCH`: the prior `(2, 2)` Lines scale rendered the vanilla 50-unit grid at a visible 100-unit interval while interaction snap stayed at 50.
   * F7 restores root Lines scale to `(1, 1)` and creates three fresh runtime renderer tiles at `(10000, 0)`, `(0, 10000)`, and `(10000, 10000)`. Together with the root tile, coverage is `20000 x 20000` with vanilla origin and 50-unit geometry. It does not copy vanilla renderer bodies, scenes, resources, or live RenderingServer RID state.
   * The instance count is a known 4x area multiplier. Expected counts range from 1600 Lines instances to 248704 Hexagon instances depending on the selected vanilla Lines type. No performance PASS is claimed.
   * F6 Desktop restoration source is unchanged from its verification commit. Placement/movement/connector snap, selection, group movement, save schema, node limit, space cap, camera, and background paths are unchanged.
   * `Nekochan-ExpandedWorkspace-0.2.14.zip` is a local development canary: SHA-256 `74043d10b5d455850be47ac0f3f7b6302f3764ec28d9ca6b4390f840256b7d49`, 12043 bytes, 13 files, ZIP root `mods-unpacked`. No release, tag, Workshop publication, public-master push, or v0.2.9 artifact operation occurred.
-  * All F7 user checks are `NOT TESTED`. Test vanilla and expanded grid density, click/drag/movement alignment, then save/restart/load to confirm F6 individual-node persistence remains intact. Do not proceed to group, full regression, or release integration until the F7 result is recorded.
+  * Runtime evidence confirms expected Lines geometry: `workspace_size=(20000,20000)`, `renderer_scale=(1,1)`, `lines_minor=50_major=500`, origin `(0,0)`, coverage `(20000,20000)`, four tiles, and 1600 total Lines instances for tested `lines_type=0`.
+  * User verified old-area density, expanded-area density, and the old/new boundary as PASS. Drag placement and existing-node movement align to the visual grid; F6 single-node persistence also remains PASS.
+  * Click placement alignment is FAIL: a clicked node initially does not align to a grid line, but aligns when moved. This is a remaining click-placement workflow alignment defect, not evidence to change snap intervals or F7 renderer geometry. Do not implement a correction without a dedicated approved diagnostic plan.
+  * Startup is slightly heavier, while camera movement/zoom and grid display switching are PASS. Performance is acceptable for the tested Lines type only; higher-density renderer modes remain untested.
+  * Do not proceed to group persistence, full regression, or release integration. The single next action is a dedicated click-placement alignment diagnostic plan.
 * **Phase 2A 検証状態**:
   * **Status: `LIMIT_RELAXATION_COMPLETE_USER_VERIFIED`**
   * Phase 2A-R2で、通常の手動配置は500個を超えて配置できることをユーザー実機で確認済み。

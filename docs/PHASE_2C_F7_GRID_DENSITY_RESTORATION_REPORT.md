@@ -1,6 +1,6 @@
 # Phase 2C-F7 Vanilla-Density Grid Restoration Report
 
-Status: `F7_CANARY_READY_FOR_USER_TEST`
+Status: `F7_GRID_DENSITY_VERIFIED_CLICK_ALIGNMENT_FAIL`
 
 ## Root Cause
 
@@ -78,19 +78,59 @@ No F6 Desktop restoration, placement, movement, connector, selection, group, sav
 | secret | 0 |
 | forbidden file | 0 |
 
+## Runtime Evidence
+
+The final F7 Mod Loader log recorded one root-renderer checkpoint:
+
+```text
+[F7][GRID]
+workspace_size=(20000.0, 20000.0)
+renderer_scale=(1.0, 1.0)
+geometry=lines_minor=50_major=500
+origin=(0.0, 0.0)
+coverage=(20000.0, 20000.0)
+tile_count=4
+per_tile_instance_count=400
+instance_count=1600
+lines_type=0
+```
+
+This is the expected F7 geometry for the tested Lines renderer: four 10000-unit tiles, vanilla renderer scale, 50-unit minor spacing, 500-unit major spacing, and 1600 total line instances. It corroborates the user's PASS observations for old-area density, expanded-area density, and the boundary without a seam, offset, or blank region.
+
 ## User Verification Status
 
 | Test | Result |
 |---|---|
-| Vanilla-area grid density | NOT TESTED |
-| Expanded-area grid density | NOT TESTED |
-| Click placement alignment | NOT TESTED |
-| Drag placement alignment | NOT TESTED |
-| Existing movement alignment | NOT TESTED |
-| F6 exact persistence regression | NOT TESTED |
+| Vanilla-area grid density | PASS (user verified) |
+| Expanded-area grid density | PASS (user verified) |
+| Old/expanded boundary seam, offset, or gap | PASS (user verified) |
+| Click placement alignment | FAIL (user verified) |
+| Drag placement alignment | PASS (user verified) |
+| Existing movement alignment | PASS (user verified) |
+| F6 exact persistence regression | PASS (user verified) |
 | Group persistence | NOT TESTED / out of F7 scope |
 
-No real-game visual, performance, or regression PASS is claimed.
+The click-placement result is isolated: a node placed by click does not initially align to the visual grid, but moving it does snap correctly. Since drag placement and existing movement both align, and runtime evidence confirms F7's visual interval, origin, scale, and coverage, this is not evidence that F7 grid tiling or snap geometry is incorrect. It is a remaining click-placement workflow alignment defect and must not be fixed by changing snap intervals or the F7 renderer.
+
+## Performance Observation
+
+| Observation | Result |
+|---|---|
+| Startup | Slightly heavier (user observed) |
+| Camera movement and zoom | PASS (user verified) |
+| Grid display switching | PASS (user verified) |
+
+Performance decision for tested Lines type `0`: `ACCEPTABLE_FOR_CANARY_WITH_MINOR_STARTUP_COST`. The log confirms only 1600 Lines instances, not the higher-count circle/cross/hexagon modes. Those modes remain untested performance risk and are not cleared by this result.
+
+## F7 Decision
+
+`GRID_DENSITY_RESTORATION`: `VERIFIED`
+
+`F6_SINGLE_NODE_PERSISTENCE_REGRESSION`: `NOT OBSERVED`
+
+`F7_CANARY_OVERALL`: `PARTIAL_SUCCESS_CLICK_ALIGNMENT_FAIL`
+
+Do not release-integrate F7. Keep the renderer and all snap intervals unchanged until a dedicated, approved click-placement alignment diagnostic determines the placement-path offset.
 
 ## Release Boundary
 
