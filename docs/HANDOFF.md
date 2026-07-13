@@ -70,9 +70,12 @@
   * Startup is slightly heavier, while camera movement/zoom and grid display switching are PASS. Performance is acceptable for the tested Lines type only; higher-density renderer modes remain untested.
   * Do not proceed to group persistence, full regression, or release integration. The single next action is a dedicated click-placement alignment diagnostic plan.
 * **Phase 2C-F8 / v0.2.15 click-placement coordinate diagnostic**:
-  * **Status: `DIAGNOSTIC_ARTIFACT_PENDING_USER_TEST`**
+  * **Status: `DIAGNOSTIC_EVIDENCE_CAPTURED`**
   * F8 plan: `docs/PHASE_2C_F8_CLICK_PLACEMENT_COORDINATE_DIAGNOSTIC_PLAN.md`; report: `docs/PHASE_2C_F8_CLICK_PLACEMENT_COORDINATE_DIAGNOSTIC_REPORT.md`.
-  * F8 observes one click-created window only. It logs C1-C9 camera, raw/clamped/snapped target, pre/post-create state, post-global-reapply state, deferred-move state, and next-deferred stability state.
+  * User result: initial click-placement grid alignment FAIL; the same node after one manual movement PASS. Save/restart/load was not tested in F8.
+  * F8 observed `download_text`: C3 target `(15400,18050)` is `TARGET_SNAP_CORRECT`; C8/C9 global position equals that target exactly. C5 global/local delta is approximately the window half-size, while the Windows parent transform origin is `(0,0)`.
+  * Classification: `VISUAL_ORIGIN_MISMATCH`. The new window's vanilla opening pivot/scale lifecycle leaves a non-grid local layout coordinate while the visual transform is active; this is distinct from F6 saved-local-as-global persistence drift. The deferred `move()` corrects C7 global y by `10.5` to the target and does not create a subsequent global drift.
+  * One unimplemented candidate for a separately approved canary: replace the click path's deferred global `move(target)` with a deferred local `position = target; moved.emit()` correction, using the F6-local-domain principle. Do not implement from F8 evidence alone because the settled opening-animation frame was not logged.
   * It preserves the F7 click target calculation and assignments exactly. F7 Lines, F6 Desktop restoration, drag placement, existing movement, 50-unit snap behavior, save schema, node limit, space cap, camera, and background paths are unchanged.
   * `Nekochan-ExpandedWorkspace-0.2.15.zip` is a local development diagnostic artifact: SHA-256 `4677776d803b53a13512f49434c691c2ec6dbc2e4790b1f6d9349903ea3eabe7`, 13113 bytes, 13 files, ZIP root `mods-unpacked`.
   * The user must test one expanded-area click-created node, manually move it once, then provide the visual results and `[F8]` logs. Do not implement a click correction, alter F7/F6, start group persistence/full regression/release integration, publish, tag, push public master, or operate on v0.2.9 until that evidence is analyzed.

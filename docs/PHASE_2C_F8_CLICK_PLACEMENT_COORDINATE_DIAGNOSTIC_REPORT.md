@@ -2,11 +2,20 @@
 
 ## Status
 
-`DIAGNOSTIC_ARTIFACT_PENDING_USER_TEST`
+`DIAGNOSTIC_EVIDENCE_CAPTURED`
 
 ## User Result
 
-`NOT TESTED`. The F8 artifact has not been run by the user.
+The user tested v0.2.15 with one expanded-area click-created node:
+
+| Check | Result |
+| --- | --- |
+| Initial click-placement visual grid alignment | `FAIL` |
+| After one manual movement visual grid alignment | `PASS` |
+| Save / restart / load | Not tested; out of F8 scope |
+
+The supplied screenshots are consistent with an initially offset visible window
+that is aligned after the later manual movement.
 
 ## Click Path
 
@@ -39,38 +48,84 @@ existing movement/snap behavior after parenting. User result: `PASS`.
 
 | Checkpoint | Status | Evidence |
 | --- | --- | --- |
-| C1 CAMERA_CENTER | `NOT TESTED` | Awaiting user log collection. |
-| C2 RAW_TARGET | `NOT TESTED` | Awaiting user log collection. |
-| C3 SNAPPED_TARGET | `NOT TESTED` | Awaiting user log collection. |
-| C4 PRE_CREATE | `NOT TESTED` | Awaiting user log collection. |
-| C5 POST_CREATE | `NOT TESTED` | Awaiting user log collection. |
-| C6 AFTER_REAPPLY_GLOBAL | `NOT TESTED` | Awaiting user log collection. |
-| C7 BEFORE_DEFERRED_MOVE | `NOT TESTED` | Awaiting user log collection. |
-| C8 AFTER_DEFERRED_MOVE | `NOT TESTED` | Awaiting user log collection. |
-| C9 STABILITY | `NOT TESTED` | Awaiting user log collection. |
+| C1 CAMERA_CENTER | `PASS` | Captured from `modloader.log`. |
+| C2 RAW_TARGET | `PASS` | Captured from `modloader.log`. |
+| C3 SNAPPED_TARGET | `PASS` | `TARGET_SNAP_CORRECT`. |
+| C4 PRE_CREATE | `PASS` | Captured from `modloader.log`. |
+| C5 POST_CREATE | `PASS` | Captured from `modloader.log`. |
+| C6 AFTER_REAPPLY_GLOBAL | `PASS` | Captured from `modloader.log`. |
+| C7 BEFORE_DEFERRED_MOVE | `PASS` | Captured from `modloader.log`. |
+| C8 AFTER_DEFERRED_MOVE | `PASS` | Captured from `modloader.log`. |
+| C9 STABILITY | `PASS` | Captured from `modloader.log`. |
+
+The actual `modloader.log` contains one F8 target, `download_text` / later
+renamed `download_text1`:
+
+| Checkpoint | Measured value |
+| --- | --- |
+| C1 CAMERA_CENTER | `(15550.68, 18198.79)`; window size `(350.0, 272.0)` |
+| C2 RAW_TARGET | `(15375.68, 18062.79)` |
+| C3 SNAPPED_TARGET | `(15400.0, 18050.0)` |
+| C4 PRE_CREATE | local/global `(15400.0, 18050.0)`; no parent |
+| C5 POST_CREATE | local `(9650.0, 9750.0)`; global `(9824.998, 9885.999)` |
+| C6 AFTER_REAPPLY_GLOBAL | local `(15225.0, 17914.0)`; global `(15400.0, 18039.5)` |
+| C7 BEFORE_DEFERRED_MOVE | same as C6 |
+| C8 AFTER_DEFERRED_MOVE | local `(15225.0, 17924.5)`; global `(15400.0, 18050.0)` |
+| C9 STABILITY | same as C8 |
 
 ## Snap Arithmetic
 
-`NOT TESTED`. C3 will log a recomputed 50-unit target, its x/y snap-unit delta
-from the nearest integer, and `TARGET_SNAP_CORRECT` or `TARGET_SNAP_INCORRECT`.
+`PASS`. C3 reports `TARGET_SNAP_CORRECT`: recomputed target equals C3, both
+target-recompute and nearest-50-unit deltas are `(0.0, 0.0)`, and snap units are
+exact integers `(308.0, 361.0)`.
 
 ## Coordinate Deltas
 
-`NOT TESTED`. C4-C9 will log `local_to_target`, `global_to_target`, and
-`global_local` for the one diagnostic target.
+| Checkpoint | Local to C3 | Global to C3 | Global minus local |
+| --- | ---: | ---: | ---: |
+| C4 | `(0.0, 0.0)` | `(0.0, 0.0)` | `(0.0, 0.0)` |
+| C5 | `(-5750.0, -8300.0)` | `(-5575.002, -8164.001)` | `(174.998, 135.999)` |
+| C6 | `(-174.998, -135.998)` | `(0.0, -10.5)` | `(174.998, 125.498)` |
+| C7 | `(-174.998, -135.998)` | `(0.0, -10.5)` | `(174.998, 125.498)` |
+| C8 | `(-174.998, -125.498)` | `(0.0, 0.0)` | `(174.998, 125.498)` |
+| C9 | `(-174.998, -125.498)` | `(0.0, 0.0)` | `(174.998, 125.498)` |
+
+The parent transform origin safely obtained at C5-C9 is `(0.0, 0.0)`. The C5
+delta is effectively half of the initial window size `(175.0, 136.0)`, matching
+vanilla `WindowContainer._ready()` setting `pivot_offset = size / 2` followed by
+`scale = Vector2(0, 0)`. This is not a fixed parent transform delta. F6 also
+observed nonzero, window-dependent global/local deltas while new windows were
+under the same opening lifecycle; the numeric offsets differ by window.
 
 ## Deferred Move Impact
 
-`NOT TESTED`. C5/C6/C8/C9 will determine whether the existing deferred
-`WindowContainer.move(target_position)` changes coordinate domain.
+C7 to C8 changes global y by `+10.5` so that C8/C9 global position exactly
+equals C3. It does not introduce a later global drift. It leaves the local
+coordinate non-grid-aligned because `WindowContainer.move()` writes a global
+position while the opening pivot/scale transform is active.
 
 ## Root Cause Classification
 
-`UNRESOLVED` pending the user visual result and C1-C9 runtime evidence.
+`VISUAL_ORIGIN_MISMATCH`.
+
+C3 is valid and C8/C9 global position equals C3 exactly, eliminating the grid
+renderer and snap calculation as causes. C5 proves the old-boundary creation
+clamp occurs, but the existing reapply/deferred path restores the global target.
+The remaining visible offset is explained by the new window's vanilla opening
+pivot/scale transform: its local layout coordinate remains offset while that
+transform is active. The parent transform origin is zero, so this is not the
+F6 saved-local-as-global persistence error and is not a parent transform issue.
 
 ## Minimal Fix Candidate
 
-None. F8 is diagnostic-only and must not implement a click-placement repair.
+One candidate only, not implemented: replace the click path's current deferred
+global `move(target_position)` correction with a one-shot deferred local
+assignment, `instance.position = target_position; instance.moved.emit()`, at
+the same lifecycle point. This mirrors F6's proven local-domain restoration and
+would make the settled window's local grid coordinate exact without changing
+grid, snap interval, drag placement, movement, or F6 restoration. It requires
+a separate approved canary because F8 did not log the opening tween's settled
+frame.
 
 ## Artifact
 
@@ -121,9 +176,9 @@ tag, Workshop upload, public-master push, or v0.2.9 artifact operation occurred.
 
 | Check | Status |
 | --- | --- |
-| Initial expanded-area click placement visual alignment | `NOT TESTED` |
-| Manual movement visual alignment | `NOT TESTED` |
-| F8 log collection | `NOT TESTED` |
+| Initial expanded-area click placement visual alignment | `FAIL` |
+| Manual movement visual alignment | `PASS` |
+| F8 log collection | `PASS` |
 
 ## Conclusion
 
