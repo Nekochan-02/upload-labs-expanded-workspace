@@ -1,8 +1,8 @@
 extends Node
 
 # Mod: Nekochan-ExpandedWorkspace
-# Phase 2C-F4 development canary: stable v0.2.9 behavior plus
-# Desktop restoration-only deferred position correction.
+# Phase 2C-F6 development canary: stable v0.2.9 behavior plus
+# Desktop exact-local restoration-only deferred position correction.
 # Do not register connector, window container, or window base/indexed area patches here.
 
 const MOD_ID: String = "Nekochan-ExpandedWorkspace"
@@ -41,7 +41,7 @@ func _init() -> void:
 		"res://mods-unpacked/Nekochan-ExpandedWorkspace/extensions/scripts/paint.gd"
 	)
 	ModLoaderLog.info(
-		"Registered Phase 2C-F4 restoration-only correction script extensions.",
+		"Registered Phase 2C-F6 exact-local restoration-only correction script extensions.",
 		MOD_ID
 	)
 
@@ -49,7 +49,7 @@ func _init() -> void:
 func _ready() -> void:
 	_apply_space_upgrade_limit("mod_ready")
 	ModLoaderLog.info(
-		"ExpandedWorkspace v0.2.12 canary loaded. Target node limit: 1000. Space upgrade cap: 200. Restoration-only position correction.",
+		"ExpandedWorkspace v0.2.13 canary loaded. Target node limit: 1000. Space upgrade cap: 200. Exact-local restoration-only position correction.",
 		MOD_ID
 	)
 

@@ -1,9 +1,9 @@
 {
 	"name": "ExpandedWorkspace",
 	"namespace": "Nekochan",
-	"version_number": "0.2.12",
+	"version_number": "0.2.13",
 	"website_url": "",
-	"description": "Phase 2C-F4 development canary: restoration-only deferred position correction.",
+	"description": "Phase 2C-F6 development canary: exact local restoration-only position correction.",
 	"dependencies": [],
 	"extra": {
 		"godot": {
