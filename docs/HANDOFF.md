@@ -17,14 +17,18 @@
   * Follow-up analysis is `docs/PHASE_2C_F2_0.2.10_REGRESSION_ANALYSIS.md`.
   * Next implementation must be based on a new approved plan, preferably a restoration-path-only diagnostic/fix rather than another global `WindowContainer` patch.
 * **Phase 2C-F3 / v0.2.11 desktop restoration diagnostic**:
-  * **Status: `DIAGNOSTIC_ARTIFACT_READY_FOR_USER_TEST`**
+  * **Status: `DIAGNOSTIC_EVIDENCE_CAPTURED`**
   * F3 diagnostic plan is `docs/PHASE_2C_F3_DESKTOP_RESTORATION_DIAGNOSTIC_PLAN.md`.
   * Diagnostic report is `docs/PHASE_2C_F3_DESKTOP_RESTORATION_DIAGNOSTIC_REPORT.md`.
   * Runtime basis is `0.2.9` behavior plus Desktop restoration checkpoint logging only.
   * `WindowContainer` / `WindowBase` / `WindowIndexed` extensions are excluded and must remain excluded.
   * No position fix is implemented. The artifact only logs P2/P3/P3.5/P4 restoration evidence for up to 3 saved windows beyond the old `10000` threshold.
   * P3 immediately after `new_object.load(window_data)` is intentionally marked `UNOBSERVED` because observing it directly would require copying vanilla `Desktop._enter_tree()`.
-  * User test scope is limited to selection deselect checks and one single-node save/exit/restart/load diagnostic evidence pass.
+  * User tested v0.2.11. Empty-area deselect and menu `x` deselect are both OK, confirming the v0.2.10 selection regression disappeared when `window_container.gd` was excluded.
+  * F3 evidence target: `download_video0`, `window_download_video.tscn`, script `res://scenes/windows/window_download.gd`, size `(350.0, 272.0)`.
+  * F3 checkpoint result: P2 saved `(19650.0, 19750.0)`, P3.5 after restore/child-entered `(19650.0, 19750.0)`, P4 deferred final `(9650.0, 9750.0)`.
+  * Therefore the coordinate change occurs after P3.5 and before P4, not in save serialization and not in the immediate Desktop restoration loop.
+  * Next work must still not implement a position fix without a new approved plan. The next diagnostic/fix plan should target the post-P3.5/pre-P4 lifecycle point.
 * **Phase 2A 検証状態**:
   * **Status: `LIMIT_RELAXATION_COMPLETE_USER_VERIFIED`**
   * Phase 2A-R2で、通常の手動配置は500個を超えて配置できることをユーザー実機で確認済み。
