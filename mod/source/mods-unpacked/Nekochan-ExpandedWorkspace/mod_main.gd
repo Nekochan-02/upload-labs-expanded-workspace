@@ -1,8 +1,8 @@
 extends Node
 
 # Mod: Nekochan-ExpandedWorkspace
-# Phase 2C-F7 development canary: stable v0.2.9 behavior plus
-# F6 exact-local restoration and vanilla-density expanded grid tiling.
+# Phase 2C-F8 development diagnostic: stable F7 behavior plus
+# click-placement C1-C9 coordinate observations only.
 # Do not register connector, window container, or window base/indexed area patches here.
 
 const MOD_ID: String = "Nekochan-ExpandedWorkspace"
@@ -41,7 +41,7 @@ func _init() -> void:
 		"res://mods-unpacked/Nekochan-ExpandedWorkspace/extensions/scripts/paint.gd"
 	)
 	ModLoaderLog.info(
-		"Registered Phase 2C-F7 vanilla-density grid and F6 exact-local restoration script extensions.",
+		"Registered Phase 2C-F8 click-placement diagnostic with F7 grid and F6 restoration unchanged.",
 		MOD_ID
 	)
 
@@ -49,7 +49,7 @@ func _init() -> void:
 func _ready() -> void:
 	_apply_space_upgrade_limit("mod_ready")
 	ModLoaderLog.info(
-		"ExpandedWorkspace v0.2.14 canary loaded. Target node limit: 1000. Space upgrade cap: 200. F6 exact-local restoration plus F7 vanilla-density grid tiling.",
+		"ExpandedWorkspace v0.2.15 diagnostic loaded. Target node limit: 1000. Space upgrade cap: 200. F8 click-placement C1-C9 diagnostics only; F6 restoration and F7 grid unchanged.",
 		MOD_ID
 	)
 

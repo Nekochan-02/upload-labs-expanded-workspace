@@ -69,6 +69,13 @@
   * Click placement alignment is FAIL: a clicked node initially does not align to a grid line, but aligns when moved. This is a remaining click-placement workflow alignment defect, not evidence to change snap intervals or F7 renderer geometry. Do not implement a correction without a dedicated approved diagnostic plan.
   * Startup is slightly heavier, while camera movement/zoom and grid display switching are PASS. Performance is acceptable for the tested Lines type only; higher-density renderer modes remain untested.
   * Do not proceed to group persistence, full regression, or release integration. The single next action is a dedicated click-placement alignment diagnostic plan.
+* **Phase 2C-F8 / v0.2.15 click-placement coordinate diagnostic**:
+  * **Status: `DIAGNOSTIC_ARTIFACT_PENDING_USER_TEST`**
+  * F8 plan: `docs/PHASE_2C_F8_CLICK_PLACEMENT_COORDINATE_DIAGNOSTIC_PLAN.md`; report: `docs/PHASE_2C_F8_CLICK_PLACEMENT_COORDINATE_DIAGNOSTIC_REPORT.md`.
+  * F8 observes one click-created window only. It logs C1-C9 camera, raw/clamped/snapped target, pre/post-create state, post-global-reapply state, deferred-move state, and next-deferred stability state.
+  * It preserves the F7 click target calculation and assignments exactly. F7 Lines, F6 Desktop restoration, drag placement, existing movement, 50-unit snap behavior, save schema, node limit, space cap, camera, and background paths are unchanged.
+  * `Nekochan-ExpandedWorkspace-0.2.15.zip` is a local development diagnostic artifact: SHA-256 `4677776d803b53a13512f49434c691c2ec6dbc2e4790b1f6d9349903ea3eabe7`, 13113 bytes, 13 files, ZIP root `mods-unpacked`.
+  * The user must test one expanded-area click-created node, manually move it once, then provide the visual results and `[F8]` logs. Do not implement a click correction, alter F7/F6, start group persistence/full regression/release integration, publish, tag, push public master, or operate on v0.2.9 until that evidence is analyzed.
 * **Phase 2A 検証状態**:
   * **Status: `LIMIT_RELAXATION_COMPLETE_USER_VERIFIED`**
   * Phase 2A-R2で、通常の手動配置は500個を超えて配置できることをユーザー実機で確認済み。

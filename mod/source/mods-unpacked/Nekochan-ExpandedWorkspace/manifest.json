@@ -1,9 +1,9 @@
 {
 	"name": "ExpandedWorkspace",
 	"namespace": "Nekochan",
-	"version_number": "0.2.14",
+	"version_number": "0.2.15",
 	"website_url": "",
-	"description": "Phase 2C-F7 development canary: vanilla-density expanded grid restoration.",
+	"description": "Phase 2C-F8 development diagnostic: click placement coordinate checkpoints.",
 	"dependencies": [],
 	"extra": {
 		"godot": {
