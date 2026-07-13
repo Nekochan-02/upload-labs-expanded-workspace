@@ -12,7 +12,7 @@ The screenshot supplied with the report is consistent with nodes being visible a
 
 ## Current Classification
 
-Status: `ROOT_CAUSE_PARTIAL`
+Status: `ROOT_CAUSE_CONFIRMED_LIFECYCLE_CLAMP`
 
 Confirmed fact:
 
@@ -25,7 +25,18 @@ Rejected repair hypothesis:
 - User verification showed this did not fix persistence. A node placed in the expanded area still moved back to the old boundary after save, exit, restart, and load.
 - v0.2.10 also introduced a deselection regression, so the global `WindowContainer` Script Extension must not be promoted to a release fix.
 
+Confirmed F3 lifecycle evidence:
+
+- P2 saved position: `(19650.0, 19750.0)`
+- P3.5 after Desktop restoration / child-entered observation: `(19650.0, 19750.0)`
+- P4 deferred final: `(9650.0, 9750.0)`
+- P4 X matches `10000 - observed_width(350) = 9650`
+
+Therefore the coordinate change occurs after the first observable child-entered restoration checkpoints and before deferred final observation. The failure is now classified as a later lifecycle clamp, not save serialization and not the immediate Desktop restoration loop.
+
 Follow-up analysis: `docs/PHASE_2C_F2_0.2.10_REGRESSION_ANALYSIS.md`
+F3 evidence: `docs/PHASE_2C_F3_DESKTOP_RESTORATION_DIAGNOSTIC_REPORT.md`
+F4 canary plan: `docs/PHASE_2C_F4_RESTORATION_CORRECTION_PLAN.md`
 
 ## Release Impact
 
