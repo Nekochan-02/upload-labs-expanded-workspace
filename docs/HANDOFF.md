@@ -47,14 +47,15 @@
   * User also observed grid density/snap mismatch. F5 classifies the grid issue as `GRID_DENSITY_SCALE_MISMATCH` with snap mismatch consequence: current `Lines` scale is `(2, 2)`, so visual 50-unit vanilla grid spacing becomes 100 while window snap remains 50.
   * v0.2.12 must not be treated as passing. Next implementation should first address exact local-position restoration, then restore vanilla-density grid coverage.
 * **Phase 2C-F6 / v0.2.13 exact local restoration canary**:
-  * **Status: `F6_CANARY_READY_FOR_USER_TEST`**
+  * **Status: `F6_SINGLE_NODE_EXACT_PERSISTENCE_VERIFIED`**
   * F6 plan is `docs/PHASE_2C_F6_EXACT_LOCAL_RESTORATION_PLAN.md`; implementation report is `docs/PHASE_2C_F6_EXACT_LOCAL_RESTORATION_REPORT.md`.
   * F5 confirmed that `WindowContainer.save()` persists local `position`, while F4 passed that local value to `WindowContainer.move()`, which writes `global_position`. This local/global coordinate mismatch caused F4 residual drift.
   * F6 retains the one-shot deferred Desktop restoration timing but assigns `window.position = desired_position` directly. `desired_position` is saved local position clamped only to `WorkspaceAreaConfig.get_max_position(window.size)`; it is not re-snapped.
   * F6 emits `window.moved` after assignment to retain the observed Desktop redraw/LOD update path. It does not use `move()`, `move_snapped()`, `global_position`, a WindowContainer/Base/Indexed extension, `get_position_snapped()`, or continuous correction.
   * `Nekochan-ExpandedWorkspace-0.2.13.zip` was built locally as a development canary. SHA-256: `88908fec32fce7d407cc971428c7682dfd05c57f7f6b184e38f1e5e466582933`; ZIP root `mods-unpacked`; 13 files. No release, tag, Workshop publish, public-master push, or v0.2.9 artifact operation occurred.
-  * All F6 real-game checks are `NOT TESTED`. The first test is single-node only: verify both deselection paths, place one node in the expanded area, save, exit, restart, load, compare the exact visual position, then collect `[F6]` log checkpoints.
-  * Group persistence is deliberately not a F6 PASS criterion. `GRID_DENSITY_SCALE_MISMATCH` remains isolated; grid code is unchanged. Do not start grid or group changes until the F6 user result is available.
+  * User verified empty-area deselect and menu x deselect as PASS. User also verified exact visual persistence for an individual node after save, exit, restart, and load.
+  * Final F6 log evidence covers three non-group targets. For `download_manager0` `(18300.0, 18000.0)`, `download_text0` `(18700.0, 18800.0)`, and `network0` `(17850.0, 17700.0)`, `clamp_delta` is zero and both AFTER and STABILITY local positions exactly equal SAVED_LOCAL. Details are in the F6 report.
+  * F6 has verified individual-node exact local persistence only. Group persistence is deliberately not a F6 PASS criterion. `GRID_DENSITY_SCALE_MISMATCH` remains isolated; grid code is unchanged. Do not start grid, group, full regression, or release integration without a new approved plan.
 * **Phase 2A 検証状態**:
   * **Status: `LIMIT_RELAXATION_COMPLETE_USER_VERIFIED`**
   * Phase 2A-R2で、通常の手動配置は500個を超えて配置できることをユーザー実機で確認済み。
