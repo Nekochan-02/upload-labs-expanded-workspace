@@ -16,6 +16,15 @@
   * The confirmed fact is that vanilla `WindowContainer._ready()` clamps restored positions through old `10000` bounds. The failed repair hypothesis is that overriding only `WindowContainer.get_position_snapped(to)` is sufficient.
   * Follow-up analysis is `docs/PHASE_2C_F2_0.2.10_REGRESSION_ANALYSIS.md`.
   * Next implementation must be based on a new approved plan, preferably a restoration-path-only diagnostic/fix rather than another global `WindowContainer` patch.
+* **Phase 2C-F3 / v0.2.11 desktop restoration diagnostic**:
+  * **Status: `DIAGNOSTIC_ARTIFACT_READY_FOR_USER_TEST`**
+  * F3 diagnostic plan is `docs/PHASE_2C_F3_DESKTOP_RESTORATION_DIAGNOSTIC_PLAN.md`.
+  * Diagnostic report is `docs/PHASE_2C_F3_DESKTOP_RESTORATION_DIAGNOSTIC_REPORT.md`.
+  * Runtime basis is `0.2.9` behavior plus Desktop restoration checkpoint logging only.
+  * `WindowContainer` / `WindowBase` / `WindowIndexed` extensions are excluded and must remain excluded.
+  * No position fix is implemented. The artifact only logs P2/P3/P3.5/P4 restoration evidence for up to 3 saved windows beyond the old `10000` threshold.
+  * P3 immediately after `new_object.load(window_data)` is intentionally marked `UNOBSERVED` because observing it directly would require copying vanilla `Desktop._enter_tree()`.
+  * User test scope is limited to selection deselect checks and one single-node save/exit/restart/load diagnostic evidence pass.
 * **Phase 2A 検証状態**:
   * **Status: `LIMIT_RELAXATION_COMPLETE_USER_VERIFIED`**
   * Phase 2A-R2で、通常の手動配置は500個を超えて配置できることをユーザー実機で確認済み。
