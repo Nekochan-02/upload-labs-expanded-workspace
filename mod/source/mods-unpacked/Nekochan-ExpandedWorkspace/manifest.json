@@ -1,9 +1,9 @@
 {
 	"name": "ExpandedWorkspace",
 	"namespace": "Nekochan",
-	"version_number": "0.2.9",
+	"version_number": "0.2.10",
 	"website_url": "",
-	"description": "Phase 2B-R3 canary G: group-selection movement sync test for expanded area movement.",
+	"description": "Phase 2C-F1 development test: expanded-area position persistence fix candidate.",
 	"dependencies": [],
 	"extra": {
 		"godot": {

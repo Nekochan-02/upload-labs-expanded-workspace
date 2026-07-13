@@ -179,6 +179,7 @@ Phase 2A-R4では、種類別配置可能数に関わる `space` アップグレ
   * Phase 2C-F1 clean install verificationでrelease blockerを確認。拡張領域へ配置した単体ノードおよびグループ配置/移動ノードが、save・終了・再起動・load後に旧領域と新領域の境界付近へ移動する。
   * 現在のrelease decisionは `BLOCKED_POSITION_PERSISTENCE`。v0.2.9 Draft Releaseをpublishしてはならない。v0.2.9 RC artifactはfailed RC evidenceとして保持する。
   * root causeは `docs/PHASE_2C_F1_POSITION_PERSISTENCE_ROOT_CAUSE.md` を参照。保存側では `position` を直接保存し、load時にraw positionを代入した後、`scenes/windows/window_container.gd::_ready()` が旧 `10000` boundsで共通clampする可能性が高い。
-  * 修正する場合は `docs/PHASE_2C_F1_IMPLEMENTATION_PLAN.md` をユーザー承認後に実施する。v0.2.9を再利用せず、`0.2.10-dev` 等のdevelopment buildで検証する。
+  * 修正する場合は `docs/PHASE_2C_F1_IMPLEMENTATION_PLAN.md` に従う。v0.2.9を再利用せず、`0.2.10` development buildで検証する。
+  * `0.2.10` development artifactを作成済み。`extensions/scenes/windows/window_container.gd` で `get_position_snapped(to)` のみを拡張boundsへ差し替える。artifactは `dist/Nekochan-ExpandedWorkspace-0.2.10.zip`、SHA-256 `ded8cd9f17ef30c088b7a8bb33272e2aae187c61830b409fdaf07c73d64f4e4f`。ユーザー実機検証は未実施。
 3. **パフォーマンスフットプリントの計測**:
    * グリッドを `MultiMesh` で描画する際、インスタンス数が16万個に増えたとき（2倍サイズ）の起動時プチフリーズの有無を確認する。

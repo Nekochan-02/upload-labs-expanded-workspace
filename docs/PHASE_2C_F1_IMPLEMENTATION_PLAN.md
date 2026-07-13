@@ -1,6 +1,6 @@
 # Phase 2C-F1 Implementation Plan
 
-Status: `AWAITING_USER_APPROVAL`
+Status: `APPROVED_FOR_0.2.10_DEVELOPMENT_TEST`
 
 ## Purpose
 
@@ -19,7 +19,7 @@ Fix the v0.2.9 Release Candidate blocker where expanded-area node positions are 
 
 ## Development Version
 
-Use a separate development version, tentatively `0.2.10-dev`, for diagnostic or fix builds.
+Use separate development version `0.2.10` for diagnostic or fix builds. This is not a public release version until a replacement Release Candidate is explicitly approved.
 
 ## Proposed Patch
 
@@ -61,4 +61,4 @@ Stop and re-evaluate if:
 
 ## Approval
 
-Implementation has not started. User approval is required before Mod code changes.
+Approved by the user for the `0.2.10` development test implementation.

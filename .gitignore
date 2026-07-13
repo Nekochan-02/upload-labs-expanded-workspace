@@ -29,5 +29,4 @@
 # These remain local research artifacts and are not part of the public baseline.
 /mod/source/mods-unpacked/Nekochan-ExpandedWorkspace/extensions/scenes/connector_point.gd
 /mod/source/mods-unpacked/Nekochan-ExpandedWorkspace/extensions/scenes/windows/window_base.gd
-/mod/source/mods-unpacked/Nekochan-ExpandedWorkspace/extensions/scenes/windows/window_container.gd
 /mod/source/mods-unpacked/Nekochan-ExpandedWorkspace/extensions/scenes/windows/window_indexed.gd

@@ -179,7 +179,7 @@ Diagnostic candidate:
 
 ## Recommended Fix
 
-Do not modify v0.2.9. Prepare a new development build such as `0.2.10-dev` after user approval of an implementation plan.
+Do not modify v0.2.9. Prepare a new development build `0.2.10` after user approval of an implementation plan.
 
 Recommended first fix attempt:
 
