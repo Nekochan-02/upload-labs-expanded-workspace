@@ -30,7 +30,7 @@
   * Therefore the coordinate change occurs after P3.5 and before P4, not in save serialization and not in the immediate Desktop restoration loop.
   * Next work must still not implement a position fix without a new approved plan. The next diagnostic/fix plan should target the post-P3.5/pre-P4 lifecycle point.
 * **Phase 2C-F4 / v0.2.12 restoration correction canary**:
-  * **Status: `F4_CANARY_READY_FOR_USER_TEST`**
+  * **Status: `PARTIAL_FIX_RESIDUAL_POSITION_DRIFT`**
   * F4 plan is `docs/PHASE_2C_F4_RESTORATION_CORRECTION_PLAN.md`.
   * F4 report is `docs/PHASE_2C_F4_RESTORATION_CORRECTION_REPORT.md`.
   * Root cause classification is now `ROOT_CAUSE_CONFIRMED_LIFECYCLE_CLAMP`.
@@ -40,7 +40,12 @@
   * Correction targets only restored windows whose saved position exceeds `(Vector2.ONE * 10000) - restored_window.size`.
   * Desired position is saved position clamped to `WorkspaceAreaConfig.get_max_position(restored_window.size)` and snapped to 50.
   * Correction is one-shot deferred and uses `window.move(desired_position)`; no save schema, selection code, continuous monitor, or active gameplay movement patch is added.
-  * User test is limited to selection deselect checks and one single-node save/exit/restart/load persistence canary.
+  * User tested v0.2.12. Old-boundary warp was not reproduced, but exact position persistence still failed: residual drift was visible after restart.
+  * F4 logs show SAVED/desired positions such as `server0 (19650.0, 19250.0)`, with BEFORE old-clamped to `(9650.0, 9250.0)`, then AFTER/STABILITY local position `(19560.07, 19059.62)`.
+  * F5 analysis is `docs/PHASE_2C_F5_POSITION_DRIFT_GRID_GEOMETRY_ANALYSIS.md`.
+  * F5 conclusion: F4 residual drift is caused by using `WindowContainer.move(saved_position)`, because vanilla `move(pos)` writes `global_position = pos` while save persistence writes local `position`.
+  * User also observed grid density/snap mismatch. F5 classifies the grid issue as `GRID_DENSITY_SCALE_MISMATCH` with snap mismatch consequence: current `Lines` scale is `(2, 2)`, so visual 50-unit vanilla grid spacing becomes 100 while window snap remains 50.
+  * v0.2.12 must not be treated as passing. Next implementation should first address exact local-position restoration, then restore vanilla-density grid coverage.
 * **Phase 2A 検証状態**:
   * **Status: `LIMIT_RELAXATION_COMPLETE_USER_VERIFIED`**
   * Phase 2A-R2で、通常の手動配置は500個を超えて配置できることをユーザー実機で確認済み。

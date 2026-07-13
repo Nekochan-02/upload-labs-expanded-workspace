@@ -1,6 +1,6 @@
 # Phase 2C-F4 Restoration Correction Report
 
-Status: `F4_CANARY_READY_FOR_USER_TEST`
+Status: `PARTIAL_FIX_RESIDUAL_POSITION_DRIFT`
 
 ## Artifact
 
@@ -51,16 +51,40 @@ ZIP scan confirmed no `window_container.gd`, `window_base.gd`, `window_indexed.g
 
 | Test | Result |
 |---|---|
-| Empty-area deselect | NOT TESTED |
-| Menu x deselect | NOT TESTED |
-| Single-node expanded position persistence | NOT TESTED |
-| SAVED checkpoint | NOT TESTED |
-| BEFORE_CORRECTION checkpoint | NOT TESTED |
-| AFTER_CORRECTION checkpoint | NOT TESTED |
-| STABILITY_CHECK checkpoint | NOT TESTED |
+| Empty-area deselect | NOT REPORTED |
+| Menu x deselect | NOT REPORTED |
+| Single-node expanded position persistence | FAIL |
+| SAVED checkpoint | CAPTURED |
+| BEFORE_CORRECTION checkpoint | CAPTURED |
+| AFTER_CORRECTION checkpoint | CAPTURED |
+| STABILITY_CHECK checkpoint | CAPTURED |
+
+## User Result
+
+- old-boundary warp: `FIXED_BY_CANARY`
+- exact saved position retention: `FAIL`
+- residual position drift: `OBSERVED`
+
+User observed that v0.2.12 no longer warps the node back to the old workspace boundary after save / exit / restart / load. However, screenshot comparison and gameplay observation showed that the node position still shifts after restart.
+
+Selection results were not reported for this v0.2.12 pass, so they are not marked as PASS here.
+
+## Checkpoint Summary
+
+Latest `modloader.log` evidence:
+
+| Window | SAVED | BEFORE | AFTER | STABILITY |
+|---|---:|---:|---:|---:|
+| `server0` | `(19650.0, 19250.0)` | `(9650.0, 9250.0)` | `(19560.07, 19059.62)` | `(19560.07, 19059.62)` |
+| `download_text0` | `(19300.0, 19000.0)` | `(9650.0, 9750.0)` | `(19210.07, 18930.12)` | `(19210.07, 18930.12)` |
+| `download_manager0` | `(18950.0, 18150.0)` | `(9650.0, 9200.0)` | `(18860.07, 17938.04)` | `(18860.07, 17938.04)` |
+
+The canary corrects away from the old-boundary clamp, but the final local `position` still differs from the saved local `position`.
+
+Detailed analysis: `docs/PHASE_2C_F5_POSITION_DRIFT_GRID_GEOMETRY_ANALYSIS.md`
 
 ## Decision
 
-`F4_CANARY_READY_FOR_USER_TEST`
+`PARTIAL_FIX_RESIDUAL_POSITION_DRIFT`
 
-Do not publish this artifact. Use it only for the scoped single-node user canary test.
+Do not publish this artifact. Do not treat v0.2.12 as a pass.
