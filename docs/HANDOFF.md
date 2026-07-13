@@ -6,6 +6,16 @@
 
 ## 1. 現状のステータス要約
 
+* **Phase 2C-F2 / v0.2.10 regression state**:
+  * **Status: `FAILED_VERIFICATION_REGRESSION`**
+  * `0.2.10` development artifact was tested by the user with only this Mod installed.
+  * Position persistence is still `FAIL`: a node placed in the expanded area moved back to the old boundary after save, exit, restart, and load.
+  * Deselection regression observed: empty-area click and the node state/options menu `x` control did not clear selected nodes.
+  * Do not treat `0.2.10` as a Release Candidate. Do not create a Release, Draft Release, tag, Workshop upload, or replacement artifact from it.
+  * `v0.2.9` Draft Release remains blocked and must not be published. The `v0.2.9` artifact must not be changed, replaced, or deleted.
+  * The confirmed fact is that vanilla `WindowContainer._ready()` clamps restored positions through old `10000` bounds. The failed repair hypothesis is that overriding only `WindowContainer.get_position_snapped(to)` is sufficient.
+  * Follow-up analysis is `docs/PHASE_2C_F2_0.2.10_REGRESSION_ANALYSIS.md`.
+  * Next implementation must be based on a new approved plan, preferably a restoration-path-only diagnostic/fix rather than another global `WindowContainer` patch.
 * **Phase 2A 検証状態**:
   * **Status: `LIMIT_RELAXATION_COMPLETE_USER_VERIFIED`**
   * Phase 2A-R2で、通常の手動配置は500個を超えて配置できることをユーザー実機で確認済み。

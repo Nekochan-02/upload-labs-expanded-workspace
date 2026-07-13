@@ -52,15 +52,35 @@ Notes:
 - The two `.tscn` marker hits in the ZIP scan are runtime `res://... .tscn` references in existing `.gd` source. No `.tscn` files are packaged.
 - This artifact must not be uploaded as a GitHub Release or Workshop item.
 
+## User Verification Result
+
+Status: `FAILED_VERIFICATION_REGRESSION`
+
+User tested `Nekochan-ExpandedWorkspace-0.2.10.zip` with only this Mod installed.
+
+- v0.2.10 position persistence: `FAIL`
+- v0.2.10 deselection: `REGRESSION OBSERVED`
+- release state: `BLOCKED`
+
+Observed failures:
+
+- A single node placed in the expanded area moved back to the old boundary after save, exit, restart, and load.
+- Selected nodes could not be deselected by clicking empty space.
+- Selected nodes could not be deselected by the node state/options menu `x` control.
+
+v0.2.10 is failed development artifact evidence only. It must not be treated as a Release Candidate.
+
+Detailed analysis: `docs/PHASE_2C_F2_0.2.10_REGRESSION_ANALYSIS.md`
+
 ## User Verification Matrix
 
 | Test | Result | Evidence |
 |---|---|---|
-| v0.2.10 development artifact installed | NOT TESTED | |
-| Mod detected as 0.2.10 | NOT TESTED | |
-| Game starts | NOT TESTED | |
-| Single node placed in expanded area | NOT TESTED | |
-| Single node position retained after save/exit/restart/load | NOT TESTED | |
+| v0.2.10 development artifact installed | TESTED | User reported only this Mod was in the Mod folder. |
+| Mod detected as 0.2.10 | NOT RECORDED | |
+| Game starts | TESTED | User reached gameplay and tested node behavior. |
+| Single node placed in expanded area | TESTED | User placed a node in the expanded area. |
+| Single node position retained after save/exit/restart/load | FAIL | Node moved back to the old boundary after load. |
 | Group frame placed or moved in expanded area | NOT TESTED | |
 | Group frame position retained after save/exit/restart/load | NOT TESTED | |
 | Group child positions retained after save/exit/restart/load | NOT TESTED | |
@@ -76,7 +96,11 @@ Notes:
 | Drag placement in expanded area | NOT TESTED | |
 | Existing node movement | NOT TESTED | |
 | Group-selection movement | NOT TESTED | |
+| Empty-area deselection | FAIL | Regression observed by user. |
+| Options-menu `x` deselection | FAIL | Regression observed by user. |
 
 ## Decision
 
-`DEV_ARTIFACT_READY_FOR_USER_TEST`
+`FAILED_VERIFICATION_REGRESSION`
+
+Do not create a GitHub Release, Draft Release, tag, Steam Workshop upload, or replacement Release Candidate from v0.2.10.
