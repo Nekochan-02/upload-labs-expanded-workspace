@@ -79,6 +79,14 @@
   * It preserves the F7 click target calculation and assignments exactly. F7 Lines, F6 Desktop restoration, drag placement, existing movement, 50-unit snap behavior, save schema, node limit, space cap, camera, and background paths are unchanged.
   * `Nekochan-ExpandedWorkspace-0.2.15.zip` is a local development diagnostic artifact: SHA-256 `4677776d803b53a13512f49434c691c2ec6dbc2e4790b1f6d9349903ea3eabe7`, 13113 bytes, 13 files, ZIP root `mods-unpacked`.
   * The user must test one expanded-area click-created node, manually move it once, then provide the visual results and `[F8]` logs. Do not implement a click correction, alter F7/F6, start group persistence/full regression/release integration, publish, tag, push public master, or operate on v0.2.9 until that evidence is analyzed.
+* **Phase 2C-F9 / v0.2.16 click local-alignment canary**:
+  * **Status: `F9_CANARY_READY_FOR_USER_TEST`**
+  * F9 plan: `docs/PHASE_2C_F9_CLICK_LOCAL_ALIGNMENT_PLAN.md`; report: `docs/PHASE_2C_F9_CLICK_LOCAL_ALIGNMENT_REPORT.md`.
+  * F9 preserves F8 target calculation and every initial/post-create global assignment. At the existing final deferred correction point only, it replaces global `move(target)` with `window.position = target; window.moved.emit()`.
+  * One click-created window logs `F9_TARGET`, before/after local correction, next-deferred stability, and one 0.5-second opening-settle checkpoint. There is no `_process`, timer loop, or continuous correction.
+  * F6 Desktop restoration, F7 Lines/grid, drag placement, existing-node movement, snap interval, save schema, node limit, space cap, camera/background, group behavior, and blocked Window script extensions are unchanged.
+  * `Nekochan-ExpandedWorkspace-0.2.16.zip` is a local development canary: SHA-256 `24abbe45d5f407a3d3deed612a646621f015d8cad8d6709818a5a591fe5e0b4b`, 13004 bytes, 13 files, ZIP root `mods-unpacked`.
+  * User gate: test initial and settled click-placement alignment, then manual movement alignment, and provide `[F9]` logs. Do not proceed to group persistence or release integration before this evidence.
 * **Phase 2A 検証状態**:
   * **Status: `LIMIT_RELAXATION_COMPLETE_USER_VERIFIED`**
   * Phase 2A-R2で、通常の手動配置は500個を超えて配置できることをユーザー実機で確認済み。
