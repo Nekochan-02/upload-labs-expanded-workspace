@@ -2,7 +2,7 @@
 
 ## Status
 
-`F9_CANARY_READY_FOR_USER_TEST`
+`F9_CLICK_ALIGNMENT_VERIFIED_DRAG_ALIGNMENT_REGRESSION_OBSERVED`
 
 ## Root Cause Evidence
 
@@ -32,6 +32,36 @@ The correction alters only the coordinate domain used by the final deferred
 click-placement correction. Existing initial and post-create global assignments,
 target calculation, bounds, and 50-unit snap arithmetic are unchanged.
 
+## F9 Runtime Evidence
+
+The user tested only v0.2.16 in the Mod folder. No save/restart/load test was
+performed.
+
+| Checkpoint | Local position | Global position | Result |
+| --- | ---: | ---: | --- |
+| F9_TARGET | target `(10350.0, 13350.0)` | n/a | `TARGET_SNAP_CORRECT` |
+| F9_BEFORE_LOCAL_CORRECTION | `(10175.0, 13214.0)` | `(10350.0, 13339.5)` | local offset present |
+| F9_AFTER_LOCAL_CORRECTION | `(10350.0, 13350.0)` | `(10525.0, 13475.5)` | local equals target |
+| F9_STABILITY_NEXT_DEFERRED | `(10350.0, 13350.0)` | `(10525.0, 13475.5)` | local equals target |
+| F9_STABILITY_AFTER_OPENING_SETTLE | `(10350.0, 13350.0)` | `(10350.0, 13350.0)` | local/global equal target |
+
+Measured equality:
+
+```text
+AFTER_LOCAL == TARGET: YES
+NEXT_DEFERRED_LOCAL == TARGET: YES
+OPENING_SETTLE_LOCAL == TARGET: YES
+```
+
+The user also observed click-placement alignment as `PASS` immediately, after
+the opening tween settles, and after one manual movement. This confirms the F9
+local-domain correction resolves the F8 click-placement alignment defect.
+
+The user separately observed drag placement as visually misaligned. F9 does
+not change drag source, but its preservation gate is therefore not satisfied.
+Treat this as a newly observed drag-alignment regression/defect and do not
+extend F9 with a speculative repair.
+
 ## F6/F7 Preservation
 
 ```text
@@ -58,6 +88,11 @@ save schema changed: NO
 | F7 grid changed | NO |
 | WindowContainer extension | NO |
 | Save schema changed | NO |
+
+The source-diff preservation check is `PASS` (`drag placement changed: NO`),
+but the latest user runtime observation is `FAIL` for drag visual alignment.
+This blocks a broader F9 pass until a dedicated drag-path diagnostic is
+approved.
 
 ## Artifact
 
@@ -92,12 +127,14 @@ of F9. The v0.2.9 artifact remains unchanged with SHA-256
 
 | Test | Result |
 | --- | --- |
-| Click placement immediate visual alignment | `NOT TESTED` |
-| Click placement after opening settles | `NOT TESTED` |
-| Manual movement after click placement | `NOT TESTED` |
-| F9 target snap correctness | `NOT TESTED` |
-| AFTER_LOCAL == TARGET | `NOT TESTED` |
-| STABILITY_LOCAL == TARGET | `NOT TESTED` |
+| Click placement immediate visual alignment | `PASS` |
+| Click placement after opening settles | `PASS` |
+| Manual movement after click placement | `PASS` |
+| F9 target snap correctness | `PASS` |
+| AFTER_LOCAL == TARGET | `PASS` |
+| STABILITY_LOCAL == TARGET | `PASS` |
+| Drag placement visual alignment | `FAIL` (user observed) |
+| Save / restart / load | `NOT TESTED` |
 
 ## User Test Steps
 
@@ -107,8 +144,9 @@ node once, then provide the visual outcome and `[F9]` log lines after exit.
 
 ## Release Boundary
 
-F9 is a local development canary. Release integration remains deferred until
-the targeted user gate is complete.
+F9 is a local development canary. Release integration remains deferred. The
+click gate is complete, but the drag-alignment regression/defect blocks any
+broader integration.
 
 ## Updated Files
 
