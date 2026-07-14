@@ -101,12 +101,16 @@
   * D9 and D10 retain local `(10775.0, 11974.5)`, offset `(-174.998, -125.499)` from target, while global equals target. D11 opening settle leaves both local and global at that same off-target local coordinate. This matches the F8 click local/global mismatch and explains the user-visible persistent off-grid result.
   * Classification: `DRAG_DEFERRED_MOVE_COORDINATE_DOMAIN_MISMATCH`. The existing final deferred `move(target)` is the confirmed narrow correction surface; it writes the target in global rather than the persisted/visual local coordinate during the opening lifecycle.
 * **Phase 2C-F11 / v0.2.18 drag local-alignment canary**:
-  * **Status: `F11_CANARY_READY_FOR_USER_TEST`**
+  * **Status: `F11_DRAG_LOCAL_ALIGNMENT_VERIFIED`**
   * F11 plan: `docs/PHASE_2C_F11_DRAG_LOCAL_ALIGNMENT_PLAN.md`; report: `docs/PHASE_2C_F11_DRAG_LOCAL_ALIGNMENT_REPORT.md`.
   * F11 retains the F10 target calculation, `Utils.screen_to_world_pos`, clamp/snap, initial/post-create global assignments, and `_finish_drag()`. At only the existing final deferred correction point, it writes `instance.position = target` and emits `instance.moved` instead of calling `move(target)`.
   * The dragger queues itself for deletion, so a self-freeing root observer performs the one deferred local assignment and logs `F11_TARGET`, before/after local correction, next-deferred stability, and one 0.5-second opening-settle checkpoint. It has no `_process`, loop, or continuous correction.
   * F9 click alignment, F7 grid, F6 restoration, existing-node movement, group behavior, snap interval, save schema, and blocked Window script extensions are unchanged.
-  * Build `Nekochan-ExpandedWorkspace-0.2.18.zip` locally, then wait for the user to verify immediate/settled drag alignment and one manual movement. No user runtime PASS is claimed before that test. Do not proceed to group/full regression/release integration, publish, tag, push public master, or operate on v0.2.9.
+  * User tested only `0.2.18`. Drag alignment is `PASS` immediately, after 0.5-1 seconds, and after one manual movement. Optional click placement is `PASS`; save/restart/load is `NOT TESTED`.
+  * Runtime sample `download_text3`: target `(11900.0, 12100.0)` is `TARGET_SNAP_CORRECT`; AFTER, next-deferred, and opening-settle local positions all exactly equal target. Two additional logged drag targets have the same local equality result.
+  * F11 therefore verifies the F10 correction hypothesis: the final deferred global `move(target)` was the defect, and deferred local assignment plus `moved.emit()` preserves local target equality through opening settle.
+  * Diagnostic follow-up: the one-target flag is per dragger instance, so three bounded sequences were emitted in the session. There is no continuous logging, but a future diagnostics-only cleanup should scope this to one target per game session before any wider canary.
+  * Do not proceed to group/full regression/release integration, publish, tag, push public master, or operate on v0.2.9.
 * **Phase 2A 検証状態**:
   * **Status: `LIMIT_RELAXATION_COMPLETE_USER_VERIFIED`**
   * Phase 2A-R2で、通常の手動配置は500個を超えて配置できることをユーザー実機で確認済み。

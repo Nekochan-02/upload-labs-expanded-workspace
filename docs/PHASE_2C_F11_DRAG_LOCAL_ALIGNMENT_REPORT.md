@@ -2,7 +2,7 @@
 
 ## Status
 
-`F11_CANARY_READY_FOR_USER_TEST`
+`F11_DRAG_LOCAL_ALIGNMENT_VERIFIED`
 
 ## Root Cause Evidence
 
@@ -23,8 +23,8 @@ drag correction surface only.
 - Method: a self-freeing root observer defers local assignment
   `window.position = target_position` after the dragger queues itself for deletion
 - Update signal: `instance.moved.emit()` immediately after local assignment
-- Logging: first drag-created target only, with immediate, next-deferred, and
-  one 0.5-second opening-settle checkpoints
+- Logging: one bounded checkpoint sequence per dragger instance, with immediate,
+  next-deferred, and one 0.5-second opening-settle checkpoints
 
 The final drag correction does not use `move()`, `move_snapped()`,
 `global_position`, re-snapping, or target recalculation.
@@ -34,6 +34,46 @@ The final drag correction does not use `move()`, `move_snapped()`,
 F11 changes only the coordinate domain of the existing final deferred drag
 correction. The target calculation, `Utils.screen_to_world_pos`, bounds, snap,
 initial/post-create global assignments, and `_finish_drag()` are unchanged.
+
+## F11 Runtime Evidence
+
+The user tested only `0.2.18` in the Mod folder. Save/restart/load was not
+tested. The primary F11 sample is `download_text3`:
+
+| Checkpoint | Local position | Global position | Result |
+| --- | ---: | ---: | --- |
+| F11_TARGET | target `(11900.0, 12100.0)` | n/a | `TARGET_SNAP_CORRECT` |
+| F11_BEFORE_LOCAL_CORRECTION | `(11725.0, 11964.0)` | `(11900.0, 12089.5)` | local offset present |
+| F11_AFTER_LOCAL_CORRECTION | `(11900.0, 12100.0)` | `(12075.0, 12225.5)` | local equals target |
+| F11_NEXT_DEFERRED_STABILITY | `(11900.0, 12100.0)` | `(12075.0, 12225.5)` | local equals target |
+| F11_OPENING_SETTLE_STABILITY | `(11900.0, 12100.0)` | `(11900.0, 12100.0)` | local/global equal target |
+
+Measured equality:
+
+```text
+AFTER_LOCAL == TARGET: YES
+NEXT_DEFERRED_LOCAL == TARGET: YES
+OPENING_SETTLE_LOCAL == TARGET: YES
+```
+
+Two additional captured drag targets, `download_manager1` and `download_text4`,
+have the same outcome: target snap is correct and each AFTER/NEXT/SETTLE local
+position exactly equals its target. They are corroborating runtime evidence,
+not extra required user tests.
+
+The user visually verified drag alignment `PASS` immediately, after 0.5-1
+seconds, and after one manual movement. Optional click placement is also
+`PASS`. The checkpoint evidence and visual behavior agree: F11 resolves the
+F10 drag local-domain mismatch.
+
+### Diagnostic Scope Observation
+
+F11 emitted three one-shot sequences in the same game session because the
+one-target flag belongs to each newly created dragger instance. The output is
+still bounded per placement and has no `_process()` or timer loop, but it does
+not enforce the intended one target for the whole game session. This does not
+affect the verified correction result; do not alter it without a separately
+approved diagnostics-only cleanup plan.
 
 ## F6/F7/F9 Preservation
 
@@ -100,22 +140,20 @@ each returned zero matches. No Release, tag, Workshop publication, public
 
 | Test | Result |
 | --- | --- |
-| Drag placement immediate visual alignment | `NOT TESTED` |
-| Drag placement after opening settles | `NOT TESTED` |
-| Manual movement after drag placement | `NOT TESTED` |
-| Optional click placement regression | `NOT TESTED` |
-| F11 target snap correctness | `NOT TESTED` |
-| AFTER_LOCAL == TARGET | `NOT TESTED` |
-| NEXT_DEFERRED_LOCAL == TARGET | `NOT TESTED` |
-| OPENING_SETTLE_LOCAL == TARGET | `NOT TESTED` |
+| Drag placement immediate visual alignment | `PASS` |
+| Drag placement after opening settles | `PASS` |
+| Manual movement after drag placement | `PASS` |
+| Optional click placement regression | `PASS` |
+| F11 target snap correctness | `PASS` |
+| AFTER_LOCAL == TARGET | `PASS` |
+| NEXT_DEFERRED_LOCAL == TARGET | `PASS` |
+| OPENING_SETTLE_LOCAL == TARGET | `PASS` |
+| Save / restart / load | `NOT TESTED` |
 
 ## User Test Steps
 
-Install only `0.2.18`, create one expanded-area drag-placed node, assess grid
-alignment immediately and after opening settles, move that node once, then
-provide the `[F11]` checkpoint lines after exit. An optional click placement
-checks that F9 behavior did not regress. Save/restart and group tests are not
-required.
+F11 runtime verification is complete. Save/restart, group persistence, full
+regression, and release integration remain out of scope.
 
 ## Updated Files
 
