@@ -90,12 +90,17 @@
   * User verified click alignment PASS immediately, after the opening tween, and after one manual movement. This verifies the F9 click local-domain correction.
   * User separately observed drag placement visually misaligned. Drag source has no F9 code diff, but its user-visible preservation gate is FAIL. Do not modify drag speculatively, proceed to group/full regression/release integration, publish, tag, push public master, or operate on v0.2.9. The single next action is a dedicated drag-placement coordinate-domain diagnostic plan.
 * **Phase 2C-F10 / v0.2.17 drag-placement coordinate diagnostic**:
-  * **Status: `F10_DIAGNOSTIC_READY_FOR_USER_TEST`**
+  * **Status: `DRAG_DEFERRED_MOVE_COORDINATE_DOMAIN_MISMATCH_CONFIRMED`**
   * F10 plan: `docs/PHASE_2C_F10_DRAG_PLACEMENT_COORDINATE_DIAGNOSTIC_PLAN.md`; report: `docs/PHASE_2C_F10_DRAG_PLACEMENT_COORDINATE_DIAGNOSTIC_REPORT.md`.
   * F10 preserves the drag target calculation, global assignments, deferred `move(target)`, and `_finish_drag()`. It logs D1-D8 from the dragger and uses one self-freeing observer for D9-D11 because the dragger queues itself for deletion.
   * F9 click correction, F6 restoration, F7 grid, snap interval, `Utils.screen_to_world_pos`, existing movement, group behavior, save schema, and blocked Window script extensions are unchanged.
   * `Nekochan-ExpandedWorkspace-0.2.17.zip` is a local diagnostic artifact: SHA-256 `87dff32cbcc9f51455f2243e030b1adfd06e7375d6bbb4f933af20b5d44ea911`, 15099 bytes, 14 files, ZIP root `mods-unpacked`.
-  * User must test one expanded-area drag-created node immediately, after opening settles, and after manual movement, then provide `[F10]` D1-D11 logs. Do not implement a drag correction, proceed to group/full regression/release integration, publish, tag, push public master, or operate on v0.2.9 before evidence analysis.
+  * User tested only v0.2.17 in the Mod folder. Expanded-area drag placement was visually `FAIL` immediately and after 0.5-1 seconds, then `PASS` after one manual movement. Save/restart/load was not tested.
+  * The supplied comparison images are labeled: image 1 is click placement and image 2 is drag placement. The F10 D1-D11 evidence applies only to the drag-created `download_text1` in image 2; image 1 is context for the verified F9 click path.
+  * F10 log target for `download_text1` is `(10950.0, 12100.0)`. D4 is `DRAG_TARGET_SNAP_CORRECT`: recompute delta is `(0.0, 0.0)` and snap units are exact `(219.0, 242.0)`, so `Utils.screen_to_world_pos` is not the observed source of offset.
+  * D9 and D10 retain local `(10775.0, 11974.5)`, offset `(-174.998, -125.499)` from target, while global equals target. D11 opening settle leaves both local and global at that same off-target local coordinate. This matches the F8 click local/global mismatch and explains the user-visible persistent off-grid result.
+  * Classification: `DRAG_DEFERRED_MOVE_COORDINATE_DOMAIN_MISMATCH`. The existing final deferred `move(target)` is the confirmed narrow correction surface; it writes the target in global rather than the persisted/visual local coordinate during the opening lifecycle.
+  * Do not implement a drag correction yet. The single next action is to create and approve an F11 narrow canary that replaces only the existing final deferred drag `move(target)` with deferred local `position = target; moved.emit()`, preserving target calculation, all prior global assignments, clamp/snap, and `_finish_drag()`. Do not proceed to group/full regression/release integration, publish, tag, push public master, or operate on v0.2.9.
 * **Phase 2A 検証状態**:
   * **Status: `LIMIT_RELAXATION_COMPLETE_USER_VERIFIED`**
   * Phase 2A-R2で、通常の手動配置は500個を超えて配置できることをユーザー実機で確認済み。
