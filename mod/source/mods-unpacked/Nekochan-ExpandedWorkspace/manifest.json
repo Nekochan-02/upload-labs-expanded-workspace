@@ -1,9 +1,9 @@
 {
 	"name": "ExpandedWorkspace",
 	"namespace": "Nekochan",
-	"version_number": "0.2.17",
+	"version_number": "0.2.18",
 	"website_url": "",
-	"description": "Phase 2C-F10 development diagnostic: drag placement coordinate checkpoints.",
+	"description": "Phase 2C-F11 development canary: drag placement local-domain alignment.",
 	"dependencies": [],
 	"extra": {
 		"godot": {

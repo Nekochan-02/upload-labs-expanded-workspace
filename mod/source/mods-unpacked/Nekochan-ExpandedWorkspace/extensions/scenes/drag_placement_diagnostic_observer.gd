@@ -1,33 +1,25 @@
 extends Node
 
-const F10_LOG_NAME: String = "Nekochan-ExpandedWorkspace:F10"
-const F10_OPENING_SETTLE_DELAY_SECONDS: float = 0.5
+const F11_LOG_NAME: String = "Nekochan-ExpandedWorkspace:F11"
+const F11_OPENING_SETTLE_DELAY_SECONDS: float = 0.5
 
 
 func begin(window: WindowContainer, target_position: Vector2) -> void:
-	call_deferred("_log_after_deferred_move", window, target_position)
-	get_tree().create_timer(F10_OPENING_SETTLE_DELAY_SECONDS).timeout.connect(
+	call_deferred("_log_next_deferred_stability", window, target_position)
+	get_tree().create_timer(F11_OPENING_SETTLE_DELAY_SECONDS).timeout.connect(
 		_log_opening_settle.bind(window, target_position)
 	)
-
-
-func _log_after_deferred_move(
-	window: WindowContainer,
-	target_position: Vector2
-) -> void:
-	_log_checkpoint_or_missing("D9_AFTER_DEFERRED_MOVE", window, target_position)
-	call_deferred("_log_next_deferred_stability", window, target_position)
 
 
 func _log_next_deferred_stability(
 	window: WindowContainer,
 	target_position: Vector2
 ) -> void:
-	_log_checkpoint_or_missing("D10_NEXT_DEFERRED_STABILITY", window, target_position)
+	_log_checkpoint_or_missing("F11_NEXT_DEFERRED_STABILITY", window, target_position)
 
 
 func _log_opening_settle(window: WindowContainer, target_position: Vector2) -> void:
-	_log_checkpoint_or_missing("D11_OPENING_SETTLE", window, target_position)
+	_log_checkpoint_or_missing("F11_OPENING_SETTLE_STABILITY", window, target_position)
 	queue_free()
 
 
@@ -38,11 +30,11 @@ func _log_checkpoint_or_missing(
 ) -> void:
 	if not is_instance_valid(window):
 		ModLoaderLog.info(
-			"[F10][drag][%s] window=missing target=%s" % [
+			"[F11][drag][%s] window=missing target=%s" % [
 				checkpoint,
 				str(target_position),
 			],
-			F10_LOG_NAME
+			F11_LOG_NAME
 		)
 		return
 
@@ -60,7 +52,7 @@ func _log_checkpoint_or_missing(
 	var local_position: Vector2 = window.position
 	var global_position: Vector2 = window.global_position
 	ModLoaderLog.info(
-		"[F10][drag][%s] window=%s local=%s global=%s parent=%s parent_global_origin=%s parent_transform_origin=%s target=%s local_to_target=%s global_to_target=%s global_local=%s" % [
+		"[F11][drag][%s] window=%s local=%s global=%s parent=%s parent_global_origin=%s parent_transform_origin=%s target=%s local_to_target=%s global_to_target=%s global_local=%s" % [
 			checkpoint,
 			window.name,
 			str(local_position),
@@ -73,5 +65,5 @@ func _log_checkpoint_or_missing(
 			str(global_position - target_position),
 			str(global_position - local_position),
 		],
-		F10_LOG_NAME
+		F11_LOG_NAME
 	)
