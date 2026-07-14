@@ -111,6 +111,12 @@
   * F11 therefore verifies the F10 correction hypothesis: the final deferred global `move(target)` was the defect, and deferred local assignment plus `moved.emit()` preserves local target equality through opening settle.
   * Diagnostic follow-up: the one-target flag is per dragger instance, so three bounded sequences were emitted in the session. There is no continuous logging, but a future diagnostics-only cleanup should scope this to one target per game session before any wider canary.
   * Do not proceed to group/full regression/release integration, publish, tag, push public master, or operate on v0.2.9.
+* **Phase 2C-F12 / group persistence diagnostic plan**:
+  * **Status: `PLAN_READY_FOR_IMPLEMENTATION_APPROVAL`**
+  * Plan: `docs/PHASE_2C_F12_GROUP_PERSISTENCE_DIAGNOSTIC_PLAN.md`.
+  * F12 is diagnostic-only and does not change F6 local restoration. It will correlate one saved expanded-area group frame with up to two saved fully enclosed child nodes, then compare frame/child saved local positions and child-to-frame relative local deltas before, after, and at the existing F6 stability checkpoint.
+  * The plan explicitly tests the F4 double-movement risk while excluding group movement, group resize, group-selection changes, save-schema changes, F7/F9/F11 changes, and blocked Window extensions.
+  * No F12 code, manifest version, artifact, test run, release operation, or push exists yet. User implementation approval is required before proceeding. Group persistence, full regression, and release integration remain blocked.
 * **Phase 2A 検証状態**:
   * **Status: `LIMIT_RELAXATION_COMPLETE_USER_VERIFIED`**
   * Phase 2A-R2で、通常の手動配置は500個を超えて配置できることをユーザー実機で確認済み。
