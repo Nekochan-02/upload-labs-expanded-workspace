@@ -44,11 +44,12 @@ Only the final deferred correction changes:
 instance.call_deferred("move", target_position)
 
 # F11
-call_deferred("_apply_expanded_drag_local_alignment", instance, target_position, log_diagnostic)
+_f11_start_local_alignment_observer(instance, target_position, log_diagnostic)
 ```
 
-The self-authored helper guards instance validity, assigns local `position`,
-and emits `moved`. It does not call `move()`, `move_snapped()`, or write
+The self-authored root observer is required because `_finish_drag()` queues the
+dragger for deletion. Its one deferred helper guards instance validity, assigns
+local `position`, and emits `moved`. It does not call `move()`, `move_snapped()`, or write
 `global_position`; it does not re-snap or recalculate the target.
 
 ## Lifecycle Checks

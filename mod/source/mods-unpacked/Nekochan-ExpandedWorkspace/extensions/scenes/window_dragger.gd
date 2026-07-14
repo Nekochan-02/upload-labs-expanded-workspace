@@ -56,12 +56,7 @@ func place() -> void:
 
 	if is_instance_valid(instance):
 		instance.global_position = target_position
-		call_deferred(
-			"_apply_expanded_drag_local_alignment",
-			instance,
-			target_position,
-			log_diagnostic
-		)
+		_f11_start_local_alignment_observer(instance, target_position, log_diagnostic)
 
 	_finish_drag()
 
@@ -70,33 +65,6 @@ func _get_expanded_drag_target(window_size: Vector2) -> Vector2:
 	var instance_pos: Vector2 = Utils.screen_to_world_pos(global_position + size / 2)
 	var target: Vector2 = instance_pos - Vector2(175, window_size.y / 2)
 	return target.clamp(Vector2.ZERO, WorkspaceAreaConfig.get_max_position(window_size)).snappedf(50)
-
-
-func _apply_expanded_drag_local_alignment(
-	instance: WindowContainer,
-	target_position: Vector2,
-	log_diagnostic: bool
-) -> void:
-	if not is_instance_valid(instance):
-		return
-
-	if log_diagnostic:
-		_f11_log_window_checkpoint(
-			"F11_BEFORE_LOCAL_CORRECTION",
-			instance,
-			target_position
-		)
-
-	instance.position = target_position
-	instance.moved.emit()
-
-	if log_diagnostic:
-		_f11_log_window_checkpoint(
-			"F11_AFTER_LOCAL_CORRECTION",
-			instance,
-			target_position
-		)
-		_f11_start_lifecycle_observer(instance, target_position)
 
 
 func _f11_log_target(window: WindowContainer, target_position: Vector2) -> void:
@@ -123,49 +91,14 @@ func _f11_log_target(window: WindowContainer, target_position: Vector2) -> void:
 	)
 
 
-func _f11_start_lifecycle_observer(
+func _f11_start_local_alignment_observer(
 	window: WindowContainer,
-	target_position: Vector2
+	target_position: Vector2,
+	log_diagnostic: bool
 ) -> void:
 	var observer = DragPlacementDiagnosticObserver.new()
 	get_tree().root.add_child(observer)
-	observer.begin(window, target_position)
-
-
-func _f11_log_window_checkpoint(
-	checkpoint: String,
-	window: WindowContainer,
-	target_position: Vector2
-) -> void:
-	var parent: Node = window.get_parent()
-	var parent_name: String = "none"
-	var parent_global_origin: String = "none"
-	var parent_transform_origin: String = "none"
-	if parent:
-		parent_name = str(parent.get_path())
-		var parent_canvas: CanvasItem = parent as CanvasItem
-		if parent_canvas:
-			parent_global_origin = str(parent_canvas.global_transform.origin)
-			parent_transform_origin = str(parent_canvas.get_global_transform().origin)
-
-	var local_position: Vector2 = window.position
-	var global_position: Vector2 = window.global_position
-	ModLoaderLog.info(
-		"[F11][drag][%s] window=%s local=%s global=%s parent=%s parent_global_origin=%s parent_transform_origin=%s target=%s local_to_target=%s global_to_target=%s global_local=%s" % [
-			checkpoint,
-			window.name,
-			str(local_position),
-			str(global_position),
-			parent_name,
-			parent_global_origin,
-			parent_transform_origin,
-			str(target_position),
-			str(local_position - target_position),
-			str(global_position - target_position),
-			str(global_position - local_position),
-		],
-		F11_LOG_NAME
-	)
+	observer.begin(window, target_position, log_diagnostic)
 
 
 func _is_inside_vanilla_area(target_position: Vector2, window_size: Vector2) -> bool:

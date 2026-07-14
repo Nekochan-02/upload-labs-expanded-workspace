@@ -4,7 +4,49 @@ const F11_LOG_NAME: String = "Nekochan-ExpandedWorkspace:F11"
 const F11_OPENING_SETTLE_DELAY_SECONDS: float = 0.5
 
 
-func begin(window: WindowContainer, target_position: Vector2) -> void:
+func begin(
+	window: WindowContainer,
+	target_position: Vector2,
+	log_diagnostic: bool
+) -> void:
+	call_deferred(
+		"_apply_expanded_drag_local_alignment",
+		window,
+		target_position,
+		log_diagnostic
+	)
+
+
+func _apply_expanded_drag_local_alignment(
+	window: WindowContainer,
+	target_position: Vector2,
+	log_diagnostic: bool
+) -> void:
+	if not is_instance_valid(window):
+		if log_diagnostic:
+			_log_checkpoint_or_missing(
+				"F11_BEFORE_LOCAL_CORRECTION",
+				window,
+				target_position
+			)
+		queue_free()
+		return
+
+	if log_diagnostic:
+		_log_checkpoint_or_missing(
+			"F11_BEFORE_LOCAL_CORRECTION",
+			window,
+			target_position
+		)
+
+	window.position = target_position
+	window.moved.emit()
+
+	if not log_diagnostic:
+		queue_free()
+		return
+
+	_log_checkpoint_or_missing("F11_AFTER_LOCAL_CORRECTION", window, target_position)
 	call_deferred("_log_next_deferred_stability", window, target_position)
 	get_tree().create_timer(F11_OPENING_SETTLE_DELAY_SECONDS).timeout.connect(
 		_log_opening_settle.bind(window, target_position)

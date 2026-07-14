@@ -104,7 +104,7 @@
   * **Status: `F11_CANARY_READY_FOR_USER_TEST`**
   * F11 plan: `docs/PHASE_2C_F11_DRAG_LOCAL_ALIGNMENT_PLAN.md`; report: `docs/PHASE_2C_F11_DRAG_LOCAL_ALIGNMENT_REPORT.md`.
   * F11 retains the F10 target calculation, `Utils.screen_to_world_pos`, clamp/snap, initial/post-create global assignments, and `_finish_drag()`. At only the existing final deferred correction point, it writes `instance.position = target` and emits `instance.moved` instead of calling `move(target)`.
-  * One drag-created target logs `F11_TARGET`, before/after local correction, next-deferred stability, and one 0.5-second opening-settle checkpoint. The self-freeing observer has no `_process`, loop, or continuous correction.
+  * The dragger queues itself for deletion, so a self-freeing root observer performs the one deferred local assignment and logs `F11_TARGET`, before/after local correction, next-deferred stability, and one 0.5-second opening-settle checkpoint. It has no `_process`, loop, or continuous correction.
   * F9 click alignment, F7 grid, F6 restoration, existing-node movement, group behavior, snap interval, save schema, and blocked Window script extensions are unchanged.
   * Build `Nekochan-ExpandedWorkspace-0.2.18.zip` locally, then wait for the user to verify immediate/settled drag alignment and one manual movement. No user runtime PASS is claimed before that test. Do not proceed to group/full regression/release integration, publish, tag, push public master, or operate on v0.2.9.
 * **Phase 2A 検証状態**:

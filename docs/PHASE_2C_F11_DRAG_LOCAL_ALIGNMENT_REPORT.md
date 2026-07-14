@@ -20,8 +20,8 @@ drag correction surface only.
 
 - File: `extensions/scenes/window_dragger.gd`
 - Patch surface: final deferred drag correction in `place()`
-- Method: deferred `_apply_expanded_drag_local_alignment()` assigns
-  `instance.position = target_position`
+- Method: a self-freeing root observer defers local assignment
+  `window.position = target_position` after the dragger queues itself for deletion
 - Update signal: `instance.moved.emit()` immediately after local assignment
 - Logging: first drag-created target only, with immediate, next-deferred, and
   one 0.5-second opening-settle checkpoints
@@ -68,11 +68,11 @@ save schema changed: NO
 - Version: `0.2.18`
 - Filename: `Nekochan-ExpandedWorkspace-0.2.18.zip`
 - Path: `dist/Nekochan-ExpandedWorkspace-0.2.18.zip`
-- Size: `14804` bytes
+- Size: `14600` bytes
 - File count: `14`
 - ZIP root: `mods-unpacked`
 - Manifest version: `0.2.18`
-- SHA-256: `191d24db43c697825024ac7f5575a11038157c407a0a10da75b3cb6baac04190`
+- SHA-256: `daf4d0a509aa6ead6f081d3de6ebb69298da6dba7f1d4a4f115a2b2af627441a`
 
 The artifact was generated from the repository source with
 `tools/build_release.ps1 -Version 0.2.18`.
