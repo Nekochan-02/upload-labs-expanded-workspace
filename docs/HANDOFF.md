@@ -89,6 +89,13 @@
   * Runtime evidence for `download_sound0`: target `(10350,13350)` is `TARGET_SNAP_CORRECT`; AFTER, next-deferred, and opening-settle local positions all exactly equal the target. The opening-settle global position also equals the target.
   * User verified click alignment PASS immediately, after the opening tween, and after one manual movement. This verifies the F9 click local-domain correction.
   * User separately observed drag placement visually misaligned. Drag source has no F9 code diff, but its user-visible preservation gate is FAIL. Do not modify drag speculatively, proceed to group/full regression/release integration, publish, tag, push public master, or operate on v0.2.9. The single next action is a dedicated drag-placement coordinate-domain diagnostic plan.
+* **Phase 2C-F10 / v0.2.17 drag-placement coordinate diagnostic**:
+  * **Status: `F10_DIAGNOSTIC_READY_FOR_USER_TEST`**
+  * F10 plan: `docs/PHASE_2C_F10_DRAG_PLACEMENT_COORDINATE_DIAGNOSTIC_PLAN.md`; report: `docs/PHASE_2C_F10_DRAG_PLACEMENT_COORDINATE_DIAGNOSTIC_REPORT.md`.
+  * F10 preserves the drag target calculation, global assignments, deferred `move(target)`, and `_finish_drag()`. It logs D1-D8 from the dragger and uses one self-freeing observer for D9-D11 because the dragger queues itself for deletion.
+  * F9 click correction, F6 restoration, F7 grid, snap interval, `Utils.screen_to_world_pos`, existing movement, group behavior, save schema, and blocked Window script extensions are unchanged.
+  * `Nekochan-ExpandedWorkspace-0.2.17.zip` is a local diagnostic artifact: SHA-256 `87dff32cbcc9f51455f2243e030b1adfd06e7375d6bbb4f933af20b5d44ea911`, 15099 bytes, 14 files, ZIP root `mods-unpacked`.
+  * User must test one expanded-area drag-created node immediately, after opening settles, and after manual movement, then provide `[F10]` D1-D11 logs. Do not implement a drag correction, proceed to group/full regression/release integration, publish, tag, push public master, or operate on v0.2.9 before evidence analysis.
 * **Phase 2A 検証状態**:
   * **Status: `LIMIT_RELAXATION_COMPLETE_USER_VERIFIED`**
   * Phase 2A-R2で、通常の手動配置は500個を超えて配置できることをユーザー実機で確認済み。
