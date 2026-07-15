@@ -2,11 +2,40 @@
 
 ## Status
 
-`F14_CANARY_READY_FOR_USER_TEST`
+`F14_PRIMARY_OLD_BOUND_SNAP_VERIFIED_SIZE_CALCULATION_BLOCKER_REMAINS`
 
 F14 is a local development canary. It is not a release candidate and must not
 be published, tagged, pushed to public master, uploaded to Workshop, or used to
 replace the blocked v0.2.9 artifact.
+
+## User Test Result
+
+The user installed only `0.2.21`, created a group beyond the old boundary, and
+ran the F13 top-left resize path. The frame remained visible at drag start,
+enlarged normally, and remained after release. Children plus connection and
+state remained. No save was made.
+
+The user then created a group, placed two nodes in it, connected them, and
+attempted another resize. That populated group became abnormally thin and tall.
+No save was made after that failure. This second resize is outside F14's
+one-target diagnostic budget, so it has no F14 checkpoint evidence and must
+not be attributed to a specific edge or formula without a new diagnostic.
+
+## Runtime Evidence
+
+Source: `C:\Users\shian\AppData\Roaming\Upload Labs\logs\godot.log`, F14 lines.
+
+| Checkpoint | Measured state |
+|---|---|
+| `F14_RESIZE_MOVE_SNAPPED_INPUT` | `group13`; input/clamped/snapped target all `(16850,18600)`; before `(16850,18600)`; size `(300,200)`; left/top flags true; in tree and visible. |
+| `F14_RESIZE_MOVE_SNAPPED_OUTPUT` | Same target and position after; size `(300,200)`; left/top flags remain true; in tree and visible. |
+| `F14_AFTER_RESIZE_FIRST_FRAME` | Position `(16850,18600)`, size `(300,200)`, left/top flags true, in tree and visible. |
+| `F14_AFTER_RELEASE_OR_CANCEL` | `resize_branch_used=true`; position `(16550,18250)`; size `(600,550)`; flags false; in tree and visible. |
+
+The output proves that the F14 expanded-bounds resize branch was selected and
+prevented the old-bound jump for the reproduced left/top path. It does not
+measure the later populated-group failure. No F14-specific warning, exception,
+or parse failure was logged.
 
 ## Root Cause Evidence
 
@@ -36,6 +65,10 @@ the prior implementation path.
 
 F6 restoration, F7 grid, F9 click, F11 drag, F12 persistence logic, save
 schema, normal group movement, and blocked Window extension paths are unchanged.
+
+Runtime non-resize movement was not exercised as part of F14. The delegation is
+verified statically by the false resize-flag branch calling
+`super.move_snapped(to)`.
 
 ## Static Audit
 
@@ -81,16 +114,26 @@ save, secret, log, or Workshop path.
 
 | Test | Result |
 |---|---|
-| Group resize drag start remains visible | NOT TESTED |
-| Group does not jump to old boundary | NOT TESTED |
-| Group can be enlarged in expanded area | NOT TESTED |
-| Group size does not collapse | NOT TESTED |
-| Children remain | NOT TESTED |
-| Connection/state remain | NOT TESTED |
-| F14 resize branch used | NOT TESTED |
-| Non-resize delegation preserved | NOT TESTED |
+| Group resize drag start remains visible | USER VERIFIED PASS, primary F13 path |
+| Group does not jump to old boundary | USER VERIFIED PASS, primary F13 path |
+| Group can be enlarged in expanded area | USER VERIFIED PASS, primary F13 path |
+| Group size does not collapse | USER OBSERVED FAIL, later populated-group resize |
+| Children remain | USER VERIFIED PASS, primary path |
+| Connection/state remain | USER VERIFIED PASS, primary path |
+| F14 resize branch used | LOG VERIFIED PASS |
+| Non-resize delegation preserved | STATIC VERIFIED; runtime NOT TESTED |
 
-Codex has not run the game and does not mark any F14 behavior as PASS.
+Codex has not run the game. User verification and log-verified results above
+are scoped to the tested primary path. The later size-collapse symptom remains
+an unclassified blocker.
+
+## Next Diagnostic Only
+
+Create an F15 plan for a single populated group resize size-calculation
+diagnostic. It must log the selected edge, `drag_start_rect`, mouse delta,
+pre/post `new_rect`-equivalent geometry if observable without copying the
+vanilla body, size/minimum size, and the old versus expanded width/height clamp
+limits. Do not implement a size fix from F14 evidence.
 
 ## User Test Steps
 
