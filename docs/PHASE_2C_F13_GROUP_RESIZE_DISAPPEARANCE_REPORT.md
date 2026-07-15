@@ -2,11 +2,67 @@
 
 ## Status
 
-`F13_DIAGNOSTIC_CANARY_READY_FOR_USER_TEST`
+`F13_DIAGNOSTIC_EVIDENCE_CAPTURED`
 
 This is a local development diagnostic artifact, not a release candidate. It
 does not implement a group resize fix and must not be published, tagged,
 pushed to public master, uploaded to Workshop, or used to change v0.2.9.
+
+## User Test Result
+
+The user installed only `Nekochan-ExpandedWorkspace-0.2.20.zip`, created one
+new group in the expanded area, started an edge resize drag, observed the
+group disappear completely, made no further changes, did not save, and exited
+the game. Child nodes plus connection and state remained.
+
+## Runtime Evidence
+
+Source: `C:\Users\shian\AppData\Roaming\Upload Labs\logs\modloader_2026-07-15_19.50.09.log`, lines 90-97.
+
+| Checkpoint | Observed state |
+|---|---|
+| `R1_BEFORE_EDGE_DRAG` | `group12`, valid/in tree/visible, local/global `(18800, 16600)`, size/minimum `(300, 200)`, scale `(1, 1)`, parent `Desktop/Windows`, child count `3`, no resize flags. |
+| `R2_EDGE_DRAG_START` | Same geometry; `resizing_left=true`, `resizing_top=true`; `drag_start_rect=[P:(18800,16600), S:(300,200)]`; `drag_start_mouse=(18800,16600)`. Old-bound anchor room is `(-8800,-6600)` while expanded-bound room is `(1200,3400)`. |
+| `R4_AFTER_FIRST_FRAME` | Logged before the first resize `_process()` in this session's deferred scheduling; still at `(18800,16600)`, valid and visible. It is not evidence of post-resize stability. |
+| `R3_FIRST_RESIZE_PROCESS` before `super` | Same valid/visible state at `(18800,16600)`, size `(300,200)`, left/top resize flags true, zero mouse delta. |
+| `R3_FIRST_RESIZE_PROCESS` after `super` | Still valid/in tree/visible, same size/minimum `(300,200)`, same scale/parent/child count, but local/global position became `(9700,9800)`. |
+| `R5_AFTER_RELEASE_OR_CANCEL` | Valid/in tree/visible at `(9700,9800)`; resize flags false. The observer corroborated the same state. |
+| `EVENT_TREE_EXITING` | Occurred only on game exit. The group remained valid, visible, parented, sized `(300,200)`, and at `(9700,9800)` until exit. |
+
+No `visibility_changed` or `resized` F13 lifecycle line was emitted. This is
+consistent with the observed unchanged visibility and unchanged size.
+
+The diagnostic intentionally did not reproduce a target rectangle. The zero
+mouse delta already makes the first-process evidence decisive: resize start
+alone moved the group frame by `(-9100,-6800)`.
+
+## Classification
+
+`GROUP_NODE_MOVED_OUT_OF_BOUNDS`
+
+More precisely, the group frame was relocated from the expanded-area camera
+region into the old workspace maximum position `(10000,10000) - (300,200) =
+(9700,9800)`. It was not queue-freed, hidden, collapsed, invalid, reparented,
+or render-only disappeared. Its children remained because only the group frame
+was old-bound snapped.
+
+The evidence identifies the triggering path as edge resize's original
+`move_snapped(new_rect.position)` call. With zero resize delta, the original
+rect position remains the saved start location; the inherited old-bound snap
+clamps it to `(9700,9800)`. The existing Mod correction is explicitly
+movement-only and does not run while `moving=false` during edge resize.
+
+## One Minimal Fix Candidate
+
+Add a dedicated `window_group.gd` resize-path correction after the original
+resize step, only while any resize flag is active: restore the just-computed
+group frame **local** position using the existing expanded workspace maximum
+for the current frame size, without changing width/height calculation, save
+schema, or the `moving` path.
+
+This is a candidate only. It requires a separately approved plan and must
+first establish whether the correction can use the already-computed local
+position without copying the vanilla resize body. No fix is implemented by F13.
 
 ## User Observation
 
@@ -77,16 +133,17 @@ claim a runtime classification before the user test.
 
 | Test | Result |
 |---|---|
-| New group resize in expanded area | NOT TESTED |
-| Group disappears | NOT TESTED |
-| Instance validity after disappearance | NOT TESTED |
-| Visibility state | NOT TESTED |
-| Size collapse | NOT TESTED |
-| Moved out of bounds | NOT TESTED |
-| Queue free / tree exit | NOT TESTED |
-| Classification | NOT TESTED |
+| New group resize in expanded area | USER OBSERVED FAIL |
+| Group disappears | USER OBSERVED FAIL |
+| Instance validity after disappearance | PASS: true through release; tree exit only on game exit |
+| Visibility state | PASS: visible=true, alpha=1.0 |
+| Size collapse | PASS: size/minimum unchanged `(300,200)` |
+| Moved out of bounds | CONFIRMED: `(18800,16600)` to `(9700,9800)` |
+| Queue free / tree exit | PASS: no queue free; tree exit only on game exit |
+| Classification | `GROUP_NODE_MOVED_OUT_OF_BOUNDS` |
 
-Codex has not run the game and does not mark any F13 runtime result as PASS.
+Codex has not run the game. The PASS entries above report only the measured
+non-failure invariants from the user's completed test and Mod Loader logs.
 
 ## Static Verification
 
