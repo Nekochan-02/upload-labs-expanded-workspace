@@ -1,8 +1,8 @@
 extends Node
 
 # Mod: Nekochan-ExpandedWorkspace
-# Phase 2C-F14 development canary: group edge-resize uses expanded bounds
-# only through WindowGroup.move_snapped while resize flags are active.
+# Phase 2C-F15 development diagnostic: one populated group resize sequence
+# records geometry without changing the F14 expanded-bounds snap branch.
 # Do not register connector, window container, or window base/indexed area patches here.
 
 const MOD_ID: String = "Nekochan-ExpandedWorkspace"
@@ -41,7 +41,7 @@ func _init() -> void:
 		"res://mods-unpacked/Nekochan-ExpandedWorkspace/extensions/scripts/paint.gd"
 	)
 	ModLoaderLog.info(
-		"Registered Phase 2C-F14 group resize expanded-bounds canary with F11 drag alignment, F9 click alignment, F7 grid, F6 restoration, and F12 persistence logic unchanged.",
+		"Registered Phase 2C-F15 populated group resize diagnostic. F14 expanded-bounds snap, F12 persistence, F11 drag alignment, F9 click alignment, F6 restoration, and F7 grid are unchanged.",
 		MOD_ID
 	)
 
@@ -49,7 +49,7 @@ func _init() -> void:
 func _ready() -> void:
 	_apply_space_upgrade_limit("mod_ready")
 	ModLoaderLog.info(
-		"ExpandedWorkspace v0.2.21 canary loaded. Target node limit: 1000. Space upgrade cap: 200. F14 changes group move_snapped only while resize flags are active; F12 persistence logic, F11 drag alignment, F9 click alignment, F6 restoration, and F7 grid are unchanged.",
+		"ExpandedWorkspace v0.2.22 diagnostic loaded. Target node limit: 1000. Space upgrade cap: 200. F15 records one populated group resize sequence only; F14 expanded-bounds snap, F12 persistence, F11 drag alignment, F9 click alignment, F6 restoration, and F7 grid are unchanged.",
 		MOD_ID
 	)
 

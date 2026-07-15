@@ -9,8 +9,13 @@ const GroupResizeDiagnosticObserver = preload(
 const F13_LOG_NAME: String = "Nekochan-ExpandedWorkspace:F13"
 const F13_OLD_WORKSPACE_SIZE: Vector2 = Vector2(10000, 10000)
 const F14_LOG_NAME: String = "Nekochan-ExpandedWorkspace:F14"
+const F15_LOG_NAME: String = "Nekochan-ExpandedWorkspace:F15"
+const F15_OLD_WORKSPACE_SIZE: Vector2 = Vector2(10000, 10000)
+const F15_MINIMUM_GROUP_SIZE: Vector2 = Vector2(200, 100)
 
 static var _f13_target_taken: bool = false
+static var _f15_target_taken: bool = false
+static var _f15_ineligible_target_reported: bool = false
 
 var _f13_sequence_active: bool = false
 var _f13_first_resize_process_logged: bool = false
@@ -18,6 +23,11 @@ var _f13_observer: Node
 var _f14_first_move_snapped_logged: bool = false
 var _f14_after_resize_frame_logged: bool = false
 var _f14_after_release_logged: bool = false
+var _f15_sequence_active: bool = false
+var _f15_first_resize_process_logged: bool = false
+var _f15_release_logged: bool = false
+var _f15_edge_path: String = "unknown"
+var _f15_children: Array[WindowContainer] = []
 
 
 func _process(delta: float) -> void:
@@ -26,14 +36,24 @@ func _process(delta: float) -> void:
 		and not _f13_first_resize_process_logged
 		and _f13_is_resizing()
 	)
+	var f15_first_resize_process: bool = (
+		_f15_sequence_active
+		and not _f15_first_resize_process_logged
+		and _f13_is_resizing()
+	)
 	if first_resize_process:
 		_f13_log_checkpoint("R3_FIRST_RESIZE_PROCESS", "before_super")
+	if f15_first_resize_process:
+		_f15_log_checkpoint("S3_FIRST_SIZE_CALCULATION", "before_super")
 
 	super._process(delta)
 
 	if first_resize_process:
 		_f13_first_resize_process_logged = true
 		_f13_log_checkpoint("R3_FIRST_RESIZE_PROCESS", "after_super")
+	if f15_first_resize_process:
+		_f15_first_resize_process_logged = true
+		_f15_log_checkpoint("S4_AFTER_FIRST_RESIZE_PROCESS", "after_super")
 
 	if not moving:
 		return
@@ -79,91 +99,346 @@ func move_snapped(to: Vector2) -> void:
 
 
 func _on_top_left_button_down() -> void:
+	var f15_started: bool = _f15_begin_populated_resize_diagnostic("top-left")
 	var started: bool = _f13_begin_edge_diagnostic()
 	super._on_top_left_button_down()
+	_f15_complete_resize_start(f15_started)
 	_f13_complete_edge_diagnostic_start(started)
 
 
 func _on_top_left_button_up() -> void:
 	super._on_top_left_button_up()
+	_f15_complete_resize_release()
 	_f13_complete_edge_diagnostic_release()
 
 
 func _on_top_button_down() -> void:
+	var f15_started: bool = _f15_begin_populated_resize_diagnostic("top")
 	var started: bool = _f13_begin_edge_diagnostic()
 	super._on_top_button_down()
+	_f15_complete_resize_start(f15_started)
 	_f13_complete_edge_diagnostic_start(started)
 
 
 func _on_top_button_up() -> void:
 	super._on_top_button_up()
+	_f15_complete_resize_release()
 	_f13_complete_edge_diagnostic_release()
 
 
 func _on_top_right_button_down() -> void:
+	var f15_started: bool = _f15_begin_populated_resize_diagnostic("top-right")
 	var started: bool = _f13_begin_edge_diagnostic()
 	super._on_top_right_button_down()
+	_f15_complete_resize_start(f15_started)
 	_f13_complete_edge_diagnostic_start(started)
 
 
 func _on_top_right_button_up() -> void:
 	super._on_top_right_button_up()
+	_f15_complete_resize_release()
 	_f13_complete_edge_diagnostic_release()
 
 
 func _on_left_button_down() -> void:
+	var f15_started: bool = _f15_begin_populated_resize_diagnostic("left")
 	var started: bool = _f13_begin_edge_diagnostic()
 	super._on_left_button_down()
+	_f15_complete_resize_start(f15_started)
 	_f13_complete_edge_diagnostic_start(started)
 
 
 func _on_left_button_up() -> void:
 	super._on_left_button_up()
+	_f15_complete_resize_release()
 	_f13_complete_edge_diagnostic_release()
 
 
 func _on_bottom_left_button_down() -> void:
+	var f15_started: bool = _f15_begin_populated_resize_diagnostic("bottom-left")
 	var started: bool = _f13_begin_edge_diagnostic()
 	super._on_bottom_left_button_down()
+	_f15_complete_resize_start(f15_started)
 	_f13_complete_edge_diagnostic_start(started)
 
 
 func _on_bottom_left_button_up() -> void:
 	super._on_bottom_left_button_up()
+	_f15_complete_resize_release()
 	_f13_complete_edge_diagnostic_release()
 
 
 func _on_bottom_button_down() -> void:
+	var f15_started: bool = _f15_begin_populated_resize_diagnostic("bottom")
 	var started: bool = _f13_begin_edge_diagnostic()
 	super._on_bottom_button_down()
+	_f15_complete_resize_start(f15_started)
 	_f13_complete_edge_diagnostic_start(started)
 
 
 func _on_bottom_button_up() -> void:
 	super._on_bottom_button_up()
+	_f15_complete_resize_release()
 	_f13_complete_edge_diagnostic_release()
 
 
 func _on_bottom_right_button_down() -> void:
+	var f15_started: bool = _f15_begin_populated_resize_diagnostic("bottom-right")
 	var started: bool = _f13_begin_edge_diagnostic()
 	super._on_bottom_right_button_down()
+	_f15_complete_resize_start(f15_started)
 	_f13_complete_edge_diagnostic_start(started)
 
 
 func _on_bottom_right_button_up() -> void:
 	super._on_bottom_right_button_up()
+	_f15_complete_resize_release()
 	_f13_complete_edge_diagnostic_release()
 
 
 func _on_right_button_down() -> void:
+	var f15_started: bool = _f15_begin_populated_resize_diagnostic("right")
 	var started: bool = _f13_begin_edge_diagnostic()
 	super._on_right_button_down()
+	_f15_complete_resize_start(f15_started)
 	_f13_complete_edge_diagnostic_start(started)
 
 
 func _on_right_button_up() -> void:
 	super._on_right_button_up()
+	_f15_complete_resize_release()
 	_f13_complete_edge_diagnostic_release()
+
+
+func _f15_begin_populated_resize_diagnostic(edge_path: String) -> bool:
+	if _f15_target_taken:
+		return false
+
+	var contained_children: Array[WindowContainer] = _f15_collect_contained_windows()
+	if contained_children.size() != 2:
+		if not _f15_ineligible_target_reported:
+			_f15_ineligible_target_reported = true
+			ModLoaderLog.info(
+				"[F15][STOP] group=%s edge=%s contained_window_count=%d required_window_count=2 reason=TARGET_NOT_ELIGIBLE" % [
+					name,
+					edge_path,
+					contained_children.size(),
+				],
+				F15_LOG_NAME
+			)
+		return false
+
+	_f15_target_taken = true
+	_f15_sequence_active = true
+	_f15_first_resize_process_logged = false
+	_f15_release_logged = false
+	_f15_edge_path = edge_path
+	_f15_children = contained_children
+	_f15_log_checkpoint("S1_BEFORE_POPULATED_RESIZE", "before_resize_flag")
+	return true
+
+
+func _f15_complete_resize_start(started: bool) -> void:
+	if not started:
+		return
+	_f15_log_checkpoint("S2_RESIZE_START", "after_resize_flag")
+
+
+func _f15_complete_resize_release() -> void:
+	if not _f15_sequence_active or _f15_release_logged:
+		return
+
+	_f15_release_logged = true
+	_f15_log_checkpoint("S5_AFTER_RELEASE", "after_resize_clear")
+	_f15_sequence_active = false
+	call_deferred("_f15_log_one_frame_after_release")
+
+
+func _f15_log_one_frame_after_release() -> void:
+	if not _f15_release_logged:
+		return
+	_f15_log_checkpoint("S6_ONE_FRAME_AFTER_RELEASE", "deferred_after_release")
+
+
+func _f15_collect_contained_windows() -> Array[WindowContainer]:
+	var contained: Array[WindowContainer] = []
+	var frame_rect: Rect2 = get_rect().grow(20)
+	for candidate_node: Node in get_tree().get_nodes_in_group("selectable"):
+		var candidate: WindowContainer = candidate_node as WindowContainer
+		if candidate and candidate != self and frame_rect.encloses(candidate.get_rect()):
+			contained.append(candidate)
+	return contained
+
+
+func _f15_log_checkpoint(checkpoint: String, phase: String) -> void:
+	var current_mouse: Vector2 = get_global_mouse_position().snappedf(50)
+	var geometry: Dictionary = _f15_derive_geometry(current_mouse)
+	var child_geometry: Dictionary = _f15_collect_child_geometry()
+	var parent: Node = get_parent()
+	var parent_path: String = str(parent.get_path()) if parent else "none"
+	ModLoaderLog.info(
+		"[F15][%s] phase=%s group=%s edge=%s is_instance_valid=true is_inside_tree=%s visible=%s position=%s global_position=%s size=%s custom_minimum_size=%s scale=%s parent=%s resizing_left=%s resizing_right=%s resizing_top=%s resizing_bottom=%s drag_start_rect=%s drag_start_mouse=%s current_mouse_global_snapped=%s mouse_delta=%s old_bound_rect=%s old_bound_snapped_position=%s old_bound_minimum_violation=%s expanded_bound_rect=%s expanded_bound_snapped_position=%s expanded_bound_minimum_violation=%s child_count_initial=%d child_count_valid=%d child_records=%s child_bounding_box=%s child_to_frame_relative_bounds=%s contained_connector_count=%d connection_presence=%s diagnostics_pure=true classification=UNRESOLVED" % [
+			checkpoint,
+			phase,
+			name,
+			_f15_edge_path,
+			str(is_inside_tree()),
+			str(visible),
+			str(position),
+			str(global_position),
+			str(size),
+			str(custom_minimum_size),
+			str(scale),
+			parent_path,
+			str(resizing_left),
+			str(resizing_right),
+			str(resizing_top),
+			str(resizing_bottom),
+			str(drag_start_rect),
+			str(drag_start_mouse),
+			str(current_mouse),
+			str(geometry["mouse_delta"]),
+			str(geometry["old_rect"]),
+			str(geometry["old_snapped_position"]),
+			str(geometry["old_minimum_violation"]),
+			str(geometry["expanded_rect"]),
+			str(geometry["expanded_snapped_position"]),
+			str(geometry["expanded_minimum_violation"]),
+			_f15_children.size(),
+			int(child_geometry["valid_count"]),
+			str(child_geometry["records"]),
+			str(child_geometry["bounding_box"]),
+			str(child_geometry["relative_bounds"]),
+			int(child_geometry["connector_count"]),
+			str(int(child_geometry["connector_count"]) > 0),
+		],
+		F15_LOG_NAME
+	)
+
+
+func _f15_derive_geometry(current_mouse: Vector2) -> Dictionary:
+	var mouse_delta: Vector2 = current_mouse - drag_start_mouse
+	var old_candidate: Dictionary = _f15_derive_rect_candidate(
+		F15_OLD_WORKSPACE_SIZE,
+		mouse_delta
+	)
+	var expanded_candidate: Dictionary = _f15_derive_rect_candidate(
+		WorkspaceAreaConfig.get_workspace_size(),
+		mouse_delta
+	)
+	return {
+		"mouse_delta": mouse_delta,
+		"old_rect": old_candidate["rect"],
+		"old_snapped_position": old_candidate["snapped_position"],
+		"old_minimum_violation": old_candidate["minimum_violation"],
+		"expanded_rect": expanded_candidate["rect"],
+		"expanded_snapped_position": expanded_candidate["snapped_position"],
+		"expanded_minimum_violation": expanded_candidate["minimum_violation"],
+	}
+
+
+# Pure diagnostic geometry only; this does not replace or mutate vanilla resize state.
+func _f15_derive_rect_candidate(bounds: Vector2, mouse_delta: Vector2) -> Dictionary:
+	var horizontal: Dictionary = _f15_derive_axis_candidate(
+		drag_start_rect.position.x,
+		drag_start_rect.size.x,
+		mouse_delta.x,
+		resizing_left,
+		resizing_right,
+		F15_MINIMUM_GROUP_SIZE.x,
+		bounds.x
+	)
+	var vertical: Dictionary = _f15_derive_axis_candidate(
+		drag_start_rect.position.y,
+		drag_start_rect.size.y,
+		mouse_delta.y,
+		resizing_top,
+		resizing_bottom,
+		F15_MINIMUM_GROUP_SIZE.y,
+		bounds.y
+	)
+	var rect: Rect2 = Rect2(
+		Vector2(float(horizontal["position"]), float(vertical["position"])),
+		Vector2(float(horizontal["size"]), float(vertical["size"]))
+	)
+	return {
+		"rect": rect,
+		"snapped_position": rect.position.clamp(Vector2.ZERO, bounds - rect.size).snappedf(50),
+		"minimum_violation": rect.size.x < F15_MINIMUM_GROUP_SIZE.x or rect.size.y < F15_MINIMUM_GROUP_SIZE.y,
+	}
+
+
+func _f15_derive_axis_candidate(
+	start_position: float,
+	start_size: float,
+	delta: float,
+	leading_edge: bool,
+	trailing_edge: bool,
+	minimum_size: float,
+	bound: float
+) -> Dictionary:
+	if leading_edge:
+		var anchor: float = start_position + start_size
+		var candidate_position: float = clampf(start_position + delta, 0.0, anchor - minimum_size)
+		return {"position": candidate_position, "size": anchor - candidate_position}
+	if trailing_edge:
+		var candidate_size: float = maxf(start_size + delta, minimum_size)
+		if start_position + candidate_size > bound:
+			candidate_size = bound - start_position
+		return {"position": start_position, "size": candidate_size}
+	return {"position": start_position, "size": start_size}
+
+
+func _f15_collect_child_geometry() -> Dictionary:
+	var records: Array[String] = []
+	var valid_count: int = 0
+	var has_bounds: bool = false
+	var bounding_box: Rect2 = Rect2()
+	var has_relative_bounds: bool = false
+	var relative_bounds: Rect2 = Rect2()
+	for child: WindowContainer in _f15_children:
+		if not is_instance_valid(child):
+			records.append("invalid")
+			continue
+		var child_rect: Rect2 = Rect2(child.position, child.size)
+		var relative_position: Vector2 = child.position - position
+		var relative_rect: Rect2 = Rect2(relative_position, child.size)
+		if not has_bounds:
+			bounding_box = child_rect
+			has_bounds = true
+		else:
+			bounding_box = bounding_box.merge(child_rect)
+		if not has_relative_bounds:
+			relative_bounds = relative_rect
+			has_relative_bounds = true
+		else:
+			relative_bounds = relative_bounds.merge(relative_rect)
+		valid_count += 1
+		records.append("%s{inside_tree=%s,position=%s,global_position=%s,size=%s,relative_position=%s}" % [
+			child.name,
+			str(child.is_inside_tree()),
+			str(child.position),
+			str(child.global_position),
+			str(child.size),
+			str(relative_position),
+		])
+	return {
+		"valid_count": valid_count,
+		"records": records,
+		"bounding_box": bounding_box if has_bounds else "none",
+		"relative_bounds": relative_bounds if has_relative_bounds else "none",
+		"connector_count": _f15_count_contained_connectors(),
+	}
+
+
+func _f15_count_contained_connectors() -> int:
+	var count: int = 0
+	var frame_rect: Rect2 = get_rect().grow(20)
+	for connector_node: Node in get_tree().get_nodes_in_group("connector_point"):
+		var connector: Control = connector_node as Control
+		if connector and frame_rect.encloses(connector.get_rect()):
+			count += 1
+	return count
 
 
 func _f13_begin_edge_diagnostic() -> bool:

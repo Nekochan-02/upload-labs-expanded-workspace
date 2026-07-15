@@ -1,9 +1,9 @@
 {
 	"name": "ExpandedWorkspace",
 	"namespace": "Nekochan",
-	"version_number": "0.2.21",
+	"version_number": "0.2.22",
 	"website_url": "",
-	"description": "Phase 2C-F14 development canary: group resize expanded-bounds snap fix.",
+	"description": "Phase 2C-F15 development diagnostic: populated group resize size-collapse evidence.",
 	"dependencies": [],
 	"extra": {
 		"godot": {

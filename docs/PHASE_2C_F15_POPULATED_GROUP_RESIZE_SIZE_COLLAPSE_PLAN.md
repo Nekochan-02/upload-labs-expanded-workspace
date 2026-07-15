@@ -2,7 +2,7 @@
 
 ## Status
 
-`DIAGNOSTIC_PLAN_REQUIRED`
+`IMPLEMENTATION_APPROVED`
 
 ## Scope
 
@@ -11,9 +11,9 @@ left/top resize path. This plan treats the later observation separately:
 a populated expanded-area group with two contained, connected nodes became
 abnormally thin and tall during resize.
 
-F15 is diagnostics only. It does not implement a size fix, alter F14, build an
-artifact, change the version, or start a user test. The proposed future
-artifact is `0.2.22` only after separate implementation approval.
+F15 is diagnostics only. It does not implement a size fix or alter F14. The
+approved development diagnostic artifact is `0.2.22`; it is not a release
+candidate and requires user verification before any classification is selected.
 
 ## Confirmed Boundary
 
@@ -87,12 +87,11 @@ one, if any:
 - `GROUP_RENDER_ONLY_SIZE_APPEARANCE`
 - `UNRESOLVED`
 
-## Future Diagnostic Design
+## Runtime Diagnostic Design
 
-The approved implementation candidate, if separately authorized, is a
-one-target, one-resize-sequence observer in the existing group extension. It
-must not change the resize result, group membership, child positions, save
-data, or F14's `move_snapped()` branch.
+The approved implementation is a one-target, one-resize-sequence observer in
+the existing group extension. It must not change the resize result, group
+membership, child positions, save data, or F14's `move_snapped()` branch.
 
 Emit only these checkpoints:
 
@@ -118,9 +117,9 @@ Bounded logging is mandatory: exactly one eligible populated group and one
 edge-resize sequence per game session. No `_process()` logging after S4, loop,
 polling, continuous observer, or all-groups scan is allowed.
 
-## Minimal Future User Test
+## Minimal User Test
 
-Use a temporary state and install only the future `0.2.22` diagnostic artifact.
+Use a temporary state and install only the `0.2.22` diagnostic artifact.
 
 1. Move to the expanded area and create one group beyond the old `10000` bound.
 2. Place exactly two nodes fully inside the group and create one connection.

@@ -136,10 +136,11 @@
   * User verified the primary F13 left/top path: F14 input/output holds `(16850,18600)` under the expanded clamp; release leaves the group valid and visible at `(16550,18250)` with size `(600,550)`. The old-bound disappearance is fixed for this path.
   * A separate populated group with two contained connected nodes later became abnormally thin and tall during resize. It was outside the one-target F14 logging budget, so no edge/formula cause is yet proven. Treat this as an unclassified group resize size-calculation blocker. The next and only action is an F15 dedicated diagnostic plan, not a size fix. Group persistence, full regression, release integration, public-master push, Release/tag/Workshop operation, and v0.2.9 artifact changes remain deferred.
 * **Phase 2C-F15 / populated group resize size-collapse diagnostic**:
-  * **Status: `F15_POPULATED_GROUP_RESIZE_SIZE_COLLAPSE_PLAN_READY`**
-  * Plan: `docs/PHASE_2C_F15_POPULATED_GROUP_RESIZE_SIZE_COLLAPSE_PLAN.md`.
+  * **Status: `F15_DIAGNOSTIC_CANARY_READY_FOR_USER_TEST`**
+  * Plan: `docs/PHASE_2C_F15_POPULATED_GROUP_RESIZE_SIZE_COLLAPSE_PLAN.md`; report: `docs/PHASE_2C_F15_POPULATED_GROUP_RESIZE_SIZE_COLLAPSE_REPORT.md`.
   * F14's old-bound position-snap correction remains verified and must not be changed. F15 isolates the later thin/tall populated-group observation as a separate blocker; its edge and geometry are not yet observed, so no cause or fix is selected.
-  * The plan requires a future approval before any `0.2.22` diagnostic implementation or artifact. It bounds the future evidence to one populated group and one resize sequence at `S1` through `S6`, with frame/child relative geometry and old versus expanded size-clamp candidates.
+  * The approved `0.2.22` diagnostic bounds evidence to one group containing exactly two enclosed windows and one resize sequence at `S1` through `S6`. It records frame/child relative geometry and old versus expanded size-clamp candidates without mutating resize state.
+  * Local development artifact: `dist/Nekochan-ExpandedWorkspace-0.2.22.zip`, `20863 bytes`, `15` files, ZIP root `mods-unpacked`, SHA-256 `8f00f3c82429a88b4e8fea672baafe209c9e12946bc9bc4c295f05554d6fb84e`. It passed the source/ZIP publish-safety audit with all required categories at zero; it remains development-only and user verification is `NOT TESTED`.
   * Do not save after a reproduced collapse. Do not resume F12 group persistence, full regression, release integration, public-master push, Release/tag/Workshop operation, or v0.2.9 artifact work.
 * **Phase 2A 検証状態**:
   * **Status: `LIMIT_RELAXATION_COMPLETE_USER_VERIFIED`**
