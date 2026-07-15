@@ -54,15 +54,19 @@ movement-only and does not run while `moving=false` during edge resize.
 
 ## One Minimal Fix Candidate
 
-Add a dedicated `window_group.gd` resize-path correction after the original
-resize step, only while any resize flag is active: restore the just-computed
-group frame **local** position using the existing expanded workspace maximum
-for the current frame size, without changing width/height calculation, save
-schema, or the `moving` path.
+Override `WindowGroup.move_snapped(to)` only while a resize flag is active.
+In that narrow condition, preserve the vanilla snapping interval but replace
+the inherited old-bound `get_position_snapped(to)` result with
+`to.clamp(Vector2.ZERO, WorkspaceAreaConfig.get_max_position(size)).snappedf(50)`
+before calling the existing `move` notification path. For all non-resize calls,
+delegate to `super.move_snapped(to)` unchanged.
 
-This is a candidate only. It requires a separately approved plan and must
-first establish whether the correction can use the already-computed local
-position without copying the vanilla resize body. No fix is implemented by F13.
+This targets exactly the proven old-bound snap, avoids copying the vanilla
+resize body, leaves width/height calculation, save schema, and normal group
+movement unchanged, and does not override `get_position_snapped()`. It is a
+candidate only. A separately approved canary must begin with the reproduced
+top-left edge path and stop if another edge reveals a size-calculation issue.
+No fix is implemented by F13.
 
 ## User Observation
 
