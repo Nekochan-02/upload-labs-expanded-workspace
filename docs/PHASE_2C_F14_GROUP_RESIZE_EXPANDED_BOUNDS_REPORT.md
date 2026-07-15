@@ -129,11 +129,14 @@ an unclassified blocker.
 
 ## Next Diagnostic Only
 
-Create an F15 plan for a single populated group resize size-calculation
-diagnostic. It must log the selected edge, `drag_start_rect`, mouse delta,
-pre/post `new_rect`-equivalent geometry if observable without copying the
-vanilla body, size/minimum size, and the old versus expanded width/height clamp
-limits. Do not implement a size fix from F14 evidence.
+F15 is planned in
+`docs/PHASE_2C_F15_POPULATED_GROUP_RESIZE_SIZE_COLLAPSE_PLAN.md`. It is a
+separate, diagnostics-only investigation of the populated-group size-collapse
+blocker. It must capture one selected edge and one bounded resize sequence,
+including `drag_start_rect`, mouse delta, independently derived
+`new_rect`-equivalent candidates, frame/child geometry, and old versus expanded
+width/height clamp candidates. Do not implement a size fix from F14 evidence or
+modify the verified F14 position-snap branch.
 
 ## User Test Steps
 
