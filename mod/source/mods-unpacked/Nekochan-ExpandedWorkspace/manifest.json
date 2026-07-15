@@ -1,9 +1,9 @@
 {
 	"name": "ExpandedWorkspace",
 	"namespace": "Nekochan",
-	"version_number": "0.2.22",
+	"version_number": "0.2.23",
 	"website_url": "",
-	"description": "Phase 2C-F15 development diagnostic: populated group resize size-collapse evidence.",
+	"description": "Phase 2C-F16 development canary: populated group resize old-bound collapse correction.",
 	"dependencies": [],
 	"extra": {
 		"godot": {

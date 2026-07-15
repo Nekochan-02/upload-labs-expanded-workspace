@@ -12,10 +12,12 @@ const F14_LOG_NAME: String = "Nekochan-ExpandedWorkspace:F14"
 const F15_LOG_NAME: String = "Nekochan-ExpandedWorkspace:F15"
 const F15_OLD_WORKSPACE_SIZE: Vector2 = Vector2(10000, 10000)
 const F15_MINIMUM_GROUP_SIZE: Vector2 = Vector2(200, 100)
+const F16_LOG_NAME: String = "Nekochan-ExpandedWorkspace:F16"
 
 static var _f13_target_taken: bool = false
 static var _f15_target_taken: bool = false
 static var _f15_ineligible_target_reported: bool = false
+static var _f16_target_taken: bool = false
 
 var _f13_sequence_active: bool = false
 var _f13_first_resize_process_logged: bool = false
@@ -28,6 +30,12 @@ var _f15_first_resize_process_logged: bool = false
 var _f15_release_logged: bool = false
 var _f15_edge_path: String = "unknown"
 var _f15_children: Array[WindowContainer] = []
+var _f16_sequence_active: bool = false
+var _f16_first_resize_logged: bool = false
+var _f16_release_logged: bool = false
+var _f16_edge_path: String = "unknown"
+var _f16_last_geometry: Dictionary = {}
+var _f16_correction_applied: bool = false
 
 
 func _process(delta: float) -> void:
@@ -41,6 +49,11 @@ func _process(delta: float) -> void:
 		and not _f15_first_resize_process_logged
 		and _f13_is_resizing()
 	)
+	var f16_resize_active: bool = _f16_sequence_active and _f13_is_resizing()
+	var f16_geometry: Dictionary = {}
+	if f16_resize_active:
+		f16_geometry = _f15_derive_geometry(get_global_mouse_position().snappedf(50))
+		_f16_last_geometry = f16_geometry
 	if first_resize_process:
 		_f13_log_checkpoint("R3_FIRST_RESIZE_PROCESS", "before_super")
 	if f15_first_resize_process:
@@ -54,6 +67,8 @@ func _process(delta: float) -> void:
 	if f15_first_resize_process:
 		_f15_first_resize_process_logged = true
 		_f15_log_checkpoint("S4_AFTER_FIRST_RESIZE_PROCESS", "after_super")
+	if f16_resize_active:
+		_f16_correct_old_bound_size_collapse(f16_geometry)
 
 	if not moving:
 		return
@@ -100,6 +115,7 @@ func move_snapped(to: Vector2) -> void:
 
 func _on_top_left_button_down() -> void:
 	var f15_started: bool = _f15_begin_populated_resize_diagnostic("top-left")
+	_f16_begin_resize_fix_canary("top-left", f15_started)
 	var started: bool = _f13_begin_edge_diagnostic()
 	super._on_top_left_button_down()
 	_f15_complete_resize_start(f15_started)
@@ -108,12 +124,14 @@ func _on_top_left_button_down() -> void:
 
 func _on_top_left_button_up() -> void:
 	super._on_top_left_button_up()
+	_f16_complete_resize_release()
 	_f15_complete_resize_release()
 	_f13_complete_edge_diagnostic_release()
 
 
 func _on_top_button_down() -> void:
 	var f15_started: bool = _f15_begin_populated_resize_diagnostic("top")
+	_f16_begin_resize_fix_canary("top", f15_started)
 	var started: bool = _f13_begin_edge_diagnostic()
 	super._on_top_button_down()
 	_f15_complete_resize_start(f15_started)
@@ -122,12 +140,14 @@ func _on_top_button_down() -> void:
 
 func _on_top_button_up() -> void:
 	super._on_top_button_up()
+	_f16_complete_resize_release()
 	_f15_complete_resize_release()
 	_f13_complete_edge_diagnostic_release()
 
 
 func _on_top_right_button_down() -> void:
 	var f15_started: bool = _f15_begin_populated_resize_diagnostic("top-right")
+	_f16_begin_resize_fix_canary("top-right", f15_started)
 	var started: bool = _f13_begin_edge_diagnostic()
 	super._on_top_right_button_down()
 	_f15_complete_resize_start(f15_started)
@@ -136,12 +156,14 @@ func _on_top_right_button_down() -> void:
 
 func _on_top_right_button_up() -> void:
 	super._on_top_right_button_up()
+	_f16_complete_resize_release()
 	_f15_complete_resize_release()
 	_f13_complete_edge_diagnostic_release()
 
 
 func _on_left_button_down() -> void:
 	var f15_started: bool = _f15_begin_populated_resize_diagnostic("left")
+	_f16_begin_resize_fix_canary("left", f15_started)
 	var started: bool = _f13_begin_edge_diagnostic()
 	super._on_left_button_down()
 	_f15_complete_resize_start(f15_started)
@@ -150,12 +172,14 @@ func _on_left_button_down() -> void:
 
 func _on_left_button_up() -> void:
 	super._on_left_button_up()
+	_f16_complete_resize_release()
 	_f15_complete_resize_release()
 	_f13_complete_edge_diagnostic_release()
 
 
 func _on_bottom_left_button_down() -> void:
 	var f15_started: bool = _f15_begin_populated_resize_diagnostic("bottom-left")
+	_f16_begin_resize_fix_canary("bottom-left", f15_started)
 	var started: bool = _f13_begin_edge_diagnostic()
 	super._on_bottom_left_button_down()
 	_f15_complete_resize_start(f15_started)
@@ -164,12 +188,14 @@ func _on_bottom_left_button_down() -> void:
 
 func _on_bottom_left_button_up() -> void:
 	super._on_bottom_left_button_up()
+	_f16_complete_resize_release()
 	_f15_complete_resize_release()
 	_f13_complete_edge_diagnostic_release()
 
 
 func _on_bottom_button_down() -> void:
 	var f15_started: bool = _f15_begin_populated_resize_diagnostic("bottom")
+	_f16_begin_resize_fix_canary("bottom", f15_started)
 	var started: bool = _f13_begin_edge_diagnostic()
 	super._on_bottom_button_down()
 	_f15_complete_resize_start(f15_started)
@@ -178,12 +204,14 @@ func _on_bottom_button_down() -> void:
 
 func _on_bottom_button_up() -> void:
 	super._on_bottom_button_up()
+	_f16_complete_resize_release()
 	_f15_complete_resize_release()
 	_f13_complete_edge_diagnostic_release()
 
 
 func _on_bottom_right_button_down() -> void:
 	var f15_started: bool = _f15_begin_populated_resize_diagnostic("bottom-right")
+	_f16_begin_resize_fix_canary("bottom-right", f15_started)
 	var started: bool = _f13_begin_edge_diagnostic()
 	super._on_bottom_right_button_down()
 	_f15_complete_resize_start(f15_started)
@@ -192,12 +220,14 @@ func _on_bottom_right_button_down() -> void:
 
 func _on_bottom_right_button_up() -> void:
 	super._on_bottom_right_button_up()
+	_f16_complete_resize_release()
 	_f15_complete_resize_release()
 	_f13_complete_edge_diagnostic_release()
 
 
 func _on_right_button_down() -> void:
 	var f15_started: bool = _f15_begin_populated_resize_diagnostic("right")
+	_f16_begin_resize_fix_canary("right", f15_started)
 	var started: bool = _f13_begin_edge_diagnostic()
 	super._on_right_button_down()
 	_f15_complete_resize_start(f15_started)
@@ -206,8 +236,150 @@ func _on_right_button_down() -> void:
 
 func _on_right_button_up() -> void:
 	super._on_right_button_up()
+	_f16_complete_resize_release()
 	_f15_complete_resize_release()
 	_f13_complete_edge_diagnostic_release()
+
+
+func _f16_begin_resize_fix_canary(edge_path: String, f15_started: bool) -> void:
+	if not f15_started or _f16_target_taken:
+		return
+	_f16_target_taken = true
+	_f16_sequence_active = true
+	_f16_first_resize_logged = false
+	_f16_release_logged = false
+	_f16_edge_path = edge_path
+	_f16_last_geometry = {}
+	_f16_correction_applied = false
+
+
+func _f16_correct_old_bound_size_collapse(geometry: Dictionary) -> void:
+	var decision: Dictionary = _f16_get_correction_decision(geometry)
+	var first_resize: bool = not _f16_first_resize_logged
+	if first_resize:
+		_f16_log_checkpoint("F16_BEFORE_CORRECTION", geometry, decision, false)
+
+	var correction_applied: bool = bool(decision["apply"])
+	if correction_applied:
+		_f16_apply_expanded_candidate(decision)
+		_f16_correction_applied = true
+
+	if first_resize:
+		_f16_log_checkpoint("F16_CORRECTION_DECISION", geometry, decision, correction_applied)
+		_f16_log_checkpoint("F16_AFTER_CORRECTION", geometry, decision, correction_applied)
+		_f16_first_resize_logged = true
+
+
+func _f16_get_correction_decision(geometry: Dictionary) -> Dictionary:
+	var old_rect: Rect2 = geometry["old_rect"]
+	var expanded_rect: Rect2 = geometry["expanded_rect"]
+	var expanded_position: Vector2 = geometry["expanded_snapped_position"]
+	var expanded_valid: bool = (
+		expanded_rect.size.x >= F15_MINIMUM_GROUP_SIZE.x
+		and expanded_rect.size.y >= F15_MINIMUM_GROUP_SIZE.y
+		and not bool(geometry["expanded_minimum_violation"])
+	)
+	var width_guard: bool = (
+		resizing_right
+		and old_rect.size.x < F15_MINIMUM_GROUP_SIZE.x
+		and expanded_valid
+		and (size.x < F15_MINIMUM_GROUP_SIZE.x or custom_minimum_size.x < F15_MINIMUM_GROUP_SIZE.x)
+	)
+	var height_guard: bool = (
+		resizing_bottom
+		and old_rect.size.y < F15_MINIMUM_GROUP_SIZE.y
+		and expanded_valid
+		and (size.y < F15_MINIMUM_GROUP_SIZE.y or custom_minimum_size.y < F15_MINIMUM_GROUP_SIZE.y)
+	)
+	return {
+		"apply": width_guard or height_guard,
+		"width_guard": width_guard,
+		"height_guard": height_guard,
+		"expanded_rect": expanded_rect,
+		"expanded_position": expanded_position,
+	}
+
+
+func _f16_apply_expanded_candidate(decision: Dictionary) -> void:
+	var expanded_rect: Rect2 = decision["expanded_rect"]
+	var corrected_size: Vector2 = size
+	var corrected_minimum: Vector2 = custom_minimum_size
+	if bool(decision["width_guard"]):
+		corrected_size.x = expanded_rect.size.x
+		corrected_minimum.x = expanded_rect.size.x
+	if bool(decision["height_guard"]):
+		corrected_size.y = expanded_rect.size.y
+		corrected_minimum.y = expanded_rect.size.y
+
+	# Control property setters preserve the vanilla resize signal/update path.
+	custom_minimum_size = corrected_minimum
+	size = corrected_size
+	var expanded_position: Vector2 = decision["expanded_position"]
+	if not position.is_equal_approx(expanded_position):
+		move(expanded_position)
+
+
+func _f16_complete_resize_release() -> void:
+	if not _f16_sequence_active or _f16_release_logged:
+		return
+	_f16_release_logged = true
+	_f16_log_checkpoint(
+		"F16_AFTER_RELEASE",
+		_f16_last_geometry,
+		{},
+		_f16_correction_applied
+	)
+	_f16_sequence_active = false
+	call_deferred("_f16_log_one_frame_after_release")
+
+
+func _f16_log_one_frame_after_release() -> void:
+	if not _f16_release_logged:
+		return
+	_f16_log_checkpoint(
+		"F16_ONE_FRAME_AFTER_RELEASE",
+		_f16_last_geometry,
+		{},
+		_f16_correction_applied
+	)
+
+
+func _f16_log_checkpoint(
+	checkpoint: String,
+	geometry: Dictionary,
+	decision: Dictionary,
+	correction_applied: bool
+) -> void:
+	var child_geometry: Dictionary = _f15_collect_child_geometry()
+	var old_rect: Variant = geometry.get("old_rect", "unavailable")
+	var expanded_rect: Variant = geometry.get("expanded_rect", "unavailable")
+	var width_guard: Variant = decision.get("width_guard", "unavailable")
+	var height_guard: Variant = decision.get("height_guard", "unavailable")
+	ModLoaderLog.info(
+		"[F16][%s] group=%s edge=%s resizing_left=%s resizing_right=%s resizing_top=%s resizing_bottom=%s old_candidate_rect=%s expanded_candidate_rect=%s actual_position=%s actual_size=%s actual_custom_minimum_size=%s width_guard=%s height_guard=%s correction_applied=%s child_count=%d child_bounding_box=%s child_relative_bounds=%s contained_connector_count=%d connection_presence=%s" % [
+			checkpoint,
+			name,
+			_f16_edge_path,
+			str(resizing_left),
+			str(resizing_right),
+			str(resizing_top),
+			str(resizing_bottom),
+			str(old_rect),
+			str(expanded_rect),
+			str(position),
+			str(size),
+			str(custom_minimum_size),
+			str(width_guard),
+			str(height_guard),
+			str(correction_applied),
+			int(child_geometry["valid_count"]),
+			str(child_geometry["bounding_box"]),
+			str(child_geometry["relative_bounds"]),
+			int(child_geometry["connector_count"]),
+			str(int(child_geometry["connector_count"]) > 0),
+		],
+		F16_LOG_NAME
+	)
 
 
 func _f15_begin_populated_resize_diagnostic(edge_path: String) -> bool:
