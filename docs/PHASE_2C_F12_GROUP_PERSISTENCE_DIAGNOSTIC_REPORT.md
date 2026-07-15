@@ -2,11 +2,20 @@
 
 ## Status
 
-`F12_DIAGNOSTIC_CANARY_READY_FOR_USER_TEST`
+`F12_INTERRUPTED_BY_GROUP_RESIZE_BLOCKER`
 
 F12 is a local development diagnostic canary for group persistence. It is not a
 release candidate and must not be published as a GitHub Release, tag, Workshop
 upload, or replacement v0.2.9 artifact.
+
+The F12 group persistence diagnostic was interrupted by a higher-priority group
+resize disappearance blocker discovered during user testing. Do not treat F12
+as PASS.
+
+User supplemental observation: an existing group moved to the expanded area
+persisted after save, exit, restart, and load. This is promising persistence
+evidence, but it is not a complete F12 pass because the group resize path is
+now a blocker.
 
 ## Purpose
 
@@ -90,6 +99,13 @@ double movement symptoms.
 | Group selectable after load | NOT TESTED |
 | Double movement detected | NOT TESTED |
 
+Supplemental observation:
+
+| Observation | Result |
+|---|---|
+| Existing group moved to expanded area persists after save/exit/restart/load | USER OBSERVED PASS |
+| New group edge resize drag | USER OBSERVED FAIL |
+
 Codex has not run the game and does not mark any F12 runtime behavior as PASS.
 
 ## Static Verification
@@ -150,6 +166,7 @@ secret, or external Workshop Mod path entries.
 13. Exit the game.
 14. Provide the `[F12]` and related `[F6]` log lines.
 
-Group movement, group resize, full regression, release integration, public
-master push, Release, tag, Workshop publication, and v0.2.9 artifact operations
-remain out of scope.
+F12 testing is paused. The next approved work item is the F13 group resize
+disappearance diagnostic plan. Group movement, group resize fix implementation,
+full regression, release integration, public master push, Release, tag,
+Workshop publication, and v0.2.9 artifact operations remain out of scope.

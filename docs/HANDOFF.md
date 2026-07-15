@@ -112,13 +112,20 @@
   * Diagnostic follow-up: the one-target flag is per dragger instance, so three bounded sequences were emitted in the session. There is no continuous logging, but a future diagnostics-only cleanup should scope this to one target per game session before any wider canary.
   * Do not proceed to group/full regression/release integration, publish, tag, push public master, or operate on v0.2.9.
 * **Phase 2C-F12 / v0.2.19 group persistence diagnostic canary**:
-  * **Status: `F12_DIAGNOSTIC_CANARY_READY_FOR_USER_TEST`**
+  * **Status: `F12_INTERRUPTED_BY_GROUP_RESIZE_BLOCKER`**
   * Plan: `docs/PHASE_2C_F12_GROUP_PERSISTENCE_DIAGNOSTIC_PLAN.md`; report: `docs/PHASE_2C_F12_GROUP_PERSISTENCE_DIAGNOSTIC_REPORT.md`.
   * F12 is diagnostic-only and does not change F6 local restoration. It correlates exactly one saved expanded-area group frame with one or two saved fully enclosed child nodes, then compares frame/child saved local positions and child-to-frame relative local deltas before correction, after unchanged F6 correction, at the next deferred checkpoint, and at a one-shot 0.5-second opening-settle checkpoint.
   * F12 logs `G1_SAVED_GROUP_FRAME_LOCAL` through `G11_OPENING_SETTLE_CHILDREN`, plus `[F12][STOP]` when a safe unambiguous group/child target cannot be selected. It has no `_process()`, every-frame logging, continuous monitor, group movement change, group resize change, save-schema change, WindowContainer/Base/Indexed extension, or `get_position_snapped()` override.
   * `Nekochan-ExpandedWorkspace-0.2.19.zip` is a local development diagnostic artifact: SHA-256 `176b0b9871639d8c22eea0ae620b19e8840b64e2f1802a0a1a245600a5c193f7`, 16106 bytes, 14 files, ZIP root `mods-unpacked`.
-  * F6/F7/F9/F11 verified behavior is preserved by scope. F12 user verification is still `NOT TESTED`; Codex must not classify group persistence as PASS until the user tests `Nekochan-ExpandedWorkspace-0.2.19.zip` and provides `[F12]` logs.
+  * User interrupted F12 after finding `GROUP_RESIZE_EDGE_DRAG_DISAPPEARANCE_BLOCKER`: placing a new group, hovering an edge point, and starting an edge resize drag makes the group disappear. Do not classify F12 as PASS.
+  * Supplemental user observation: an existing group moved to the expanded area persisted after save, exit, restart, and load. This is promising but incomplete group persistence evidence because resize is now a blocker.
   * Full regression, release integration, public master push, Release/tag/Workshop operation, and v0.2.9 artifact operation remain blocked.
+* **Phase 2C-F13 / group resize disappearance diagnostic plan**:
+  * **Status: `F13_GROUP_RESIZE_DISAPPEARANCE_PLAN_READY`**
+  * Plan: `docs/PHASE_2C_F13_GROUP_RESIZE_DISAPPEARANCE_PLAN.md`.
+  * Static analysis points to `scenes/windows/window_group.gd`: vanilla resize uses separate `resizing_left/right/top/bottom` flags and hard-coded `MAX_BOUNDS = Vector2(10000, 10000)`. The current Mod extension runs `super._process(delta)` and only corrects the `moving` path afterward, so edge resize remains on the old-boundary path.
+  * First diagnostic artifact candidate is `0.2.20`, scoped to one group and bounded R1-R5 checkpoints to classify whether the group is queue-freed, hidden, moved out of bounds, size-collapsed, invalid-rect, clipped, reparented/lost membership, render-only disappeared, or unresolved.
+  * No F13 runtime code, manifest version change, artifact, push, Release, tag, Workshop operation, or fix implementation exists yet.
 * **Phase 2A 検証状態**:
   * **Status: `LIMIT_RELAXATION_COMPLETE_USER_VERIFIED`**
   * Phase 2A-R2で、通常の手動配置は500個を超えて配置できることをユーザー実機で確認済み。
