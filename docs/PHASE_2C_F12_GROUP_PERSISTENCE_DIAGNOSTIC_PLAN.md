@@ -2,7 +2,7 @@
 
 ## Status
 
-`PLAN_READY_FOR_IMPLEMENTATION_APPROVAL`
+`IMPLEMENTATION_COMPLETE_AWAITING_USER_TEST`
 
 ## Objective
 
@@ -50,12 +50,23 @@ and make no group-specific inference.
 
 For the selected frame and each correlated child, log only:
 
-- `F12_GROUP_SAVED`: saved local position, saved size, frame/child role, and
-  saved group-relative delta for children.
-- `F12_GROUP_BEFORE`: runtime local position before the existing F6 correction.
-- `F12_GROUP_AFTER`: runtime local position after that unchanged correction.
-- `F12_GROUP_STABILITY`: runtime local position at the existing deferred F6
-  stability checkpoint.
+- `G1_SAVED_GROUP_FRAME_LOCAL`: saved group frame local position and size.
+- `G2_SAVED_CHILD_LOCAL_POSITIONS`: saved child local position and saved
+  group-relative delta.
+- `G3_SAVED_GROUP_MEMBERSHIP`: selected saved frame/child correlation.
+- `G4_BEFORE_RESTORE_CORRECTION_FRAME`: runtime frame state before F6
+  correction.
+- `G5_BEFORE_RESTORE_CORRECTION_CHILDREN`: runtime child state before F6
+  correction.
+- `G6_AFTER_RESTORE_CORRECTION_FRAME`: runtime frame state after unchanged F6
+  correction.
+- `G7_AFTER_RESTORE_CORRECTION_CHILDREN`: runtime child state after unchanged
+  F6 correction.
+- `G8_NEXT_DEFERRED_FRAME`: one deferred frame stability checkpoint.
+- `G9_NEXT_DEFERRED_CHILDREN`: one deferred child stability checkpoint.
+- `G10_OPENING_SETTLE_FRAME`: one 0.5-second opening-settle frame checkpoint.
+- `G11_OPENING_SETTLE_CHILDREN`: one 0.5-second opening-settle child
+  checkpoint.
 
 For each child, calculate at every checkpoint:
 
@@ -100,8 +111,8 @@ camera/background changed: NO
 ```
 
 No vanilla function body may be copied. No continuous monitor, `_process()`,
-or timer loop is permitted. The existing F6 single deferred stability callback
-is the only deferred observation point.
+or timer loop is permitted. F12 uses one deferred checkpoint and one one-shot
+0.5-second opening-settle timer only; it performs no continuous observation.
 
 ## Stop Conditions
 
@@ -123,10 +134,8 @@ guess a movement or resize repair.
 
 ## Proposed Artifact Boundary
 
-If implementation is separately approved:
-
-- Proposed version: `0.2.19`
-- Proposed artifact: `Nekochan-ExpandedWorkspace-0.2.19.zip`
+- Version: `0.2.19`
+- Artifact: `Nekochan-ExpandedWorkspace-0.2.19.zip`
 - Type: local development diagnostic canary only
 
 No Release, Draft Release, tag, Workshop operation, public `master` push,
@@ -148,8 +157,11 @@ merge, or v0.2.9 artifact operation is permitted.
 Group resize, group movement, full regression, and release integration are out
 of scope.
 
-## Approval Gate
+## Implementation State
 
-This document is a plan only. Do not modify Mod code, change the manifest,
-build an artifact, or run a group persistence test until the user explicitly
-approves the F12 implementation.
+The user approved F12 implementation after this plan. The implementation is
+diagnostic-only: it adds bounded F12 group/child checkpoint logging around the
+existing F6 restoration path, keeps the F6 mutation lines unchanged, and does
+not add a group persistence fix.
+
+User verification is still required before classifying group persistence.
