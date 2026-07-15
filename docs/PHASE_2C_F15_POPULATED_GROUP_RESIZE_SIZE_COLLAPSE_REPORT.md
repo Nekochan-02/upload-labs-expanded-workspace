@@ -2,18 +2,75 @@
 
 ## Status
 
-`F15_DIAGNOSTIC_CANARY_READY_FOR_USER_TEST`
+`F15_GROUP_SIZE_WIDTH_COLLAPSED_CONFIRMED`
 
 F15 is a local development diagnostic artifact. It is not a release candidate.
 Do not publish, tag, push to public master, upload to Workshop, or replace the
 blocked v0.2.9 artifact.
 
+## User Test Result
+
+The user installed only `0.2.22`, created one expanded-area group containing
+exactly two nodes, and attempted one `top-right` resize. The frame immediately
+became thin and vertically elongated. The two nodes and their visible
+connection/state remained. No save was made after the failure, and the user
+exited without further action.
+
+## Runtime Evidence
+
+Source: `C:\Users\shian\AppData\Roaming\Upload Labs\logs\godot.log` and
+`modloader.log`, `[F15]` lines for `group15`. Both logs contain the same F15
+sequence.
+
+| Checkpoint | Measured state |
+|---|---|
+| `S1_BEFORE_POPULATED_RESIZE` | Frame `(13900,16250)`, size/minimum `(800,650)`; two valid children; edge recorded as `top-right`. This pre-edge baseline retains the prior drag-start values. |
+| `S2_RESIZE_START` | `resizing_top=true`, `resizing_right=true`; `drag_start_rect=(13900,16250,800,650)`; `drag_start_mouse=(14700,16250)`; current mouse equal to start; delta `(0,0)`. |
+| `S3_FIRST_SIZE_CALCULATION` | Same active edge and zero delta. Old-bound candidate is position `(13900,16250)`, size `(-3900,650)`, minimum violation `true`; expanded candidate remains `(13900,16250,800,650)`, violation `false`. |
+| `S4_AFTER_FIRST_RESIZE_PROCESS` | Frame position/global remains `(13900,16250)`, but actual size is `(20,650)` and `custom_minimum_size=(-3900,650)`. Both children remain valid with unchanged geometry. |
+| `S5_AFTER_RELEASE` | Frame remains `(13900,16250)`, size `(20,650)`, minimum `(-3900,650)`; resize flags clear. |
+| `S6_ONE_FRAME_AFTER_RELEASE` | Same collapsed width/minimum and same child geometry; no deferred recovery. |
+
+The old-bound candidate snaps to `(13900,9350)` at S2/S3, whereas the expanded
+candidate snaps to the unchanged valid position `(13900,16250)`. F14 therefore
+continues to protect frame position for this path; the visual displacement is
+the collapsed frame geometry, not a recorded change in frame local/global
+position.
+
+## Classification
+
+`GROUP_SIZE_WIDTH_COLLAPSED`
+
+The diagnosis is direct: the `top-right` right-edge calculation starts from a
+left anchor of `13900`. With zero mouse delta, the vanilla old-bound width limit
+produces `10000 - 13900 = -3900`. The first vanilla resize process assigns that
+value to `custom_minimum_size.x`; Godot exposes the rendered frame width as
+`20`. The expanded-bound candidate preserves the correct `800` width.
+
+This excludes a mouse-delta mismatch, edge-flag mismatch, child-bounds issue,
+render-only issue, or F14 position-snap residue for the tested path. The F15
+contained connector-point count is `0`; that metric only counts connector
+points geometrically inside the frame and does not negate the user's separate
+visual confirmation that connection/state remained.
+
+## Minimal Fix Candidate (Not Implemented)
+
+At the existing `WindowGroup` extension's post-vanilla resize point, add a
+future narrow correction only when an active right or bottom resize would
+produce a non-positive old-bound size while the independently derived
+expanded-bound rectangle is valid. Restore only the expanded candidate's size,
+`custom_minimum_size`, and position through the existing notification path.
+
+This would leave F14's `move_snapped(to)` branch intact and avoid copying the
+vanilla `_process()` body. It is a candidate only: it requires a separate
+approved canary plan and must not be implemented from this report alone.
+
 ## Purpose
 
 F14 remains verified for its primary left/top old-bound position-snap path.
 F15 records the separate populated-group thin/tall observation without
-changing resize behavior. It has no runtime classification before user evidence
-is collected.
+changing resize behavior. The user evidence and F15 checkpoints now classify
+the tested `top-right` path as `GROUP_SIZE_WIDTH_COLLAPSED`.
 
 ## Implementation Scope
 
@@ -112,18 +169,18 @@ The ZIP was inspected after the final build: it has one `mods-unpacked` root,
 
 | Test | Result |
 |---|---|
-| Populated group resize reproduces collapse | NOT TESTED |
-| Edge/corner identified | NOT TESTED |
-| Width collapse | NOT TESTED |
-| Height collapse | NOT TESTED |
-| Minimum size interaction | NOT TESTED |
-| Child bounding box interaction | NOT TESTED |
-| Old-bound candidate implicated | NOT TESTED |
-| Expanded-bound candidate implicated | NOT TESTED |
-| Classification | NOT TESTED |
+| Populated group resize reproduces collapse | USER OBSERVED FAIL; LOG CORROBORATED |
+| Edge/corner identified | LOG VERIFIED: `top-right` |
+| Width collapse | LOG VERIFIED: `(800,650)` to `(20,650)` |
+| Height collapse | NOT OBSERVED |
+| Minimum size interaction | LOG VERIFIED: `custom_minimum_size.x=-3900` |
+| Child bounding box interaction | NOT OBSERVED: unchanged through S6 |
+| Old-bound candidate implicated | LOG VERIFIED: width `-3900` with zero delta |
+| Expanded-bound candidate implicated | LOG VERIFIED: valid `(800,650)` candidate |
+| Classification | `GROUP_SIZE_WIDTH_COLLAPSED` |
 
-Codex has not run the game. Runtime classification is intentionally deferred to
-user evidence and actual `[F15]` log lines.
+Codex has not run the game. This classification combines the user's visual
+result with the actual `[F15]` checkpoint evidence.
 
 ## User Test Steps
 
