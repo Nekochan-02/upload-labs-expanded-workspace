@@ -121,11 +121,12 @@
   * Supplemental user observation: an existing group moved to the expanded area persisted after save, exit, restart, and load. This is promising but incomplete group persistence evidence because resize is now a blocker.
   * Full regression, release integration, public master push, Release/tag/Workshop operation, and v0.2.9 artifact operation remain blocked.
 * **Phase 2C-F13 / group resize disappearance diagnostic plan**:
-  * **Status: `F13_GROUP_RESIZE_DISAPPEARANCE_PLAN_READY`**
+  * **Status: `F13_DIAGNOSTIC_CANARY_READY_FOR_USER_TEST`**
   * Plan: `docs/PHASE_2C_F13_GROUP_RESIZE_DISAPPEARANCE_PLAN.md`.
   * Static analysis points to `scenes/windows/window_group.gd`: vanilla resize uses separate `resizing_left/right/top/bottom` flags and hard-coded `MAX_BOUNDS = Vector2(10000, 10000)`. The current Mod extension runs `super._process(delta)` and only corrects the `moving` path afterward, so edge resize remains on the old-boundary path.
   * First diagnostic artifact candidate is `0.2.20`, scoped to one group and bounded R1-R5 checkpoints to classify whether the group is queue-freed, hidden, moved out of bounds, size-collapsed, invalid-rect, clipped, reparented/lost membership, render-only disappeared, or unresolved.
-  * No F13 runtime code, manifest version change, artifact, push, Release, tag, Workshop operation, or fix implementation exists yet.
+  * `0.2.20` adds bounded observation only: one group is claimed at its first edge resize start; R1-R5 capture before/after flag setup, the first original resize process, one deferred state, and release/cancel. A self-freeing observer reports `is_instance_valid=false` at R4/R5 if the group no longer exists. The original resize handlers and resize `_process()` body are invoked through `super`; no resize calculation, `MAX_BOUNDS`, save schema, F6/F7/F9/F11/F12 behavior, or blocked Window extension is changed.
+  * `docs/PHASE_2C_F13_GROUP_RESIZE_DISAPPEARANCE_REPORT.md` is the runtime evidence record. User testing must use a temporary state, not save after disappearance, and provide `[F13]` logs. Do not proceed to a resize fix, F12 continuation, full regression, release integration, public master push, Release, tag, Workshop, or v0.2.9 artifact operation.
 * **Phase 2A 検証状態**:
   * **Status: `LIMIT_RELAXATION_COMPLETE_USER_VERIFIED`**
   * Phase 2A-R2で、通常の手動配置は500個を超えて配置できることをユーザー実機で確認済み。
