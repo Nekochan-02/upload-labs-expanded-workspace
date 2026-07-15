@@ -8,12 +8,16 @@ const GroupResizeDiagnosticObserver = preload(
 )
 const F13_LOG_NAME: String = "Nekochan-ExpandedWorkspace:F13"
 const F13_OLD_WORKSPACE_SIZE: Vector2 = Vector2(10000, 10000)
+const F14_LOG_NAME: String = "Nekochan-ExpandedWorkspace:F14"
 
 static var _f13_target_taken: bool = false
 
 var _f13_sequence_active: bool = false
 var _f13_first_resize_process_logged: bool = false
 var _f13_observer: Node
+var _f14_first_move_snapped_logged: bool = false
+var _f14_after_resize_frame_logged: bool = false
+var _f14_after_release_logged: bool = false
 
 
 func _process(delta: float) -> void:
@@ -40,6 +44,38 @@ func _process(delta: float) -> void:
 		WorkspaceAreaConfig.get_max_position(size)
 	).snappedf(50)
 	move(target_position)
+
+
+func move_snapped(to: Vector2) -> void:
+	if not _is_expanded_workspace_resize_active():
+		super.move_snapped(to)
+		return
+
+	var position_before: Vector2 = position
+	var clamped_target: Vector2 = to.clamp(
+		Vector2.ZERO,
+		WorkspaceAreaConfig.get_max_position(size)
+	)
+	var snapped_target: Vector2 = clamped_target.snappedf(50)
+	if _f13_sequence_active and not _f14_first_move_snapped_logged:
+		_f14_log_resize_move_snapped_input(
+			to,
+			clamped_target,
+			snapped_target,
+			position_before
+		)
+
+	move(snapped_target)
+
+	if _f13_sequence_active and not _f14_first_move_snapped_logged:
+		_f14_first_move_snapped_logged = true
+		_f14_log_resize_move_snapped_output(
+			to,
+			clamped_target,
+			snapped_target,
+			position_before
+		)
+		call_deferred("_f14_log_after_resize_first_frame")
 
 
 func _on_top_left_button_down() -> void:
@@ -136,6 +172,9 @@ func _f13_begin_edge_diagnostic() -> bool:
 
 	_f13_target_taken = true
 	_f13_sequence_active = true
+	_f14_first_move_snapped_logged = false
+	_f14_after_resize_frame_logged = false
+	_f14_after_release_logged = false
 	_f13_connect_lifecycle_signals()
 	_f13_log_checkpoint("R1_BEFORE_EDGE_DRAG", "before_resize_flag")
 	return true
@@ -156,6 +195,7 @@ func _f13_complete_edge_diagnostic_release() -> void:
 		return
 
 	_f13_log_checkpoint("R5_AFTER_RELEASE_OR_CANCEL", "after_resize_clear")
+	_f14_log_after_release_or_cancel()
 	if is_instance_valid(_f13_observer):
 		_f13_observer.log_after_release_or_cancel()
 	_f13_sequence_active = false
@@ -187,6 +227,104 @@ func _f13_log_from_observer(checkpoint: String) -> void:
 
 func _f13_is_resizing() -> bool:
 	return resizing_left or resizing_right or resizing_top or resizing_bottom
+
+
+func _is_expanded_workspace_resize_active() -> bool:
+	return resizing_left or resizing_right or resizing_top or resizing_bottom
+
+
+func _f14_log_resize_move_snapped_input(
+	input_to: Vector2,
+	clamped_target: Vector2,
+	snapped_target: Vector2,
+	position_before: Vector2
+) -> void:
+	ModLoaderLog.info(
+		"[F14][F14_RESIZE_MOVE_SNAPPED_INPUT] group=%s input_to=%s clamped_target=%s snapped_target=%s position_before=%s size=%s resizing_left=%s resizing_right=%s resizing_top=%s resizing_bottom=%s is_inside_tree=%s visible=%s" % [
+			name,
+			str(input_to),
+			str(clamped_target),
+			str(snapped_target),
+			str(position_before),
+			str(size),
+			str(resizing_left),
+			str(resizing_right),
+			str(resizing_top),
+			str(resizing_bottom),
+			str(is_inside_tree()),
+			str(visible),
+		],
+		F14_LOG_NAME
+	)
+
+
+func _f14_log_resize_move_snapped_output(
+	input_to: Vector2,
+	clamped_target: Vector2,
+	snapped_target: Vector2,
+	position_before: Vector2
+) -> void:
+	ModLoaderLog.info(
+		"[F14][F14_RESIZE_MOVE_SNAPPED_OUTPUT] group=%s input_to=%s clamped_target=%s snapped_target=%s position_before=%s position_after=%s size=%s resizing_left=%s resizing_right=%s resizing_top=%s resizing_bottom=%s is_inside_tree=%s visible=%s" % [
+			name,
+			str(input_to),
+			str(clamped_target),
+			str(snapped_target),
+			str(position_before),
+			str(position),
+			str(size),
+			str(resizing_left),
+			str(resizing_right),
+			str(resizing_top),
+			str(resizing_bottom),
+			str(is_inside_tree()),
+			str(visible),
+		],
+		F14_LOG_NAME
+	)
+
+
+func _f14_log_after_resize_first_frame() -> void:
+	if _f14_after_resize_frame_logged or not _f14_first_move_snapped_logged:
+		return
+
+	_f14_after_resize_frame_logged = true
+	ModLoaderLog.info(
+		"[F14][F14_AFTER_RESIZE_FIRST_FRAME] group=%s position=%s size=%s resizing_left=%s resizing_right=%s resizing_top=%s resizing_bottom=%s is_inside_tree=%s visible=%s" % [
+			name,
+			str(position),
+			str(size),
+			str(resizing_left),
+			str(resizing_right),
+			str(resizing_top),
+			str(resizing_bottom),
+			str(is_inside_tree()),
+			str(visible),
+		],
+		F14_LOG_NAME
+	)
+
+
+func _f14_log_after_release_or_cancel() -> void:
+	if _f14_after_release_logged:
+		return
+
+	_f14_after_release_logged = true
+	ModLoaderLog.info(
+		"[F14][F14_AFTER_RELEASE_OR_CANCEL] group=%s resize_branch_used=%s position=%s size=%s resizing_left=%s resizing_right=%s resizing_top=%s resizing_bottom=%s is_inside_tree=%s visible=%s" % [
+			name,
+			str(_f14_first_move_snapped_logged),
+			str(position),
+			str(size),
+			str(resizing_left),
+			str(resizing_right),
+			str(resizing_top),
+			str(resizing_bottom),
+			str(is_inside_tree()),
+			str(visible),
+		],
+		F14_LOG_NAME
+	)
 
 
 func _f13_log_checkpoint(checkpoint: String, phase: String) -> void:
