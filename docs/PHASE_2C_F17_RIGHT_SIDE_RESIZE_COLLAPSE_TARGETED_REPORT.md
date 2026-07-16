@@ -7,6 +7,18 @@
 F17 is a local development canary, not a release candidate. Do not publish,
 tag, push to public master, upload to Workshop, or modify v0.2.9.
 
+## F19 Scope Decision
+
+F19 carries the primary `top-right` and secondary childless `right` results as
+verified scope: `F17 top-right group resize width-collapse: VERIFIED` and
+`F17 right-side childless group resize width-collapse: VERIFIED`.
+
+This does not prove the exhaustive group-resize edge matrix. Bottom and
+bottom-right are classified as targeted regression candidates, while a full
+all-edges matrix is deferred unless targeted checks expose a blocker. F17
+diagnostic logs and target-acquisition flags remain cleanup candidates before a
+clean RC.
+
 ## Test Validity
 
 The first reported attempt was invalid because it loaded `0.2.23`; that

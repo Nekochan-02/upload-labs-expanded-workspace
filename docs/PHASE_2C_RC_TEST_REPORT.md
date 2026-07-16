@@ -1,5 +1,15 @@
 # Phase 2C v0.2.9 Release Candidate Test Report
 
+## F19 Staleness Notice
+
+This report remains historical evidence for the blocked `v0.2.9` release
+candidate. It is superseded for current scope decisions by
+`docs/PHASE_2C_F19_POST_F12_SCOPE_DECISION_PLAN.md`.
+
+`v0.2.9` remains unchanged and must not be published. The current verified
+development canary is `0.2.24`, but `0.2.24` contains diagnostic code/logging
+and is not a clean Release Candidate.
+
 ## Artifact
 
 - filename: `Nekochan-ExpandedWorkspace-0.2.9.zip`

@@ -74,6 +74,17 @@ This verdict covers one saved expanded-area group frame with two contained
 children and one observed connection. It does not cover group resize beyond
 the setup prerequisite, full regression, release integration, or publication.
 
+## F19 Scope Decision
+
+F19 accepts this post-F17 F12 result as verified evidence for the narrow group
+persistence target. The result should be carried into the scope-decision plan
+as `F12 group persistence post-F17: VERIFIED`.
+
+This does not convert `0.2.24` into a release candidate. The F12 diagnostic
+logging remains part of the current canary source and must be removed or gated
+before a clean RC artifact. The next recommended action is a targeted
+regression plan, not full regression or release integration.
+
 ## Purpose
 
 F12 measures whether the verified F6 restoration-only local correction is safe

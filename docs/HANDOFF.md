@@ -4,6 +4,21 @@
 
 ---
 
+## 0. 最新再開ポイント
+
+* **Phase 2C-F19 / post-F12 scope decision**:
+  * **Status: `F19_POST_F12_SCOPE_DECISION_PLAN_READY`**
+  * Current branch: `dev/phase-2c-f19-post-f12-scope-decision`.
+  * Verified HEAD before F19 docs work: `4fe64b5abde9088f6556ff234d7af15104fbcf16`.
+  * `origin/master` remains `0489e834bb1eff79742081f32656ee43f04a2cb5`; the local development branch was ahead by 40 commits before F19.
+  * `0.2.24` / `Nekochan-ExpandedWorkspace-0.2.24.zip` is the current verified development canary. Size: `22115 bytes`; SHA-256: `942f67e0e0535b208a6ecc67d1d13cd9baf714035a8471dcdad55926373e7e7c`.
+  * `0.2.24` is diagnostic-heavy and is not a clean Release Candidate. `v0.2.9` remains unchanged and stale relative to verified fixes.
+  * Verified scope now includes F6 single-node exact local persistence, F7 primary line-grid density restoration, F9 click local alignment, F11 drag local alignment, F14 old-bound group resize snap, F17 right/top-right width-collapse correction, and F12 post-F17 group persistence.
+  * Next recommended action: create a targeted regression plan. Do not start full regression, release integration, diagnostic cleanup implementation, build, version bump, push, tag, GitHub Release, or Workshop publication.
+  * Scope decision plan: `docs/PHASE_2C_F19_POST_F12_SCOPE_DECISION_PLAN.md`.
+
+---
+
 ## 1. 現状のステータス要約
 
 * **Phase 2C-F2 / v0.2.10 regression state**:
