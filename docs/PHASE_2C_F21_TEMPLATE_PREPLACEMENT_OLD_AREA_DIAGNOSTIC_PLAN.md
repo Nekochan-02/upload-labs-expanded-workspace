@@ -1,6 +1,6 @@
 # Phase 2C-F21: Template Pre-placement Old-Area QoL Diagnostic Plan
 
-Status: `F21_TEMPLATE_PREPLACEMENT_DIAGNOSTIC_CANARY_READY_FOR_USER_TEST`
+Status: `TEMPLATE_CAMERA_SOURCE_OLD_BOUND_CLAMPED_CONFIRMED`
 
 Implementation authorization: the user approved the bounded `0.2.25`
 diagnostic canary after this plan's F21 docs-only commit. The authorization is
@@ -8,8 +8,11 @@ limited to observation around `Desktop.paste()`, one template placement
 sequence, and T1-T8 checkpoints. It does not authorize a placement fix.
 
 Implementation record: `0.2.25` was packaged as a development diagnostic
-artifact. Runtime verification remains pending and classification remains
-`UNRESOLVED`.
+artifact. The first reported runtime attempt used `0.2.24`; the valid retest
+loaded only `0.2.25` and emitted all T1-T8 checkpoints. It confirms
+`TEMPLATE_CAMERA_SOURCE_OLD_BOUND_CLAMPED`: the camera-derived raw target is
+within the expanded area, but the immediate and deferred positions both equal
+the old-bound candidate.
 
 This plan was docs-only until the user separately approved the bounded `0.2.25`
 diagnostic implementation. That approval authorizes observation-only runtime
@@ -100,10 +103,10 @@ The future diagnostic must select one primary result or `UNRESOLVED`:
 | `TEMPLATE_SCREEN_TO_WORLD_DOMAIN_MISMATCH` | Preview input path proves a bad screen/world conversion. |
 | `UNRESOLVED` | Evidence does not isolate one branch. |
 
-## Future Diagnostic Proposal
+## Diagnostic Execution
 
-If separately approved, create a bounded `0.2.25` diagnostic artifact named
-`Nekochan-ExpandedWorkspace-0.2.25.zip`. F21 neither implements nor builds it.
+The approved bounded `0.2.25` diagnostic artifact already exists as
+`Nekochan-ExpandedWorkspace-0.2.25.zip`. Do not rebuild it for the retest.
 
 The touchpoint is the template/schematic `Desktop.paste()` path. It must
 preserve vanilla behavior, log one placement sequence only, avoid every-frame
@@ -159,5 +162,5 @@ approved observation-only `0.2.25` diagnostic; its local artifact was built.
 
 ## Next Recommended Action
 
-Request approval to implement a `0.2.25` template pre-placement diagnostic
-artifact, limited to one placement sequence and T1-T8 checkpoints.
+Create a docs-only, minimal template pre-placement fix plan for the confirmed
+old-bound clamp. Do not implement the fix without separate approval.
