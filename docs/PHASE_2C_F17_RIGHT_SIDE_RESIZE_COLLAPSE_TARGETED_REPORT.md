@@ -2,7 +2,7 @@
 
 ## Status
 
-`F17_TOP_RIGHT_WIDTH_COLLAPSE_VERIFIED`
+`F17_RIGHT_SIDE_WIDTH_COLLAPSE_VERIFIED`
 
 F17 is a local development canary, not a release candidate. Do not publish,
 tag, push to public master, upload to Workshop, or modify v0.2.9.
@@ -50,14 +50,24 @@ change only because the top edge moves by 50. F15's connector count is `0`, so
 runtime logs do not independently prove the connection; the user's visual
 result confirms connection/state remained.
 
+In a fresh `0.2.24` session, the secondary childless `right` target is also
+captured once for `group0`. The old candidate width is `-6000`, the expanded
+candidate is `(300,200)`, and vanilla transiently produces size/minimum
+`(20,200)` / `(-6000,200)`. F17 records
+`correction_branch_evaluated=true`, `width_guard=true`, and
+`correction_applied=true`, restoring `(300,200)` / `(300,200)` before the
+first corrected frame. Release and one-frame stability are `(450,200)` with
+the same non-negative minimum. F13/F14 confirm the frame remains valid,
+inside the tree, visible, and at `(16000,18250)`, with no old-bound jump.
+
 ## Canary Verdict
 
-`F17_TOP_RIGHT_WIDTH_COLLAPSE_VERIFIED`
+`F17_RIGHT_SIDE_WIDTH_COLLAPSE_VERIFIED`
 
-The F17 primary top-right canary passes. It directly captures and corrects the
-known old-bound width collapse in the same resize frame, preserving a visible,
-valid frame through release. This does not verify the separate secondary
-`right` path, group persistence, full regression, or release readiness.
+The F17 primary `top-right` and secondary childless `right` canaries pass. Both
+directly capture and correct the known old-bound width collapse in the same
+resize frame, preserving a visible, valid frame through release. This does not
+resume group persistence, full regression, or release readiness.
 
 ## F16 Handling
 
@@ -143,10 +153,11 @@ The repository build allowlist and the resulting ZIP inspection both passed.
 | Test | Result |
 |---|---|
 | Top-right target captured | PASS: `group18`, `edge=top-right` |
-| Top-left did not consume target | PASS: top-right is the sole F17 target; user did not touch top-left |
-| Correction branch evaluated on right/top-right | PASS: `correction_branch_evaluated=true`, `width_guard=true` |
-| Width does not collapse to 20 | PASS after correction: transient vanilla `20` restored to `300`, then `700` at release |
-| `custom_minimum_size.x` non-negative | PASS after correction: `-5250` restored to `300`, then `700` at release |
+| Right target captured | PASS: `group0`, `edge=right` |
+| Top-left did not consume target | PASS: top-right and right were first targets in separate sessions; user did not touch top-left |
+| Correction branch evaluated on right/top-right | PASS: true with `width_guard=true` on both targets |
+| Width does not collapse to 20 | PASS after correction: top-right `20 -> 300 -> 700`; right `20 -> 300 -> 450` |
+| `custom_minimum_size.x` non-negative | PASS after correction: top-right `-5250 -> 300 -> 700`; right `-6000 -> 300 -> 450` |
 | Group remains valid/visible | PASS: F13/F14 lifecycle logs confirm valid/in-tree/visible |
 | Children remain | PASS: user visual result; F15 records two valid child nodes after population |
 | Connection/state remain | USER PASS; F15 connector count is `0`, so runtime evidence is inconclusive |
@@ -154,12 +165,12 @@ The repository build allowlist and the resulting ZIP inspection both passed.
 
 Codex has not run the game and does not assign runtime PASS status.
 
-## User Test Steps
+## Next Planning Boundary
 
-1. In a fresh `0.2.24` session, create a childless group beyond the old boundary.
-2. Do not touch top-left or top-right. Use `right` first with little or zero
-   mouse delta, then drag slightly and release.
-3. Do not save after failure. Exit and provide `[F17]` logs.
+F17 has no further required runtime edge test. `bottom-right` and `bottom`
+remain optional future coverage, not a prerequisite for this canary conclusion.
+Do not resume F12 group persistence without a separately approved re-entry
+plan.
 
 ## Deferred Work
 
