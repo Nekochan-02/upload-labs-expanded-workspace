@@ -7,12 +7,14 @@
 ## 0. 最新再開ポイント
 
 * **Phase 2C-F23 / template pre-placement fix canary**:
-  * **Status: `F23_TEMPLATE_PREPLACEMENT_FIX_CANARY_READY_FOR_USER_TEST`**
+  * **Status: `F23_TEMPLATE_PREPLACEMENT_FIX_BLOCKED`**
   * Current branch: `dev/phase-2c-f23-template-preplacement-fix-canary` from F22 plan commit `843dba109c5c7f475992c697097679da528c6c78` (`docs: plan template pre-placement fix`).
   * The approved Candidate A implementation adds one `Desktop.paste()` post-super transaction. It calculates raw/old/expanded targets, snapshots direct-child window and connector IDs, and corrects only the newly pasted set by the old-to-expanded local delta after all count, validity, connector, and selection guards pass.
   * Any ambiguity is fail-closed: F23 logs a `SKIP` or `STOP` reason and moves nothing. It does not copy vanilla `Desktop.paste()`, mutate template/save data, change node limit/space cap, or touch F6/F7/F9/F11/F12/F14/F17 or group resize.
   * Local development artifact: `dist/Nekochan-ExpandedWorkspace-0.2.26.zip`, `25749` bytes, `15` files, ZIP root `mods-unpacked`, SHA-256 `e600976a0407b78117473f06f16265442e145b3fe0225094a369974dea733c71`. ZIP allowlist and forbidden-entry audit pass.
-  * F23 report: `docs/PHASE_2C_F23_TEMPLATE_PREPLACEMENT_FIX_CANARY_REPORT.md`. User runtime verification is pending; do not begin cleanup, clean integration, full regression, release integration, push, tag, Release, or Workshop work.
+  * The valid user test loaded only `0.2.26` and reached all F23 checkpoints. Window identity and selection passed (`18/18`, selection match true), but expected serialized connector entries `29` did not equal actual new connector objects `17`. F23 correctly emitted `STOP_NEW_CONNECTOR_COUNT_MISMATCH`, applied no correction, and left immediate/final placement at the old candidate `(6750, 8950)`.
+  * Visual relative layout, connection/state, selection/deselection, and manual move remained PASS. No unrelated node moved and no visible error occurred. This is a fail-closed F23 block, not evidence of an unsafe movement or an ExpandedWorkspace crash.
+  * F23 report: `docs/PHASE_2C_F23_TEMPLATE_PREPLACEMENT_FIX_CANARY_REPORT.md`. The next and only action is a docs-only connector-identification guard refinement plan; do not implement another correction, begin cleanup, clean integration, full regression, release integration, push, tag, Release, or Workshop work.
 
 * **Phase 2C-F22 / template pre-placement old-bound fix plan**:
   * **Status: `F22_TEMPLATE_PREPLACEMENT_FIX_PLAN_APPROVED_FOR_F23_CANARY`**

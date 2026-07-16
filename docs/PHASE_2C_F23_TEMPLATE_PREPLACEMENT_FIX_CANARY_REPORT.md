@@ -1,25 +1,56 @@
 # Phase 2C-F23: Template Pre-placement Fix Canary Report
 
-Status: `F23_TEMPLATE_PREPLACEMENT_FIX_CANARY_READY_FOR_USER_TEST`
+Status: `F23_TEMPLATE_PREPLACEMENT_FIX_BLOCKED`
 
 The `0.2.26` local development canary implements the F22-approved Candidate A
 only: a one-sequence, guarded post-super correction for the F21-confirmed old
-workspace clamp. It is not a release candidate and user verification is
-required before any cleanup or integration decision.
+workspace clamp. The valid user test reached the F23 transaction, but its
+connector-count guard failed closed. No correction was applied and no cleanup
+or integration decision is authorized.
 
 ## Runtime Evidence Matrix
 
 | Test | Result |
 |---|---|
-| Template recall in expanded area appears near camera | NOT TESTED |
-| Preview/pre-placement not old-bound clamped | NOT TESTED |
-| Final placement not old-bound clamped | NOT TESTED |
-| Relative layout preserved | NOT TESTED |
-| Connection/state preserved | NOT TESTED |
-| Selection/deselection preserved | NOT TESTED |
-| Manual move after paste works | NOT TESTED |
-| Correction applied safely | NOT TESTED |
-| Unrelated windows untouched | NOT TESTED |
+| Template recall in expanded area appears near camera | FAIL; remains near old area |
+| Preview/pre-placement not old-bound clamped | FAIL; remains near old area |
+| Final placement not old-bound clamped | FAIL; remains near old area |
+| Relative layout preserved | PASS; no correction was applied |
+| Connection/state preserved | PASS; visual evidence |
+| Selection/deselection preserved | PASS; visual evidence |
+| Manual move after paste works | PASS; visual evidence |
+| Correction applied safely | BLOCKED; `STOP_NEW_CONNECTOR_COUNT_MISMATCH` |
+| Unrelated windows untouched | PASS; correction was not applied |
+
+## F23 Runtime Evidence
+
+The latest game and Mod Loader logs show only
+`Nekochan-ExpandedWorkspace-0.2.26.zip` loaded and the v0.2.26 F23 banner.
+All required F23 labels were emitted for one sequence.
+
+| Checkpoint | Actual result |
+|---|---|
+| `F23_PASTE_TARGETS` | Camera `(16708.99, 17440.3)`; raw `(15083.99, 16915.3)`; old `(6750, 8950)`; expanded `(15083.99, 16915.3)`; delta `(8333.994, 7965.299)` |
+| `F23_PASTE_SET_IDENTIFICATION` | Windows expected/actual `18/18`; selection `18`, matches `true`; connectors expected/actual `29/17` |
+| `F23_CORRECTION_DECISION` | `applied=false`, `STOP_NEW_CONNECTOR_COUNT_MISMATCH` |
+| `F23_BEFORE_CORRECTION` | First group local `(6750, 8950)` at the old candidate |
+| `F23_AFTER_CORRECTION` | Unchanged; correction not applied |
+| `F23_RELATIVE_LAYOUT_CHECK` | `applied=false`, preserved `true` |
+| `F23_SELECTION_CHECK` | Selection matches the pasted set: `true` |
+| `F23_CONNECTOR_CHECK` | The 17 observed new connectors have zero custom points; no connector adjustment ran |
+| `F23_FINAL_STABILITY` | `correction_applied=false`, stable `true`; final group remains `(6750, 8950)` |
+
+The window identity and selection guards both passed. The blocked guard is
+strict equality between the serialized connector-data entry count (`29`) and
+the actual runtime connector-object count (`17`). The mismatch is not evidence
+that an unrelated object was selected or moved: no correction was applied.
+It instead establishes that the future connector guard must distinguish staged
+serialized connector entries from connector objects actually created for the
+pasted set before a correction can be safely applied.
+
+`[F12][STOP]` remains the unrelated save/load diagnostic skip. The recurring
+`res://mods-unpacked/` path error and `ad_prompt.gd` parse error remain known
+non-fatal environment/game baselines.
 
 ## Implementation
 
@@ -103,3 +134,10 @@ custom-connector-point templates.
 No full regression, diagnostic cleanup, clean integration, release
 integration, push, merge, tag, Release, or Workshop publication is part of
 F23.
+
+## Next Recommended Action
+
+Create a docs-only, connector-identification guard refinement plan. It must
+establish a safe runtime predicate for which newly created connector objects
+belong to the pasted set, without relaxing the unrelated-object guard or
+implementing another fix.
