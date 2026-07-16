@@ -2,10 +2,12 @@
 
 ## Status
 
-`REENTRY_PLAN_REQUIRED`
+`F12_GROUP_PERSISTENCE_REENTRY_VERIFIED_POST_F17`
 
-This is a planning-only gate. Do not modify runtime code, build an artifact,
-run the game, push, publish, tag, or operate on v0.2.9 in F18.
+F18 was a planning-only gate before the separately approved user test. Its
+adjusted `0.2.24` re-entry test is now verified below. Do not modify runtime
+code, build an artifact, run full regression, push, publish, tag, or operate
+on v0.2.9 in this phase.
 
 ## Verified Prerequisites
 
@@ -112,9 +114,30 @@ following occurs:
 - a save mutation, WindowContainer patch, `get_position_snapped()` override,
   or large vanilla function copy appears necessary.
 
+## Execution Result
+
+The user ran Option A with only `Nekochan-ExpandedWorkspace-0.2.24.zip`.
+The empty group was first enlarged through verified `top-right` setup resize;
+no collapse occurred. After two children and one connection were placed, no
+further resize or unnecessary group movement occurred before save/load.
+
+Actual `[F12]` G1-G11 and related `[F6]` lines show the frame restored from
+old-clamped `(9000, 9250)` to saved `(18450, 18450)`, and both children restored
+to their exact saved locals. Child saved-relative offsets `(100, 150)` and
+`(500, 250)` have zero relative delta after correction, at next deferred, and
+at opening settle. Membership is true and `connector_count=1` at each of G6,
+G8, and G10. No F12 stop or double movement evidence was recorded.
+
+The user separately verified frame/child positions, relative layout,
+membership, connection/state, and group selectability after load. Therefore
+the narrow result is `F12_GROUP_PERSISTENCE_REENTRY_VERIFIED_POST_F17`.
+
+This result does not authorize full regression, release integration, public
+master push, Release/tag/Workshop operation, or v0.2.9 artifact work.
+
 ## Next Recommended Action
 
-Request approval to run the Option A `0.2.24` F12 persistence re-entry test.
-Do not implement a group persistence repair, full regression, release
-integration, public push, Release/tag/Workshop operation, or v0.2.9 artifact
-change.
+Prepare only a post-F12 scope-decision plan that explicitly keeps full
+regression and release integration deferred until separately approved. Do not
+implement a group persistence repair, run full regression, integrate for
+release, push publicly, operate Release/tag/Workshop, or change v0.2.9.

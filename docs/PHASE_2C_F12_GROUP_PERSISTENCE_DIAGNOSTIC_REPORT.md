@@ -2,15 +2,16 @@
 
 ## Status
 
-`F12_INTERRUPTED_BY_GROUP_RESIZE_BLOCKER`
+`F12_GROUP_PERSISTENCE_REENTRY_VERIFIED_POST_F17`
 
 F12 is a local development diagnostic canary for group persistence. It is not a
 release candidate and must not be published as a GitHub Release, tag, Workshop
 upload, or replacement v0.2.9 artifact.
 
-The F12 group persistence diagnostic was interrupted by a higher-priority group
-resize disappearance blocker discovered during user testing. Do not treat F12
-as PASS.
+The original F12 run was interrupted by a higher-priority group resize
+disappearance blocker. The post-F17 re-entry run below verifies the narrow F12
+save/load persistence target. This does not authorize full regression, release
+integration, publication, or any v0.2.9 operation.
 
 ## F18 Re-entry Gate
 
@@ -26,13 +27,52 @@ and relative deltas, and detect membership ambiguity. F18 recommends current
 `0.2.24` rather than a new `0.2.25` artifact because F17 did not modify the F12
 source. The re-entry setup may use only verified `top-right` or `right` resize
 on the empty group before children are placed; after setup, F12 excludes resize.
-If setup regresses, do not save and classify it as F14/F17 evidence. F12 remains
-`NOT TESTED` pending separate user approval of that test.
+If setup regresses, do not save and classify it as F14/F17 evidence. The
+adjusted F12 re-entry test was subsequently run with this setup and passed.
 
 User supplemental observation: an existing group moved to the expanded area
-persisted after save, exit, restart, and load. This is promising persistence
-evidence, but it is not a complete F12 pass because the group resize path is
-now a blocker.
+persisted after save, exit, restart, and load. It is supporting evidence only;
+the verified F12 result is based on the separate adjusted two-child re-entry
+test below.
+
+## F18 Adjusted Re-entry Runtime Evidence
+
+The user tested only `Nekochan-ExpandedWorkspace-0.2.24.zip`. An empty group
+was enlarged through the verified `top-right` setup path before children were
+placed; the setup did not collapse. Two enclosed children and one connection
+were then created. No group resize or unnecessary group movement occurred
+after child placement. The user saved, exited, restarted, and loaded the same
+save.
+
+The actual game and Mod Loader logs record one unambiguous F12 target:
+
+| Checkpoint | Measured result |
+|---|---|
+| G1 saved frame | `group0` local `(18450, 18450)`, size `(1000, 750)` |
+| G2 saved children | `download_text0` `(18550, 18600)`, saved relative `(100, 150)`; `enhancer0` `(18950, 18700)`, saved relative `(500, 250)` |
+| G3 membership | Expected children `[download_text0, enhancer0]`, count `2` |
+| G4/G5 before F6 correction | Frame was old-clamped at `(9000, 9250)` and membership was false. Children were `(9650, 9750)` and `(9650, 9700)` with relative deltas `(550, 350)` and `(150, 200)` respectively. Connector count was `1`. |
+| G6/G7 after F6 correction | Frame and both children exactly equal their G1/G2 saved local positions. Both child relative positions equal saved relative positions; both relative deltas are `(0, 0)`; membership is true; connector count remains `1`. |
+| G8/G9 next deferred | Exact saved locals, zero relative deltas, membership true, connector count `1`. |
+| G10/G11 opening settle | Exact saved locals, zero relative deltas, membership true, connector count `1`, and children remain visible/in tree. |
+
+Related `[F6]` lines independently report `DESIRED_LOCAL`,
+`AFTER_CORRECTION_LOCAL`, and `STABILITY_LOCAL` equal to the saved local value
+for `group0`, `download_text0`, and `enhancer0`. No `[F12][STOP]` line was
+recorded for this target.
+
+The user visually confirmed the same frame and child positions, unchanged
+child-to-frame layout, preserved membership, connection/state, and group
+selectability after load. Runtime instrumentation does not log selection, so
+selectability is a user-observed result. The checkpoint sequence shows no
+double movement: the frame and both children remain at their exact saved local
+positions with zero relative delta through both stability checkpoints.
+
+**Verdict:** `F12_GROUP_PERSISTENCE_REENTRY_VERIFIED_POST_F17`.
+
+This verdict covers one saved expanded-area group frame with two contained
+children and one observed connection. It does not cover group resize beyond
+the setup prerequisite, full regression, release integration, or publication.
 
 ## Purpose
 
@@ -108,22 +148,25 @@ double movement symptoms.
 
 | Test | Result |
 |---|---|
-| Group frame position persistence | NOT TESTED |
-| Child node position persistence | NOT TESTED |
-| Child-to-frame relative layout | NOT TESTED |
-| Group membership preservation | NOT TESTED |
-| Connection/state preservation | NOT TESTED |
-| Group selectable after load | NOT TESTED |
-| Double movement detected | NOT TESTED |
+| Group frame position persistence | USER AND RUNTIME PASS |
+| Child node position persistence | USER AND RUNTIME PASS |
+| Child-to-frame relative layout | USER AND RUNTIME PASS |
+| Group membership preservation | USER AND RUNTIME PASS |
+| Connection/state preservation | USER AND RUNTIME PASS (`connector_count=1`) |
+| Group selectable after load | USER PASS |
+| Double movement detected | NOT DETECTED IN RUNTIME CHECKPOINTS |
 
 Supplemental observation:
 
 | Observation | Result |
 |---|---|
 | Existing group moved to expanded area persists after save/exit/restart/load | USER OBSERVED PASS |
-| New group edge resize drag | USER OBSERVED FAIL |
+| Adjusted F18 group frame with two children persists after save/exit/restart/load | USER AND RUNTIME PASS |
+| Historical F13 new-group edge resize drag | USER OBSERVED FAIL; addressed separately by F14/F17 |
 
-Codex has not run the game and does not mark any F12 runtime behavior as PASS.
+Codex has not run the game. The runtime entries above are derived from the
+actual user-provided game and Mod Loader logs, and visual entries are the
+user's reported observations.
 
 ## Static Verification
 
@@ -183,7 +226,6 @@ secret, or external Workshop Mod path entries.
 13. Exit the game.
 14. Provide the `[F12]` and related `[F6]` log lines.
 
-F12 testing is paused. The next approved work item is the F13 group resize
-disappearance diagnostic plan. Group movement, group resize fix implementation,
-full regression, release integration, public master push, Release, tag,
-Workshop publication, and v0.2.9 artifact operations remain out of scope.
+The adjusted F12 re-entry test is complete. Full regression, release
+integration, public master push, Release, tag, Workshop publication, and
+v0.2.9 artifact operations remain out of scope.
