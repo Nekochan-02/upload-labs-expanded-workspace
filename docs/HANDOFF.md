@@ -145,11 +145,13 @@
   * Local development artifact: `dist/Nekochan-ExpandedWorkspace-0.2.22.zip`, `20863 bytes`, `15` files, ZIP root `mods-unpacked`, SHA-256 `8f00f3c82429a88b4e8fea672baafe209c9e12946bc9bc4c295f05554d6fb84e`. It passed the source/ZIP publish-safety audit with all required categories at zero; it remains development-only.
   * Do not save after a reproduced collapse. Do not resume F12 group persistence, full regression, release integration, public-master push, Release/tag/Workshop operation, or v0.2.9 artifact work.
 * **Phase 2C-F16 / populated group resize width-collapse fix canary**:
-  * **Status: `F16_CANARY_READY_FOR_USER_TEST`**
+  * **Status: `F16_TARGET_EDGE_MISMATCH_NOT_VERIFIED`**
   * Plan: `docs/PHASE_2C_F16_POPULATED_GROUP_RESIZE_COLLAPSE_FIX_PLAN.md`; report: `docs/PHASE_2C_F16_POPULATED_GROUP_RESIZE_COLLAPSE_FIX_REPORT.md`.
-  * F16 is a guarded post-vanilla `WindowGroup` correction for the F15-proven old-bound right/bottom size collapse only. It restores affected size/minimum axes from an independently derived valid expanded candidate, and calls the existing `move()` path only when position differs.
-  * F14's resize-only expanded-bound snap branch remains unchanged. F6/F7/F9/F11/F12, save schema, child geometry, group persistence, full regression, release integration, public-master push, Release/tag/Workshop, and v0.2.9 artifact work remain deferred.
-  * Local development artifact: `dist/Nekochan-ExpandedWorkspace-0.2.23.zip`, `21846 bytes`, `15` files, ZIP root `mods-unpacked`, SHA-256 `d124dee730ff43178f1fb5c0698cbc557312f945739b1ea310e054124fce1ebf`. Source/ZIP publish-safety audit categories are all zero; user verification is `NOT TESTED`.
+  * The user observed width collapse on the intended top-right path and also on right-side resize of a group without children; left-side paths remained normal. Children and connection/state remained; no save was made.
+  * Actual F16 logs cover only a normal top-left sequence: candidates and actual size/minimum remain valid, both guards are false, and no correction is applied. No F16 line covers the failing top-right/right/bottom path.
+  * Cause of the evidence gap: F16 begins only when F15's first eligible diagnostic target begins. The prior top-left resize consumed F15's one-target budget, so the intended top-right correction branch was neither activated nor logged. F16 is not verified; do not infer a correction failure from the absent target evidence.
+  * The next only action is an F17 plan that decouples correction activation from F15 target acquisition and reserves logging for top-right. Do not implement another fix, change F14/F6/F7/F9/F11/F12, resume persistence, or begin regression/release work.
+  * Local development artifact: `dist/Nekochan-ExpandedWorkspace-0.2.23.zip`, `21846 bytes`, `15` files, ZIP root `mods-unpacked`, SHA-256 `d124dee730ff43178f1fb5c0698cbc557312f945739b1ea310e054124fce1ebf`. Source/ZIP publish-safety audit categories are all zero.
 * **Phase 2A 検証状態**:
   * **Status: `LIMIT_RELAXATION_COMPLETE_USER_VERIFIED`**
   * Phase 2A-R2で、通常の手動配置は500個を超えて配置できることをユーザー実機で確認済み。
