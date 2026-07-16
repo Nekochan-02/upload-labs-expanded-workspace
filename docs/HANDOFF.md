@@ -6,6 +6,16 @@
 
 ## 0. 最新再開ポイント
 
+* **Phase 2C-F26 / diagnostic cleanup and clean integration plan**:
+  * **Status: `F26_DIAGNOSTIC_CLEANUP_CLEAN_INTEGRATION_PLAN_READY`**
+  * Current branch: `dev/phase-2c-f26-diagnostic-cleanup-clean-integration-plan` from the clean F25 result commit `4c6ef67` (`docs: record F25 connector ownership pass`).
+  * F26 is docs-only. It inventories every active F6-F25 canary diagnostic, separates functional lifecycle helpers from logging-only code, and maps the required preservation and smoke coverage for each affected source file.
+  * Required clean-RC preservation includes node limit `1000`, space cap `200`, `20000 x 20000` workspace, 50-unit grid density, click/drag local alignment, exact single/group persistence, group movement/resize corrections, and endpoint-owned template placement correction.
+  * The key cleanup distinction is that the F11 observer still performs the deferred local correction and must not be deleted merely because it has a diagnostic name. F25 endpoint ownership guards and correction also remain functional; coordinate/ID checkpoint output is the cleanup candidate.
+  * F26 recommends a future `0.2.28 clean RC` and `Nekochan-ExpandedWorkspace-0.2.28.zip`, but does not change the manifest, generate an artifact, run a test, or implement cleanup/integration.
+  * Next action requires explicit approval: implement diagnostic cleanup and clean integration only. RC artifact generation, runtime testing, push, merge, tag, Release, and Workshop remain separately unauthorized.
+  * F26 plan: `docs/PHASE_2C_F26_DIAGNOSTIC_CLEANUP_CLEAN_INTEGRATION_PLAN.md`.
+
 * **Phase 2C-F25 / template connector ownership canary**:
   * **Status: `F25_TEMPLATE_CONNECTOR_OWNERSHIP_CANARY_PASS`**
   * Current branch: `dev/phase-2c-f25-template-connector-ownership-canary` from F24 plan commit `b87837d` (`docs: plan template connector guard refinement`).
@@ -14,7 +24,7 @@
   * One F25 sequence logs staged/actual connector counts, endpoint ownership, classification, decision, pre/post window and connector correction, relative layout, selection, and deferred stability. It also reports that pre-existing windows/connectors remained untouched.
   * The valid user test loaded only `0.2.27`, reproduced staged/runtime connector counts `29/17`, and passed all F25 guards. All `17` runtime connectors were `INTERNAL_PASTED_CONNECTOR`; external, ambiguous, and unowned counts were `0`. Correction applied from old `(6750, 8950)` to expanded `(13069.54, 16520.61)` with delta `(6319.538, 7570.607)`.
   * F25 confirms relative layout, connection/state, selection/deselection, manual movement, and visual placement near the expanded camera target. Deferred F25 stability records `unrelated_windows_untouched=true` and `unrelated_connectors_untouched=true`; no ExpandedWorkspace stop condition occurred.
-  * Local development artifact: `dist/Nekochan-ExpandedWorkspace-0.2.27.zip`, `26894` bytes, `15` files, ZIP root `mods-unpacked`, SHA-256 `cc78df30ca62db2ee3b12d3c504fac861fb379dc2f03cbace8329aebf04dd563`. Allowlisted package and forbidden-entry audit pass. F25 result docs are pending a docs-only commit; do not perform cleanup, clean integration, full regression, release integration, push, tag, Release, or Workshop work.
+  * Local development artifact: `dist/Nekochan-ExpandedWorkspace-0.2.27.zip`, `26894` bytes, `15` files, ZIP root `mods-unpacked`, SHA-256 `cc78df30ca62db2ee3b12d3c504fac861fb379dc2f03cbace8329aebf04dd563`. Allowlisted package and forbidden-entry audit pass. F25 result docs were committed as `4c6ef67`; cleanup and clean integration remain pending the F26 plan approval.
   * F25 report: `docs/PHASE_2C_F25_TEMPLATE_CONNECTOR_OWNERSHIP_CANARY_REPORT.md`.
 
 * **Phase 2C-F24 / template connector guard refinement plan**:
