@@ -203,8 +203,8 @@ connection/state, and the node-limit `1000` smoke. The diagnostic evidence
 supports the targeted placement, persistence, grid, and top-right resize paths.
 
 No F20 stop condition attributable to the Mod was observed. The `space` cap
-`200` UI/purchase smoke and group movement remain required before RC. Template
-/ schematic pre-placement at the old boundary is now a confirmed known
+`200` UI/purchase smoke subsequently passed. Group movement remains required
+before RC. Template / schematic pre-placement at the old boundary is now a confirmed known
 limitation. See `docs/PHASE_2C_F20_TARGETED_REGRESSION_REPORT.md` for the
 full evidence and constraints.
 

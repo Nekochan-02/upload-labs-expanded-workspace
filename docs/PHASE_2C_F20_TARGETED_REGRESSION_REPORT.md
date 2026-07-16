@@ -31,7 +31,7 @@ merge, tag, Release, or Workshop publication.
 | Group resize right | PASS; no jump or width collapse | Visual evidence only; current target diagnostics logged `top-right`, not standalone `right` | PASS (visual) |
 | Group persistence | PASS for frame, two children, layout, membership, selectability, and connection/state | F12 G6-G11 records exact local positions, zero child relative deltas, membership true, and `connector_count=1` | PASS |
 | Node limit `1000` | PASS | User smoke result; no dedicated F20 marker exists | PASS |
-| Space upgrade cap `200` | NOT TESTED | Startup logs confirm the runtime patch applied, but not a UI/purchase smoke | OPEN RC GATE |
+| Space upgrade cap `200` | PASS: UI display, cap behavior, and purchase/upgrade flow | Latest single-Mod session logs R4 applied `(100 -> 200)` during `mod_ready`; user confirmed no stop at `100` and no error UI | PASS |
 
 ## Diagnostic Reconciliation
 
@@ -50,6 +50,9 @@ Relevant F20 execution evidence is in the local logs under
 - `modloader_2026-07-16_20.15.48.log` records F14/F17 top-right resize events
   through release. The selected diagnostic target had no collapse guard to
   apply and retained its stable rect.
+- The subsequent space-cap smoke's latest single-Mod session records
+  `Nekochan-ExpandedWorkspace-0.2.24.zip` as loaded, one-item Mod load order,
+  and `Applied R4 space upgrade limit patch (100 -> 200) during mod_ready`.
 
 `[F12][STOP] group diagnostic skipped: eligible_group_candidates=0` appears
 on later starts with no eligible group. It is a bounded diagnostic-skip message,
@@ -61,6 +64,13 @@ The Mod itself loads and all intended extensions install; no reference to
 `ad_prompt` or `Ads` exists in the Mod source. This is therefore recorded as
 an external/base-game script error, not an ExpandedWorkspace regression. It
 must remain visible as environment baseline information for later RC review.
+
+The same latest sessions also log `ERROR ModLoader:Path` when opening
+`res://mods-unpacked/`. It repeats across launches, including the single-zip
+session, while the zip itself loads, all expected extensions install, and R4
+applies successfully. It is a non-fatal Mod Loader baseline path error, not an
+ExpandedWorkspace load or extension failure. Record it for later environment
+review, but do not classify it as an F20 Mod stop condition.
 
 ## Stop-Condition Assessment
 
@@ -88,7 +98,7 @@ paste/schematic runtime change is authorized by this report.
 
 | Item | Status |
 |---|---|
-| Space upgrade cap `200` UI/purchase smoke | Required before RC; not tested |
+| Space upgrade cap `200` UI/purchase smoke | PASS; no `100` cap stop observed |
 | Group movement across old boundary | Required before RC; not reported in this F20 run |
 | Fresh clean-install smoke on a future clean RC artifact | Required before RC; not applicable to diagnostic `0.2.24` |
 | Connector-point movement smoke | Optional; not reported |
@@ -97,7 +107,7 @@ paste/schematic runtime change is authorized by this report.
 
 ## Next Action
 
-Run the `space` upgrade cap `200` smoke check.
+Record and commit the docs-only space-cap smoke result.
 
 ## Explicit Non-Actions
 
