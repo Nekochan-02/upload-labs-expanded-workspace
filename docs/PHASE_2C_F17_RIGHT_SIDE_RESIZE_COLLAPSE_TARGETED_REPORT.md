@@ -2,56 +2,62 @@
 
 ## Status
 
-`F17_NOT_EXECUTED_ARTIFACT_MISMATCH`
+`F17_TOP_RIGHT_WIDTH_COLLAPSE_VERIFIED`
 
 F17 is a local development canary, not a release candidate. Do not publish,
 tag, push to public master, upload to Workshop, or modify v0.2.9.
 
 ## Test Validity
 
-The user correctly reported the intended F17 procedure, including no prior
-top-left interaction and no save after the failure. However, the actual game
-session did not load F17. `godot.log` and `modloader.log` at `18:20:44` show
-`Nekochan-ExpandedWorkspace-0.2.23.zip`, F16 registration text, and
-`ExpandedWorkspace v0.2.23 canary loaded`.
+The first reported attempt was invalid because it loaded `0.2.23`; that
+artifact mismatch remains recorded as a separate failed setup attempt.
 
-The live Mod folder inspection after game exit likewise contains only
-`Nekochan-ExpandedWorkspace-0.2.23.zip` (21846 bytes, manifest version
-`0.2.23`); there is no `0.2.24` package. Therefore this is an installation
-mismatch, not an F17 runtime result.
+The subsequent completed session is valid F17 evidence. `godot.log` and
+`modloader.log` at `18:31:09` load
+`Nekochan-ExpandedWorkspace-0.2.24.zip`, register F17, and report
+`ExpandedWorkspace v0.2.24 canary loaded`. The user performed `top-right`
+first, did not touch top-left, did not save, and exited.
 
 ## Runtime Evidence
 
-There are zero `[F17]` lines in both current game and Mod Loader logs. All
-required F17 checkpoints are consequently `NOT EXECUTED`:
+All required `[F17]` checkpoints occur once for `group18` with
+`edge=top-right`:
 
-- `F17_TARGET_EDGE_SELECTED`
-- `F17_BEFORE_CORRECTION`
-- `F17_CORRECTION_DECISION`
-- `F17_AFTER_CORRECTION`
-- `F17_AFTER_RELEASE`
-- `F17_ONE_FRAME_AFTER_RELEASE`
+| Checkpoint | Measured state |
+|---|---|
+| `F17_TARGET_EDGE_SELECTED` | `diagnostic_target_selected=true`; initial position `(15250,18350)`, size/minimum `(300,200)`. |
+| `F17_BEFORE_CORRECTION` | right/top flags true; branch evaluated true; old candidate `(-5250,200)`; expanded candidate `(300,200)`; vanilla transient size/minimum `(20,200)` / `(-5250,200)`; width guard true. |
+| `F17_CORRECTION_DECISION` | correction applied true; size/minimum restored to `(300,200)` / `(300,200)`. |
+| `F17_AFTER_CORRECTION` | same corrected `(300,200)` size/minimum in the same active resize sequence. |
+| `F17_AFTER_RELEASE` | position `(15250,18200)`, size/minimum `(700,350)` / `(700,350)`; correction remains true. |
+| `F17_ONE_FRAME_AFTER_RELEASE` | identical release geometry; no deferred collapse. |
 
-The observed session contains F16/F13 evidence for `group17`, not F17:
+The transient `20/-5250` state is the expected vanilla failure checkpoint. It
+does not persist to the post-correction frame, release, or one-frame stability
+checkpoint, which matches the user's normal visual result.
 
-- edge: `top-right`; flags: right/top true; no prior top-left F17 target can be
-  evaluated because F17 was not loaded;
-- pre-resize frame: position `(14750,18650)`, size/minimum `(300,200)`;
-- F13 post-vanilla state: size `(20,200)`,
-  `custom_minimum_size=(-4750,200)`, matching the visible width collapse;
-- group remains inside tree and visible at the same position, so no old-bound
-  position jump occurred in this F16 session;
-- F15 reports `contained_window_count=0`; the F13 `child_count=3` is internal
-  group scene structure, not evidence of two contained user nodes. Connection
-  and user-node state are not testable from this session.
+F13/F14 lifecycle logs confirm the group remains valid, inside the tree, and
+visible at the corrected first frame and after release. The frame stays beyond
+the old boundary: `(15250,18350)` before correction and `(15250,18200)` after
+release; the y change is the intentional top-edge resize, not an old-bound
+jump.
+
+After the primary target, the user placed two nodes and performed the populated
+top-right resize. F15 then records two valid contained nodes, stable global
+positions, and release geometry `(13650,18050)` with size/minimum `(1000,700)`
+after an intermediate vanilla `20/-3650` state. The child relative y values
+change only because the top edge moves by 50. F15's connector count is `0`, so
+runtime logs do not independently prove the connection; the user's visual
+result confirms connection/state remained.
 
 ## Canary Verdict
 
-`BLOCKED`
+`F17_TOP_RIGHT_WIDTH_COLLAPSE_VERIFIED`
 
-F17 is neither PASS nor FAIL because its artifact did not run. The visual
-collapse confirms the pre-existing F16 path remains unsafe, but it cannot
-classify F17 correction activation, target selection, or post-correction state.
+The F17 primary top-right canary passes. It directly captures and corrects the
+known old-bound width collapse in the same resize frame, preserving a visible,
+valid frame through release. This does not verify the separate secondary
+`right` path, group persistence, full regression, or release readiness.
 
 ## F16 Handling
 
@@ -136,28 +142,24 @@ The repository build allowlist and the resulting ZIP inspection both passed.
 
 | Test | Result |
 |---|---|
-| Top-right target captured | NOT EXECUTED: F17 not loaded |
-| Top-left did not consume target | NOT EXECUTED: F17 not loaded |
-| Correction branch evaluated on right/top-right | NOT EXECUTED: F17 not loaded |
-| Width does not collapse to 20 | NOT EXECUTED: F17 not loaded; F16 visual/log result collapsed to 20 |
-| `custom_minimum_size.x` non-negative | NOT EXECUTED: F17 not loaded; F16 logged `-4750` |
-| Group remains valid/visible | NOT EXECUTED: F17 not loaded; F16 logged true/true |
-| Children remain | NOT EXECUTED: F17 not loaded |
-| Connection/state remain | NOT EXECUTED: F17 not loaded |
-| Old-bound jump absent | NOT EXECUTED: F17 not loaded; F16 position did not jump |
+| Top-right target captured | PASS: `group18`, `edge=top-right` |
+| Top-left did not consume target | PASS: top-right is the sole F17 target; user did not touch top-left |
+| Correction branch evaluated on right/top-right | PASS: `correction_branch_evaluated=true`, `width_guard=true` |
+| Width does not collapse to 20 | PASS after correction: transient vanilla `20` restored to `300`, then `700` at release |
+| `custom_minimum_size.x` non-negative | PASS after correction: `-5250` restored to `300`, then `700` at release |
+| Group remains valid/visible | PASS: F13/F14 lifecycle logs confirm valid/in-tree/visible |
+| Children remain | PASS: user visual result; F15 records two valid child nodes after population |
+| Connection/state remain | USER PASS; F15 connector count is `0`, so runtime evidence is inconclusive |
+| Old-bound jump absent | PASS: corrected/released frame remains beyond old boundary |
 
 Codex has not run the game and does not assign runtime PASS status.
 
 ## User Test Steps
 
-1. Before launch, confirm the live Mod folder contains only
-   `Nekochan-ExpandedWorkspace-0.2.24.zip`; remove the `0.2.23` package.
-2. Move to the expanded area and create a group beyond the old `10000` boundary.
-3. Place exactly two nodes inside and add one connection if convenient.
-4. Do not touch top-left. Use `top-right` first with little or zero mouse delta.
-5. Drag slightly, release, and confirm the frame remains normal-shaped.
-6. Confirm children plus connection/state remain. Do not save after failure.
-7. Exit the game and provide the `[F17]` logs.
+1. In a fresh `0.2.24` session, create a childless group beyond the old boundary.
+2. Do not touch top-left or top-right. Use `right` first with little or zero
+   mouse delta, then drag slightly and release.
+3. Do not save after failure. Exit and provide `[F17]` logs.
 
 ## Deferred Work
 
