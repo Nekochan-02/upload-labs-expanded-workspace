@@ -1,26 +1,27 @@
 # Phase 2C-F25: Template Connector Ownership Canary Report
 
-Status: `F25_TEMPLATE_CONNECTOR_OWNERSHIP_CANARY_READY_FOR_USER_TEST`
+Status: `F25_TEMPLATE_CONNECTOR_OWNERSHIP_CANARY_PASS`
 
 The `0.2.27` local development canary replaces the F23 serialized connector
-count equality guard with a runtime endpoint-ownership guard. User runtime
-verification is required before any cleanup or integration decision.
+count equality guard with a runtime endpoint-ownership guard. The valid user
+test and F25 logs confirm safe correction for the prior `29/17` template.
+Cleanup and integration remain unauthorized.
 
 ## Runtime Evidence Matrix
 
 | Test | Result |
 |---|---|
-| Template recall in expanded area appears near camera | NOT TESTED |
-| Preview/pre-placement not old-bound clamped | NOT TESTED |
-| Final placement not old-bound clamped | NOT TESTED |
-| Relative layout preserved | NOT TESTED |
-| Connection/state preserved | NOT TESTED |
-| Selection/deselection preserved | NOT TESTED |
-| Manual move after paste works | NOT TESTED |
-| Correction applied safely | NOT TESTED |
-| Endpoint ownership classification complete | NOT TESTED |
-| Unrelated windows untouched | NOT TESTED |
-| Unrelated connectors untouched | NOT TESTED |
+| Template recall in expanded area appears near camera | PASS; visual evidence |
+| Preview/pre-placement not old-bound clamped | PASS; visual evidence |
+| Final placement not old-bound clamped | PASS; visual evidence and F25 window position |
+| Relative layout preserved | PASS; F25 pre/post offsets match |
+| Connection/state preserved | PASS; visual evidence |
+| Selection/deselection preserved | PASS; visual evidence and F25 selection match |
+| Manual move after paste works | PASS; visual evidence |
+| Correction applied safely | PASS; all guards passed |
+| Endpoint ownership classification complete | PASS; `17` internal, all other classes `0` |
+| Unrelated windows untouched | PASS; F25 deferred stability `true` |
+| Unrelated connectors untouched | PASS; F25 deferred stability `true` |
 
 ## F24 Commit
 
@@ -41,6 +42,33 @@ F24 source analysis shows the two counts describe different things:
 `Desktop.copy()` stages connector metadata by selected input ownership, while
 `Desktop.paste()` creates Connector objects only for retained copied output
 connections. F25 logs both counts but does not compare them for equality.
+
+## F25 Runtime Evidence
+
+The latest game and Mod Loader logs load only
+`Nekochan-ExpandedWorkspace-0.2.27.zip`; `mod_load_order` contains one
+`Nekochan-ExpandedWorkspace` entry and the v0.2.27 F25 banner. All required
+F25 labels were emitted for one paste sequence.
+
+| Checkpoint | Actual result |
+|---|---|
+| `F25_CONNECTOR_GUARD_SOURCE` | Camera `(14694.54, 17045.61)`; raw `(13069.54, 16520.61)`; old `(6750, 8950)`; expanded `(13069.54, 16520.61)`; delta `(6319.538, 7570.607)`; windows `18/18`; connectors staged/runtime `29/17`; selection, window, connector, and pasted-resource guards `true`; pasted resource count `63`. |
+| `F25_CONNECTOR_ENDPOINT_OWNERSHIP` | All `17` observed new direct-child connectors have parent `Connectors` and both endpoint IDs resolve inside the pasted resource set. |
+| `F25_CONNECTOR_CLASSIFICATION` | `INTERNAL_PASTED_CONNECTOR=17`; `EXTERNAL_CONNECTOR=0`; `AMBIGUOUS_CONNECTOR=0`; `UNOWNED_CONNECTOR=0`. |
+| `F25_CORRECTION_DECISION` | `applied=true`, `all_guards_passed`. No stop or skip reason. |
+| `F25_WINDOW_CORRECTION` | Group frame moved from old `(6750, 8950)` to expanded `(13069.54, 16520.61)`; all pasted windows received the same delta. |
+| `F25_CONNECTOR_CORRECTION` | `17` internal connectors processed; all had zero custom points; `translated=true`, `update_points_called=true`. |
+| `F25_RELATIVE_LAYOUT_CHECK` | `applied=true`, `preserved=true`; all logged pre/post offsets match. |
+| `F25_SELECTION_CHECK` | `selection_matches=true` for all `18` pasted window IDs. |
+| `F25_FINAL_STABILITY` | `correction_applied=true`, `stable=true`, `unrelated_windows_untouched=true`, `unrelated_connectors_untouched=true`. |
+
+Visual results agree with the logs: preview and final placement were near the
+expanded camera target; connection/state, selection/deselection, and manual
+movement passed; no unrelated existing object moved and no visible error
+appeared. The recurring `res://mods-unpacked/` path error and `ad_prompt.gd`
+parse error remain known non-fatal environment/game baselines. Renderer
+shutdown messages were logged after the completed F25 sequence and do not
+carry an F25 stop reason.
 
 ## Implementation
 
@@ -145,4 +173,5 @@ rewrite, or force push.
 
 ## Next Recommended Action
 
-Install `0.2.27` and run only the connector ownership canary.
+Commit the F25 result documentation only. Do not start cleanup, clean
+integration, RC artifact work, push, tag, Release, or Workshop operations.

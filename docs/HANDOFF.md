@@ -7,12 +7,14 @@
 ## 0. 最新再開ポイント
 
 * **Phase 2C-F25 / template connector ownership canary**:
-  * **Status: `F25_TEMPLATE_CONNECTOR_OWNERSHIP_CANARY_READY_FOR_USER_TEST`**
+  * **Status: `F25_TEMPLATE_CONNECTOR_OWNERSHIP_CANARY_PASS`**
   * Current branch: `dev/phase-2c-f25-template-connector-ownership-canary` from F24 plan commit `b87837d` (`docs: plan template connector guard refinement`).
   * `0.2.27` replaces only F23's serialized/runtime connector count equality guard. It retains the direct-child pasted-window snapshot, expected window count, valid-parent, and selection-membership guards, then derives pasted resource IDs from the validated windows' `containers`.
   * Each actual new direct-child Connector is classified from both `output_id` and `input_id`. F25 corrects only if every actual new connector is internal to the pasted resource set; any external, unowned, or ambiguous endpoint stops before moving a window. Only internal new connector custom points are translated and refreshed.
   * One F25 sequence logs staged/actual connector counts, endpoint ownership, classification, decision, pre/post window and connector correction, relative layout, selection, and deferred stability. It also reports that pre-existing windows/connectors remained untouched.
-  * Local development artifact: `dist/Nekochan-ExpandedWorkspace-0.2.27.zip`, `26894` bytes, `15` files, ZIP root `mods-unpacked`, SHA-256 `cc78df30ca62db2ee3b12d3c504fac861fb379dc2f03cbace8329aebf04dd563`. Allowlisted package and forbidden-entry audit pass; user verification is pending. Do not perform cleanup, clean integration, full regression, release integration, push, tag, Release, or Workshop work.
+  * The valid user test loaded only `0.2.27`, reproduced staged/runtime connector counts `29/17`, and passed all F25 guards. All `17` runtime connectors were `INTERNAL_PASTED_CONNECTOR`; external, ambiguous, and unowned counts were `0`. Correction applied from old `(6750, 8950)` to expanded `(13069.54, 16520.61)` with delta `(6319.538, 7570.607)`.
+  * F25 confirms relative layout, connection/state, selection/deselection, manual movement, and visual placement near the expanded camera target. Deferred F25 stability records `unrelated_windows_untouched=true` and `unrelated_connectors_untouched=true`; no ExpandedWorkspace stop condition occurred.
+  * Local development artifact: `dist/Nekochan-ExpandedWorkspace-0.2.27.zip`, `26894` bytes, `15` files, ZIP root `mods-unpacked`, SHA-256 `cc78df30ca62db2ee3b12d3c504fac861fb379dc2f03cbace8329aebf04dd563`. Allowlisted package and forbidden-entry audit pass. F25 result docs are pending a docs-only commit; do not perform cleanup, clean integration, full regression, release integration, push, tag, Release, or Workshop work.
   * F25 report: `docs/PHASE_2C_F25_TEMPLATE_CONNECTOR_OWNERSHIP_CANARY_REPORT.md`.
 
 * **Phase 2C-F24 / template connector guard refinement plan**:
