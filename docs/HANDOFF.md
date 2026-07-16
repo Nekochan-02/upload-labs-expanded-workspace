@@ -6,6 +6,17 @@
 
 ## 0. 最新再開ポイント
 
+* **Phase 2C-F28 / expanded-area range-selection diagnostic plan**:
+  * **Status: `F28_RANGE_SELECTION_DIAGNOSTIC_PLAN_READY`**
+  * Current branch: `dev/phase-2c-f28-range-selection-diagnostic-plan` from F27 blocker-record commit `1b7a5e3` (`docs: record range selection smoke blocker`).
+  * `0.2.28` clean RC remains `F27_CLEAN_RC_SMOKE_BLOCKED`: user smoke found shift + drag range selection PASS in the old area and FAIL in the expanded area. Classification is `EXPANDED_AREA_RANGE_SELECTION_NOT_WORKING`; initial diagnostic classification remains `RANGE_SELECTION_UNRESOLVED`.
+  * Static evidence identifies the vanilla `multi_select` action as physical Shift, InputBlocker-to-SelectionPanel input routing, SelectionPanel rectangle/hit-test/result application, and a fixed vanilla InputBlocker rectangle. The mod expands Desktop, Background, and Lines but has no explicit InputBlocker or SelectionPanel resize. This is a diagnostic target, not a root-cause conclusion.
+  * F27's existing Desktop drag signal hooks remain present before and after cleanup. That does not rule out a cleanup regression because those hooks are not the complete range-selection path and no `0.2.27` comparison result exists.
+  * F28 is docs-only and proposes only one future `0.2.29` bounded diagnostic canary with R1-R10 evidence checkpoints. It does not implement a diagnostic or fix, generate an artifact, build, or run a test.
+  * Release/public operations remain blocked. Do not mark `0.2.28` release-ready unless the issue is fixed and smoke-tested or explicitly accepted as a known limitation.
+  * Next action: approve implementation of the `0.2.29` expanded-area range-selection diagnostic canary only. Do not authorize a fix, cleanup, clean integration, RC artifact, push, tag, Release, or Workshop operation.
+  * F28 plan: `docs/PHASE_2C_F28_RANGE_SELECTION_EXPANDED_AREA_DIAGNOSTIC_PLAN.md`.
+
 * **Phase 2C-F27 / clean integration RC**:
   * **Status: `F27_CLEAN_RC_SMOKE_BLOCKED`**
   * Current branch: `dev/phase-2c-f27-clean-integration-0.2.28` from F26 plan commit `ac40b89` (`docs: plan diagnostic cleanup and clean integration`).

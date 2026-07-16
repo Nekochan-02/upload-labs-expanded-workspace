@@ -182,6 +182,10 @@ the F27 cleanup. Initial classification is `RANGE_SELECTION_UNRESOLVED`.
 
 F28 is required as a docs-only source-analysis and diagnostic plan before any
 runtime diagnostic or fix work. Do not mark the overall clean RC smoke PASS.
+The approved F28 plan is recorded in
+`docs/PHASE_2C_F28_RANGE_SELECTION_EXPANDED_AREA_DIAGNOSTIC_PLAN.md`; its next
+possible implementation step is a separately approved, bounded `0.2.29`
+diagnostic canary, not a fix.
 
 ## 11. User Test Steps
 
@@ -215,5 +219,6 @@ GitHub Release, Workshop publication, history rewrite, or force push occurred.
 
 ## 15. Next Recommended Action
 
-Create and approve the F28 expanded-area range-selection diagnostic plan. Do
-not publish or continue release integration.
+Approve implementation of one bounded `0.2.29` expanded-area range-selection
+diagnostic canary. Do not implement a fix, publish, or continue release
+integration.
