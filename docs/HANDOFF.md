@@ -163,7 +163,7 @@
 * **Phase 2C-F18 / F12 group-persistence re-entry gate plan**:
   * **Status: `REENTRY_PLAN_REQUIRED`**
   * Plan: `docs/PHASE_2C_F18_F12_GROUP_PERSISTENCE_REENTRY_PLAN.md`.
-  * F12 remains interrupted and not PASS. Its `desktop.gd` diagnostics have not changed since `bfcc63a`; they still record group frame/child saved and runtime local positions, relative deltas, and membership across G1-G11. F14/F17 changed group resize paths only and do not conflict with a no-resize persistence test.
+  * F12 remains interrupted and not PASS. Its `desktop.gd` diagnostics have not changed since `bfcc63a`; they still record group frame/child saved and runtime local positions, relative deltas, and membership across G1-G11. Setup may resize an empty group only with verified `top-right` or `right` before child placement; the final save/load phase performs no resize and does not conflict with F14/F17.
   * Decision: Option A. Reuse `0.2.24` for the future F12 re-entry test; do not create `0.2.25` unless actual F12 evidence is ambiguous. F18 is plan-only: no runtime code, artifact, test, persistence fix, regression/release work, push, Release/tag/Workshop, or v0.2.9 artifact operation is authorized.
 * **Phase 2A 検証状態**:
   * **Status: `LIMIT_RELAXATION_COMPLETE_USER_VERIFIED`**

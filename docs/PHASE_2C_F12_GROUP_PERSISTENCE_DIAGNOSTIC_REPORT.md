@@ -24,8 +24,10 @@ The F12 diagnostic remains present and unchanged in
 one or two enclosed saved children, log G1-G11, compare exact local positions
 and relative deltas, and detect membership ambiguity. F18 recommends current
 `0.2.24` rather than a new `0.2.25` artifact because F17 did not modify the F12
-source and the re-entry test excludes resize. F12 remains `NOT TESTED` pending
-separate user approval of that test.
+source. The re-entry setup may use only verified `top-right` or `right` resize
+on the empty group before children are placed; after setup, F12 excludes resize.
+If setup regresses, do not save and classify it as F14/F17 evidence. F12 remains
+`NOT TESTED` pending separate user approval of that test.
 
 User supplemental observation: an existing group moved to the expanded area
 persisted after save, exit, restart, and load. This is promising persistence

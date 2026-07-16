@@ -56,7 +56,7 @@ push is permitted.
 | Relative-layout delta evidence | YES |
 | Membership evidence | YES, frame containment at every checkpoint |
 | Connection/state signal | Limited connector count plus user visual check |
-| F14/F17 conflict during a no-resize F12 test | NO |
+| F14/F17 conflict during final F12 save/load phase | NO |
 | F12 obsolete assumption from v0.2.19 | NO material runtime assumption found |
 
 F12 retains one selected saved expanded-area group, bounded G1-G11 checkpoints,
@@ -69,8 +69,10 @@ only `window_group.gd`; it did not alter this F12 source.
 **Option A: use current `0.2.24` for the F12 group persistence re-entry test.**
 
 `0.2.24` already packages the unchanged F12 diagnostic, F6 correction, and
-verified F14/F17 resize handling. A persistence-only test does not invoke group
-resize, so F14/F17 diagnostics do not create target or logging ambiguity.
+verified F14/F17 resize handling. The required setup resize uses only a verified
+`top-right` or `right` edge before any child is placed; after setup, the
+persistence test performs no group resize. F14/F17 therefore do not create
+target or logging ambiguity during the save/load observation phase.
 
 **Option B: do not create `0.2.25` now.** A new artifact is unnecessary because
 there is no F12 source change to version, re-arm, or isolate. A future artifact
@@ -80,13 +82,17 @@ would be required only if live F12 logs prove ambiguous or stale.
 
 Use only `Nekochan-ExpandedWorkspace-0.2.24.zip` in a temporary test state.
 
-1. In the expanded area, create or position one group frame containing exactly
-   two fully enclosed nodes. Add one connection if practical.
-2. Do not resize or move the group after this setup.
-3. Save, exit, restart, and load the same save.
-4. Check frame absolute position, both child absolute positions, child-to-frame
+1. In the expanded area, create one empty group frame. Before adding children,
+   resize it with only verified `top-right` or `right` until two nodes fit.
+2. If the setup resize collapses, jumps, or disappears, do not save; stop and
+   classify it as an F14/F17 resize regression rather than F12 evidence.
+3. Place exactly two fully enclosed nodes and add one connection if practical.
+4. Do not resize the group or perform unnecessary group movement after nodes
+   are placed.
+5. Save, exit, restart, and load the same save.
+6. Check frame absolute position, both child absolute positions, child-to-frame
    layout, group membership/selectability, and connection/state.
-5. Exit and collect `[F12]` G1-G11 and related `[F6]` lines.
+7. Exit and collect `[F12]` G1-G11 and related `[F6]` lines.
 
 Expected observations: exact frame and child local restoration, zero child
 relative delta, preserved membership, no double movement, and no old-boundary
@@ -102,6 +108,7 @@ following occurs:
 - membership, connection/state, or selectability is lost or ambiguous;
 - double movement is detected;
 - F14/F17 appears to interfere with persistence;
+- the required setup resize collapses, jumps, or disappears before save;
 - a save mutation, WindowContainer patch, `get_position_snapped()` override,
   or large vanilla function copy appears necessary.
 
