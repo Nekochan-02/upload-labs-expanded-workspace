@@ -6,12 +6,21 @@
 
 ## 0. 最新再開ポイント
 
+* **Phase 2C-F25 / template connector ownership canary**:
+  * **Status: `F25_TEMPLATE_CONNECTOR_OWNERSHIP_CANARY_READY_FOR_USER_TEST`**
+  * Current branch: `dev/phase-2c-f25-template-connector-ownership-canary` from F24 plan commit `b87837d` (`docs: plan template connector guard refinement`).
+  * `0.2.27` replaces only F23's serialized/runtime connector count equality guard. It retains the direct-child pasted-window snapshot, expected window count, valid-parent, and selection-membership guards, then derives pasted resource IDs from the validated windows' `containers`.
+  * Each actual new direct-child Connector is classified from both `output_id` and `input_id`. F25 corrects only if every actual new connector is internal to the pasted resource set; any external, unowned, or ambiguous endpoint stops before moving a window. Only internal new connector custom points are translated and refreshed.
+  * One F25 sequence logs staged/actual connector counts, endpoint ownership, classification, decision, pre/post window and connector correction, relative layout, selection, and deferred stability. It also reports that pre-existing windows/connectors remained untouched.
+  * Local development artifact: `dist/Nekochan-ExpandedWorkspace-0.2.27.zip`, `26894` bytes, `15` files, ZIP root `mods-unpacked`, SHA-256 `cc78df30ca62db2ee3b12d3c504fac861fb379dc2f03cbace8329aebf04dd563`. Allowlisted package and forbidden-entry audit pass; user verification is pending. Do not perform cleanup, clean integration, full regression, release integration, push, tag, Release, or Workshop work.
+  * F25 report: `docs/PHASE_2C_F25_TEMPLATE_CONNECTOR_OWNERSHIP_CANARY_REPORT.md`.
+
 * **Phase 2C-F24 / template connector guard refinement plan**:
   * **Status: `F24_TEMPLATE_CONNECTOR_GUARD_REFINEMENT_PLAN_READY`**
   * Current branch: `dev/phase-2c-f24-template-connector-guard-plan` from F23 result commit `cc0b094` (`docs: record F23 template pre-placement blocked result`).
   * Source analysis confirms that `Desktop.copy()` stages connector metadata by selected input membership, while `Desktop.paste()` instantiates connectors only for retained copied outputs. Therefore F23's serialized/runtime connector count mismatch (`29/17`) is expected-path evidence, not an object-identification failure.
   * F24 recommends an endpoint-ownership guard for a separately approved `0.2.27` canary: collect resource IDs from the already validated pasted windows, classify each new direct-child connector by both endpoint IDs, and correct only if every observed new connector is internal to that exact set. `data.connectors.size()` becomes diagnostic-only.
-  * F24 is docs-only. Do not implement the guard, generate an artifact, run a build or runtime test, clean diagnostics, begin clean integration, push, tag, Release, or Workshop work.
+  * F24 is superseded by the separately approved and bounded F25 canary. Do not widen F25, clean diagnostics, begin clean integration, push, tag, Release, or Workshop work.
   * F24 plan: `docs/PHASE_2C_F24_TEMPLATE_CONNECTOR_GUARD_REFINEMENT_PLAN.md`.
 
 * **Phase 2C-F23 / template pre-placement fix canary**:

@@ -137,7 +137,7 @@ F23.
 
 ## Next Recommended Action
 
-F24 now records the docs-only connector-ownership guard refinement analysis in
-`docs/PHASE_2C_F24_TEMPLATE_CONNECTOR_GUARD_REFINEMENT_PLAN.md`. Any future
-implementation remains separately approval-gated and must not relax the
-unrelated-object guard.
+F25 now implements the separately approved `0.2.27` endpoint-ownership
+refinement canary. Its user runtime verification remains pending in
+`docs/PHASE_2C_F25_TEMPLATE_CONNECTOR_OWNERSHIP_CANARY_REPORT.md`; F23 remains
+the historical fail-closed blocker record.
