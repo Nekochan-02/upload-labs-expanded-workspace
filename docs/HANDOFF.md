@@ -152,11 +152,11 @@
   * Cause of the evidence gap: F16 begins only when F15's first eligible diagnostic target begins. The prior top-left resize consumed F15's one-target budget, so the intended top-right correction branch was neither activated nor logged. F16 is not verified; do not infer a correction failure from the absent target evidence.
   * The next only action is the F17 plan: `docs/PHASE_2C_F17_RIGHT_SIDE_RESIZE_COLLAPSE_TARGETED_PLAN.md`. It decouples correction activation from F15 target acquisition and reserves logging for top-right. Do not implement another fix, change F14/F6/F7/F9/F11/F12, resume persistence, or begin regression/release work.
   * Local development artifact: `dist/Nekochan-ExpandedWorkspace-0.2.23.zip`, `21846 bytes`, `15` files, ZIP root `mods-unpacked`, SHA-256 `d124dee730ff43178f1fb5c0698cbc557312f945739b1ea310e054124fce1ebf`. Source/ZIP publish-safety audit categories are all zero.
-* **Phase 2C-F17 / right-side resize collapse targeted canary plan**:
-  * **Status: `PLAN_REQUIRED`**
-  * Plan: `docs/PHASE_2C_F17_RIGHT_SIDE_RESIZE_COLLAPSE_TARGETED_PLAN.md`.
-  * F17 is plan-only. A future canary must independently activate guarded correction for right/bottom resize and log only one selected target edge, beginning with top-right. Top-left must not consume the target.
-  * No runtime code, artifact, Release/tag/Workshop operation, public push, group persistence, full regression, or release integration is authorized by F17 planning.
+* **Phase 2C-F17 / right-side resize collapse targeted canary**:
+  * **Status: `F17_CANARY_READY_FOR_USER_TEST`**
+  * Plan: `docs/PHASE_2C_F17_RIGHT_SIDE_RESIZE_COLLAPSE_TARGETED_PLAN.md`; report: `docs/PHASE_2C_F17_RIGHT_SIDE_RESIZE_COLLAPSE_TARGETED_REPORT.md`.
+  * F17 removes the F16 dependency on F15's one-target diagnostic acquisition. Guarded correction now evaluates for every right/bottom resize after vanilla processing; only F17 logging is limited to the first `top-right` or `right` sequence. Top-left cannot consume the F17 target.
+  * `0.2.24` is a local development canary only: `dist/Nekochan-ExpandedWorkspace-0.2.24.zip`, `22115` bytes, `15` files, ZIP root `mods-unpacked`, SHA-256 `942f67e0e0535b208a6ecc67d1d13cd9baf714035a8471dcdad55926373e7e7c`. User testing must begin with a top-right resize beyond the old boundary and must not save after failure. Group persistence, full regression, release integration, public push, Release/tag/Workshop operation, and v0.2.9 artifact operations remain deferred.
 * **Phase 2A 検証状態**:
   * **Status: `LIMIT_RELAXATION_COMPLETE_USER_VERIFIED`**
   * Phase 2A-R2で、通常の手動配置は500個を超えて配置できることをユーザー実機で確認済み。

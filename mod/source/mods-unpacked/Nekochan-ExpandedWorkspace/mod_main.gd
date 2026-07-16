@@ -1,8 +1,8 @@
 extends Node
 
 # Mod: Nekochan-ExpandedWorkspace
-# Phase 2C-F16 development canary: correct only an observed old-bound size
-# collapse after vanilla group resize processing; keep the F14 snap branch intact.
+# Phase 2C-F17 development canary: target right-side old-bound size collapse
+# independently from one bounded top-right/right diagnostic sequence.
 # Do not register connector, window container, or window base/indexed area patches here.
 
 const MOD_ID: String = "Nekochan-ExpandedWorkspace"
@@ -41,7 +41,7 @@ func _init() -> void:
 		"res://mods-unpacked/Nekochan-ExpandedWorkspace/extensions/scripts/paint.gd"
 	)
 	ModLoaderLog.info(
-		"Registered Phase 2C-F16 populated group resize collapse-fix canary. F14 expanded-bounds snap, F12 persistence, F11 drag alignment, F9 click alignment, F6 restoration, and F7 grid are unchanged.",
+		"Registered Phase 2C-F17 right-side group resize collapse canary. F14 expanded-bounds snap, F12 persistence, F11 drag alignment, F9 click alignment, F6 restoration, and F7 grid are unchanged.",
 		MOD_ID
 	)
 
@@ -49,7 +49,7 @@ func _init() -> void:
 func _ready() -> void:
 	_apply_space_upgrade_limit("mod_ready")
 	ModLoaderLog.info(
-		"ExpandedWorkspace v0.2.23 canary loaded. Target node limit: 1000. Space upgrade cap: 200. F16 corrects one guarded populated group resize collapse only; F14 expanded-bounds snap, F12 persistence, F11 drag alignment, F9 click alignment, F6 restoration, and F7 grid are unchanged.",
+		"ExpandedWorkspace v0.2.24 canary loaded. Target node limit: 1000. Space upgrade cap: 200. F17 evaluates guarded right/bottom resize collapse correction independently of bounded top-right/right diagnostics; F14 expanded-bounds snap, F12 persistence, F11 drag alignment, F9 click alignment, F6 restoration, and F7 grid are unchanged.",
 		MOD_ID
 	)
 

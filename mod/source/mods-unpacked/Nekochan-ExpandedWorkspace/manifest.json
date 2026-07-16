@@ -1,9 +1,9 @@
 {
 	"name": "ExpandedWorkspace",
 	"namespace": "Nekochan",
-	"version_number": "0.2.23",
+	"version_number": "0.2.24",
 	"website_url": "",
-	"description": "Phase 2C-F16 development canary: populated group resize old-bound collapse correction.",
+	"description": "Phase 2C-F17 development canary: targeted right-side group resize collapse correction.",
 	"dependencies": [],
 	"extra": {
 		"godot": {

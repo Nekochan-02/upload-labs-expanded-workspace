@@ -2,7 +2,7 @@
 
 ## Status
 
-`PLAN_REQUIRED`
+`IMPLEMENTED_AWAITING_USER_TEST`
 
 ## F15 Root Cause Evidence
 
@@ -53,7 +53,7 @@ If top-left is resized first, it must neither arm nor consume the F17 target.
 Valid resize results remain untouched even when correction activation is
 evaluated.
 
-## Future Implementation Constraints
+## Implementation Constraints
 
 The future F17 implementation may alter only the existing `WindowGroup`
 extension. It must:
@@ -67,17 +67,20 @@ extension. It must:
   vanilla resize-body copy, child mutation, membership change, or save-schema
   change.
 
-No F17 implementation is approved by this plan.
+The approved F17 implementation changes only the existing `WindowGroup`
+extension. It evaluates correction during every active right/bottom resize, while
+F17 logging captures only the first `top-right` or `right` sequence. No
+top-left, left, or top interaction can consume the F17 diagnostic target.
 
-## Future Artifact Proposal
+## Development Artifact
 
 - Version: `0.2.24`
 - Filename: `Nekochan-ExpandedWorkspace-0.2.24.zip`
 - Purpose: target the right-side group resize width-collapse path only.
-- Status: future local development canary; not a Release, Draft Release, tag,
-  Workshop artifact, or replacement for v0.2.9.
+- Status: built locally as a development canary; not a Release, Draft Release,
+  tag, Workshop artifact, or replacement for v0.2.9.
 
-## Future User Test Proposal
+## User Test Proposal
 
 Use a temporary state and install only `0.2.24`.
 
@@ -93,7 +96,7 @@ Use a temporary state and install only `0.2.24`.
 The optional secondary test is a childless `right` resize. Do not test all
 edges, save/restart, group persistence, full regression, or release work.
 
-## Expected Future Pass
+## Expected Pass
 
 The targeted top-right/right sequence must show a non-negative
 `custom_minimum_size.x`, a width other than `20`, a correction decision when
