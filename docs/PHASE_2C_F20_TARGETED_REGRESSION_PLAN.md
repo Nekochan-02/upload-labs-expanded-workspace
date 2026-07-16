@@ -1,6 +1,6 @@
 # Phase 2C-F20: Targeted Regression Plan
 
-Status: `TARGETED_REGRESSION_PLAN_REQUIRED`
+Status: `F20_TARGETED_REGRESSION_PASS_WITH_OPEN_RC_GATES`
 
 This is a docs-only targeted-regression plan. It does not execute tests or
 authorize runtime code changes, artifact generation, builds, diagnostic cleanup
@@ -46,7 +46,7 @@ later persistence and resize changes may have regressed them.
 | Artifact classification | Verified but diagnostic-heavy development artifact |
 | Artifact size | `22115 bytes` |
 | SHA-256 | `942f67e0e0535b208a6ecc67d1d13cd9baf714035a8471dcdad55926373e7e7c` |
-| F20 execution | Not authorized or performed |
+| F20 execution | User-run on `0.2.24`; high-risk targeted paths passed with no Mod stop condition |
 | Clean RC execution | Required later, after clean integration creates a new artifact |
 
 The first execution, if approved, should use `0.2.24` to avoid changing
@@ -193,6 +193,20 @@ original `0.2.24` diagnostics.
 Clean integration planning may begin only after the user approves and records
 the `0.2.24` required-before-clean-integration scenarios as passing, with no
 stop condition. Any observed failure takes priority over cleanup planning.
+
+## Execution Record
+
+The user executed F20 on `0.2.24` and reported PASS for startup, grid and
+camera, click and drag placement, existing-node movement, selection,
+single-node persistence, group resize, group persistence including one
+connection/state, and the node-limit `1000` smoke. The diagnostic evidence
+supports the targeted placement, persistence, grid, and top-right resize paths.
+
+No F20 stop condition attributable to the Mod was observed. The `space` cap
+`200` UI/purchase smoke and group movement remain required before RC. Template
+/ schematic pre-placement at the old boundary is now a confirmed known
+limitation. See `docs/PHASE_2C_F20_TARGETED_REGRESSION_REPORT.md` for the
+full evidence and constraints.
 
 ## Explicit Non-Actions
 

@@ -7,11 +7,13 @@
 ## 0. 最新再開ポイント
 
 * **Phase 2C-F20 / targeted regression plan**:
-  * **Status: `TARGETED_REGRESSION_PLAN_REQUIRED`**
+  * **Status: `F20_TARGETED_REGRESSION_PASS_WITH_OPEN_RC_GATES`**
   * Current branch: `dev/phase-2c-f20-targeted-regression-plan` at F19 commit `bb0ff6d858f5fd6d4dffddc75e48ccfc28d37401` (`docs: record post-F12 scope decision plan`).
-  * F20 is docs-only. It defines, but does not execute, the shortest targeted regression pass for the diagnostic-heavy `0.2.24` development canary.
-  * Required-before-clean-integration checks are clean installation/loader, primary grid seam, click and drag placement, existing-node movement, single-node persistence, group right/top-right resize smoke, and group persistence with relative layout plus connection/state preservation.
-  * Required-before-RC additions are selection/deselection, group movement, node-limit `1000`, space-upgrade-cap `200`, and clean-install/startup smoke on the future clean RC artifact.
+  * The user executed F20 on diagnostic-heavy `0.2.24`. Startup, grid/camera, click and drag placement, existing-node movement, selection/deselection, single-node persistence, group top-right/right resize, group persistence with connection/state, and node-limit `1000` all passed. No Mod stop condition was observed.
+  * Log evidence supports F6 exact-local stability, F7 grid geometry, F9/F11 settled local alignment, F12 group frame/children relative-layout and membership/connector preservation, and F14/F17 top-right resize. The right-side resize result is visual PASS; the current diagnostic target emitted top-right lines only.
+  * `space` cap `200` UI/purchase smoke and group movement across the old boundary remain required before RC. A future clean RC still requires its own clean-install/startup smoke check.
+  * Template/schematic pre-placement in the expanded area is a confirmed known limitation: it appears at the old-area boundary rather than the camera position. It is not an F20 stop condition and authorizes no runtime fix.
+  * F20 report: `docs/PHASE_2C_F20_TARGETED_REGRESSION_REPORT.md`.
   * Do not execute regression, modify runtime code, clean diagnostics, build, generate artifacts, bump versions, push, merge, tag, release, or publish without separate approval.
   * F20 plan: `docs/PHASE_2C_F20_TARGETED_REGRESSION_PLAN.md`.
 
