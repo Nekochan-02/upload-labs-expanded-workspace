@@ -145,6 +145,15 @@ The camera source is used, but the inherited old `10000` clamp selects
 placement remains at that same old-bound candidate. This is a QoL defect, not
 an ExpandedWorkspace crash, save-corruption, or regression stop condition.
 
+## F22 Decision
+
+F22 records Candidate A, a guarded post-super delta correction, as the
+preferred future canary direction. It must identify the exact newly pasted
+windows and connectors, translate only that set by the old-to-expanded delta,
+and fail closed if counts, selection membership, or preservation checks do not
+agree. F22 authorizes no implementation. See
+`docs/PHASE_2C_F22_TEMPLATE_PREPLACEMENT_OLD_BOUND_FIX_PLAN.md`.
+
 ## Explicit Non-Actions
 
 No fix, cleanup, clean integration, artifact regeneration, push, merge, tag,
