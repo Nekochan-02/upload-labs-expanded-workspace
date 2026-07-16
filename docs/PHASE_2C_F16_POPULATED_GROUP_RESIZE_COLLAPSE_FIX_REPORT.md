@@ -55,10 +55,12 @@ observed by F16.
 
 ## Next Diagnostic Only
 
-Prepare one F17 plan to decouple correction activation from F15's first-edge
-diagnostic target and to reserve F17 logging for the intended `top-right`
-sequence. The correction must remain WindowGroup-only and use the same F15
-guards; do not implement it or broaden it to release/regression work yet.
+F17 is planned in
+`docs/PHASE_2C_F17_RIGHT_SIDE_RESIZE_COLLAPSE_TARGETED_PLAN.md`. It must
+decouple correction activation from F15's first-edge diagnostic target and
+reserve F17 logging for the intended `top-right` sequence. The correction must
+remain WindowGroup-only and use the same F15 guards; do not implement it or
+broaden it to release/regression work yet.
 
 ## Implementation
 

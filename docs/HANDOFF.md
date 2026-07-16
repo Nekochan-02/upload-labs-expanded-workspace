@@ -150,8 +150,13 @@
   * The user observed width collapse on the intended top-right path and also on right-side resize of a group without children; left-side paths remained normal. Children and connection/state remained; no save was made.
   * Actual F16 logs cover only a normal top-left sequence: candidates and actual size/minimum remain valid, both guards are false, and no correction is applied. No F16 line covers the failing top-right/right/bottom path.
   * Cause of the evidence gap: F16 begins only when F15's first eligible diagnostic target begins. The prior top-left resize consumed F15's one-target budget, so the intended top-right correction branch was neither activated nor logged. F16 is not verified; do not infer a correction failure from the absent target evidence.
-  * The next only action is an F17 plan that decouples correction activation from F15 target acquisition and reserves logging for top-right. Do not implement another fix, change F14/F6/F7/F9/F11/F12, resume persistence, or begin regression/release work.
+  * The next only action is the F17 plan: `docs/PHASE_2C_F17_RIGHT_SIDE_RESIZE_COLLAPSE_TARGETED_PLAN.md`. It decouples correction activation from F15 target acquisition and reserves logging for top-right. Do not implement another fix, change F14/F6/F7/F9/F11/F12, resume persistence, or begin regression/release work.
   * Local development artifact: `dist/Nekochan-ExpandedWorkspace-0.2.23.zip`, `21846 bytes`, `15` files, ZIP root `mods-unpacked`, SHA-256 `d124dee730ff43178f1fb5c0698cbc557312f945739b1ea310e054124fce1ebf`. Source/ZIP publish-safety audit categories are all zero.
+* **Phase 2C-F17 / right-side resize collapse targeted canary plan**:
+  * **Status: `PLAN_REQUIRED`**
+  * Plan: `docs/PHASE_2C_F17_RIGHT_SIDE_RESIZE_COLLAPSE_TARGETED_PLAN.md`.
+  * F17 is plan-only. A future canary must independently activate guarded correction for right/bottom resize and log only one selected target edge, beginning with top-right. Top-left must not consume the target.
+  * No runtime code, artifact, Release/tag/Workshop operation, public push, group persistence, full regression, or release integration is authorized by F17 planning.
 * **Phase 2A 検証状態**:
   * **Status: `LIMIT_RELAXATION_COMPLETE_USER_VERIFIED`**
   * Phase 2A-R2で、通常の手動配置は500個を超えて配置できることをユーザー実機で確認済み。
