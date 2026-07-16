@@ -137,7 +137,7 @@ F23.
 
 ## Next Recommended Action
 
-Create a docs-only, connector-identification guard refinement plan. It must
-establish a safe runtime predicate for which newly created connector objects
-belong to the pasted set, without relaxing the unrelated-object guard or
-implementing another fix.
+F24 now records the docs-only connector-ownership guard refinement analysis in
+`docs/PHASE_2C_F24_TEMPLATE_CONNECTOR_GUARD_REFINEMENT_PLAN.md`. Any future
+implementation remains separately approval-gated and must not relax the
+unrelated-object guard.

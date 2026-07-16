@@ -6,6 +6,14 @@
 
 ## 0. 最新再開ポイント
 
+* **Phase 2C-F24 / template connector guard refinement plan**:
+  * **Status: `F24_TEMPLATE_CONNECTOR_GUARD_REFINEMENT_PLAN_READY`**
+  * Current branch: `dev/phase-2c-f24-template-connector-guard-plan` from F23 result commit `cc0b094` (`docs: record F23 template pre-placement blocked result`).
+  * Source analysis confirms that `Desktop.copy()` stages connector metadata by selected input membership, while `Desktop.paste()` instantiates connectors only for retained copied outputs. Therefore F23's serialized/runtime connector count mismatch (`29/17`) is expected-path evidence, not an object-identification failure.
+  * F24 recommends an endpoint-ownership guard for a separately approved `0.2.27` canary: collect resource IDs from the already validated pasted windows, classify each new direct-child connector by both endpoint IDs, and correct only if every observed new connector is internal to that exact set. `data.connectors.size()` becomes diagnostic-only.
+  * F24 is docs-only. Do not implement the guard, generate an artifact, run a build or runtime test, clean diagnostics, begin clean integration, push, tag, Release, or Workshop work.
+  * F24 plan: `docs/PHASE_2C_F24_TEMPLATE_CONNECTOR_GUARD_REFINEMENT_PLAN.md`.
+
 * **Phase 2C-F23 / template pre-placement fix canary**:
   * **Status: `F23_TEMPLATE_PREPLACEMENT_FIX_BLOCKED`**
   * Current branch: `dev/phase-2c-f23-template-preplacement-fix-canary` from F22 plan commit `843dba109c5c7f475992c697097679da528c6c78` (`docs: plan template pre-placement fix`).
@@ -14,7 +22,7 @@
   * Local development artifact: `dist/Nekochan-ExpandedWorkspace-0.2.26.zip`, `25749` bytes, `15` files, ZIP root `mods-unpacked`, SHA-256 `e600976a0407b78117473f06f16265442e145b3fe0225094a369974dea733c71`. ZIP allowlist and forbidden-entry audit pass.
   * The valid user test loaded only `0.2.26` and reached all F23 checkpoints. Window identity and selection passed (`18/18`, selection match true), but expected serialized connector entries `29` did not equal actual new connector objects `17`. F23 correctly emitted `STOP_NEW_CONNECTOR_COUNT_MISMATCH`, applied no correction, and left immediate/final placement at the old candidate `(6750, 8950)`.
   * Visual relative layout, connection/state, selection/deselection, and manual move remained PASS. No unrelated node moved and no visible error occurred. This is a fail-closed F23 block, not evidence of an unsafe movement or an ExpandedWorkspace crash.
-  * F23 report: `docs/PHASE_2C_F23_TEMPLATE_PREPLACEMENT_FIX_CANARY_REPORT.md`. The next and only action is a docs-only connector-identification guard refinement plan; do not implement another correction, begin cleanup, clean integration, full regression, release integration, push, tag, Release, or Workshop work.
+  * F23 report: `docs/PHASE_2C_F23_TEMPLATE_PREPLACEMENT_FIX_CANARY_REPORT.md`. Its blocker is now analyzed by F24; do not implement another correction, begin cleanup, clean integration, full regression, release integration, push, tag, Release, or Workshop work.
 
 * **Phase 2C-F22 / template pre-placement old-bound fix plan**:
   * **Status: `F22_TEMPLATE_PREPLACEMENT_FIX_PLAN_APPROVED_FOR_F23_CANARY`**
