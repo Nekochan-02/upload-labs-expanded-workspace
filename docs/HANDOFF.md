@@ -6,6 +6,16 @@
 
 ## 0. 最新再開ポイント
 
+* **Phase 2C-F27 / clean integration RC**:
+  * **Status: `F27_CLEAN_INTEGRATION_RC_READY_FOR_USER_TEST`**
+  * Current branch: `dev/phase-2c-f27-clean-integration-0.2.28` from F26 plan commit `ac40b89` (`docs: plan diagnostic cleanup and clean integration`).
+  * F27 removes the active F6-F25 checkpoint telemetry, diagnostic acquisition flags, and pure resize observers while retaining verified functional corrections. F11 now uses a small functional deferred-local-alignment helper; it is not a diagnostic observer.
+  * F25 now applies its direct-child, selection, resource-ownership, and endpoint guards for each applicable old-bound template paste. It fails closed without verbose diagnostics and emits at most one concise guard warning per session.
+  * Manifest/startup confirmation are `0.2.28`. Local artifact: `dist/Nekochan-ExpandedWorkspace-0.2.28.zip`, `13481` bytes, `14` files, ZIP root `mods-unpacked`, SHA-256 `53cf75fafd712c35b13a2c116e6a6f48baf00767671dac5f50c7d1dd092172ca`.
+  * Static checks pass: no active F checkpoint labels, blocked extension references, `get_position_snapped` override, save/schema change, forbidden tracked path, or forbidden ZIP entry. The ZIP manifest is `0.2.28`.
+  * All `0.2.28` runtime smoke rows remain `NOT TESTED`. Do not push, merge, tag, Release, Workshop publish, or run release integration. The next action is for the user to install only `0.2.28` and run the clean RC smoke.
+  * F27 report: `docs/PHASE_2C_F27_CLEAN_INTEGRATION_RC_REPORT.md`.
+
 * **Phase 2C-F26 / diagnostic cleanup and clean integration plan**:
   * **Status: `F26_DIAGNOSTIC_CLEANUP_CLEAN_INTEGRATION_PLAN_READY`**
   * Current branch: `dev/phase-2c-f26-diagnostic-cleanup-clean-integration-plan` from the clean F25 result commit `4c6ef67` (`docs: record F25 connector ownership pass`).
@@ -13,7 +23,7 @@
   * Required clean-RC preservation includes node limit `1000`, space cap `200`, `20000 x 20000` workspace, 50-unit grid density, click/drag local alignment, exact single/group persistence, group movement/resize corrections, and endpoint-owned template placement correction.
   * The key cleanup distinction is that the F11 observer still performs the deferred local correction and must not be deleted merely because it has a diagnostic name. F25 endpoint ownership guards and correction also remain functional; coordinate/ID checkpoint output is the cleanup candidate.
   * F26 recommends a future `0.2.28 clean RC` and `Nekochan-ExpandedWorkspace-0.2.28.zip`, but does not change the manifest, generate an artifact, run a test, or implement cleanup/integration.
-  * Next action requires explicit approval: implement diagnostic cleanup and clean integration only. RC artifact generation, runtime testing, push, merge, tag, Release, and Workshop remain separately unauthorized.
+  * The approved cleanup/integration scope is implemented by F27. Runtime smoke, push, merge, tag, Release, and Workshop remain separately unauthorized.
   * F26 plan: `docs/PHASE_2C_F26_DIAGNOSTIC_CLEANUP_CLEAN_INTEGRATION_PLAN.md`.
 
 * **Phase 2C-F25 / template connector ownership canary**:

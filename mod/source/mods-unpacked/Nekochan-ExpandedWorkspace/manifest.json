@@ -1,9 +1,9 @@
 {
 	"name": "ExpandedWorkspace",
 	"namespace": "Nekochan",
-	"version_number": "0.2.27",
+	"version_number": "0.2.28",
 	"website_url": "",
-	"description": "Phase 2C-F25 development canary: endpoint-owned template connector correction.",
+	"description": "Expanded workspace, capacity, persistence, and template placement fixes.",
 	"dependencies": [],
 	"extra": {
 		"godot": {

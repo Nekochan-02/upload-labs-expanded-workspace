@@ -1,8 +1,8 @@
 extends Node
 
 # Mod: Nekochan-ExpandedWorkspace
-# Phase 2C-F25 development canary: correct one old-bound template placement
-# sequence only when the pasted window and connector endpoint-ownership guards pass.
+# Clean RC integration of verified workspace, capacity, persistence, resize, and
+# guarded template placement corrections.
 # Do not register connector, window container, or window base/indexed area patches here.
 
 const MOD_ID: String = "Nekochan-ExpandedWorkspace"
@@ -40,18 +40,11 @@ func _init() -> void:
 	ModLoaderMod.install_script_extension(
 		"res://mods-unpacked/Nekochan-ExpandedWorkspace/extensions/scripts/paint.gd"
 	)
-	ModLoaderLog.info(
-		"Registered Phase 2C-F25 endpoint-owned template pre-placement correction canary. It corrects one Desktop.paste sequence only after pasted-window, connector endpoint-ownership, and selection guards pass; F17 resize, F14 snap, F12 persistence, F11 drag, F9 click, F6 restoration, and F7 grid are unchanged.",
-		MOD_ID
-	)
 
 
 func _ready() -> void:
 	_apply_space_upgrade_limit("mod_ready")
-	ModLoaderLog.info(
-		"ExpandedWorkspace v0.2.27 fix canary loaded. Target node limit: 1000. Space upgrade cap: 200. F25 conditionally corrects one old-bound template pre-placement sequence after endpoint-ownership guards pass; F17 resize, F14 snap, F12 persistence, F11 drag alignment, F9 click alignment, F6 restoration, and F7 grid are unchanged.",
-		MOD_ID
-	)
+	ModLoaderLog.info("ExpandedWorkspace v0.2.28 loaded.", MOD_ID)
 
 
 func _apply_space_upgrade_limit(phase: String) -> void:
