@@ -1,8 +1,8 @@
 extends Node
 
 # Mod: Nekochan-ExpandedWorkspace
-# Phase 2C-F21 development diagnostic: observe one template pre-placement
-# sequence without changing its anchor, preview, or final placement behavior.
+# Phase 2C-F23 development canary: correct one old-bound template placement
+# sequence only when the post-paste pasted-set guards all pass.
 # Do not register connector, window container, or window base/indexed area patches here.
 
 const MOD_ID: String = "Nekochan-ExpandedWorkspace"
@@ -41,7 +41,7 @@ func _init() -> void:
 		"res://mods-unpacked/Nekochan-ExpandedWorkspace/extensions/scripts/paint.gd"
 	)
 	ModLoaderLog.info(
-		"Registered Phase 2C-F21 template pre-placement diagnostic. It observes one Desktop.paste sequence only; F17 resize, F14 snap, F12 persistence, F11 drag, F9 click, F6 restoration, and F7 grid are unchanged.",
+		"Registered Phase 2C-F23 guarded template pre-placement correction canary. It corrects one Desktop.paste sequence only after pasted-set, connector, and selection guards pass; F17 resize, F14 snap, F12 persistence, F11 drag, F9 click, F6 restoration, and F7 grid are unchanged.",
 		MOD_ID
 	)
 
@@ -49,7 +49,7 @@ func _init() -> void:
 func _ready() -> void:
 	_apply_space_upgrade_limit("mod_ready")
 	ModLoaderLog.info(
-		"ExpandedWorkspace v0.2.25 diagnostic canary loaded. Target node limit: 1000. Space upgrade cap: 200. F21 observes one template pre-placement sequence without changing placement behavior; F17 resize, F14 snap, F12 persistence, F11 drag alignment, F9 click alignment, F6 restoration, and F7 grid are unchanged.",
+		"ExpandedWorkspace v0.2.26 fix canary loaded. Target node limit: 1000. Space upgrade cap: 200. F23 conditionally corrects one old-bound template pre-placement sequence after all guards pass; F17 resize, F14 snap, F12 persistence, F11 drag alignment, F9 click alignment, F6 restoration, and F7 grid are unchanged.",
 		MOD_ID
 	)
 

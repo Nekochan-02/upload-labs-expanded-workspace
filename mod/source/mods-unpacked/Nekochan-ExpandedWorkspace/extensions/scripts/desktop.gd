@@ -13,6 +13,9 @@ const F12_OPENING_SETTLE_DELAY_SECONDS: float = 0.5
 const F21_LOG_NAME: String = "Nekochan-ExpandedWorkspace:F21"
 const F21_OLD_WORKSPACE_SIZE: Vector2 = Vector2(10000, 10000)
 const F21_MAX_WINDOW_RECORDS: int = 2
+const F23_LOG_NAME: String = "Nekochan-ExpandedWorkspace:F23"
+const F23_OLD_WORKSPACE_SIZE: Vector2 = Vector2(10000, 10000)
+const F23_MAX_LOG_RECORDS: int = 20
 
 var _expanded_workspace_drag_start_positions: Dictionary = {}
 var _f6_saved_restore_positions: Dictionary = {}
@@ -22,6 +25,8 @@ var _f6_stability_checks: Array = []
 var _f12_group_diagnostic: Dictionary = {}
 var _f21_sequence_consumed: bool
 var _f21_pending: Dictionary = {}
+var _f23_sequence_consumed: bool
+var _f23_pending: Dictionary = {}
 
 
 func _enter_tree() -> void:
@@ -43,15 +48,11 @@ func _ready() -> void:
 
 
 func paste(data: Dictionary) -> void:
-	var f21_started: bool = _f21_begin_template_preplacement_diagnostic(data)
+	var f23_started: bool = _f23_begin_template_preplacement_fix_canary(data)
 	_paste_with_expanded_node_limit(data)
 
-	if f21_started:
-		_f21_log_template_runtime_checkpoint(
-			"T6_PREVIEW_INSTANCE_POSITION",
-			"immediate_after_super_paste"
-		)
-		call_deferred("_f21_log_template_final_checkpoint")
+	if f23_started:
+		_f23_evaluate_and_apply_correction()
 
 
 func _paste_with_expanded_node_limit(data: Dictionary) -> void:
@@ -251,6 +252,387 @@ func _f21_log_offset_from_camera(
 		],
 		F21_LOG_NAME
 	)
+
+
+func _f23_begin_template_preplacement_fix_canary(data: Dictionary) -> bool:
+	if _f23_sequence_consumed:
+		return false
+
+	_f23_sequence_consumed = true
+	var rect_value = data.get("rect", Rect2())
+	var rect_valid: bool = rect_value is Rect2
+	var template_rect: Rect2 = rect_value if rect_valid else Rect2()
+	var camera_center: Vector2 = Globals.camera_center
+	var raw_target: Vector2 = camera_center - (template_rect.size / 2.0)
+	var old_max: Vector2 = (F23_OLD_WORKSPACE_SIZE - template_rect.size).max(Vector2.ZERO)
+	var old_candidate: Vector2 = raw_target.clamp(Vector2.ZERO, old_max)
+	var expanded_max: Vector2 = WorkspaceAreaConfig.get_max_position(template_rect.size)
+	var expanded_candidate: Vector2 = raw_target.clamp(Vector2.ZERO, expanded_max)
+	var correction_delta: Vector2 = expanded_candidate - old_candidate
+
+	_f23_pending = {
+		"before_window_ids": _f23_capture_window_ids(),
+		"before_connector_ids": _f23_capture_connector_ids(),
+		"expected_window_count": _f23_expected_window_count(data),
+		"expected_connector_count": _f23_expected_connector_count(data),
+		"rect_valid": rect_valid,
+		"template_rect": template_rect,
+		"camera_center": camera_center,
+		"raw_target": raw_target,
+		"old_candidate": old_candidate,
+		"expanded_candidate": expanded_candidate,
+		"old_bound_clamp": not raw_target.is_equal_approx(old_candidate),
+		"expanded_differs": not old_candidate.is_equal_approx(expanded_candidate),
+		"correction_delta": correction_delta,
+		"correction_applied": false,
+	}
+
+	_f23_log(
+		"F23_PASTE_TARGETS",
+		"camera_center=%s rect_position=%s rect_size=%s raw_target=%s old_candidate=%s expanded_candidate=%s correction_delta=%s old_bound_clamp=%s expanded_differs=%s expected_windows=%d expected_connectors=%d before_window_count=%d before_connector_count=%d" % [
+			str(camera_center),
+			str(template_rect.position),
+			str(template_rect.size),
+			str(raw_target),
+			str(old_candidate),
+			str(expanded_candidate),
+			str(correction_delta),
+			str(_f23_pending["old_bound_clamp"]),
+			str(_f23_pending["expanded_differs"]),
+			_f23_pending["expected_window_count"],
+			_f23_pending["expected_connector_count"],
+			_f23_pending["before_window_ids"].size(),
+			_f23_pending["before_connector_ids"].size(),
+		]
+	)
+	return true
+
+
+func _f23_evaluate_and_apply_correction() -> void:
+	if _f23_pending.is_empty():
+		return
+
+	var new_windows: Array[WindowContainer] = _f23_collect_new_windows()
+	var new_connectors: Array[Connector] = _f23_collect_new_connectors()
+	var selection_matches: bool = _f23_selection_matches(new_windows)
+	var windows_valid: bool = _f23_windows_are_valid(new_windows)
+	var connectors_valid: bool = _f23_connectors_are_valid(new_connectors)
+	var before_records: Array = _f23_window_records(new_windows)
+	var before_relative: Array = _f23_relative_offsets(new_windows)
+
+	_f23_log(
+		"F23_PASTE_SET_IDENTIFICATION",
+		"expected_window_count=%d actual_new_window_count=%d expected_connector_count=%d actual_new_connector_count=%d selection_count=%d selection_matches=%s windows_valid=%s connectors_valid=%s new_windows=%s new_connectors=%s" % [
+			_f23_pending["expected_window_count"],
+			new_windows.size(),
+			_f23_pending["expected_connector_count"],
+			new_connectors.size(),
+			Globals.selections.size(),
+			str(selection_matches),
+			str(windows_valid),
+			str(connectors_valid),
+			str(before_records),
+			str(_f23_connector_records(new_connectors)),
+		]
+	)
+	_f23_log("F23_BEFORE_CORRECTION", "window_records=%s" % [str(before_records)])
+
+	var decision_reason: String = _f23_get_correction_stop_reason(
+		new_windows,
+		new_connectors,
+		selection_matches,
+		windows_valid,
+		connectors_valid
+	)
+	if not decision_reason.is_empty():
+		_f23_pending["expected_positions"] = _f23_position_map(new_windows)
+		_f23_log(
+			"F23_CORRECTION_DECISION",
+			"applied=false reason=%s correction_delta=%s" % [
+				decision_reason,
+				str(_f23_pending["correction_delta"]),
+			]
+		)
+		_f23_log("F23_AFTER_CORRECTION", "applied=false window_records=%s" % [str(before_records)])
+		_f23_log(
+			"F23_RELATIVE_LAYOUT_CHECK",
+			"applied=false preserved=true before=%s after=%s" % [
+				str(before_relative),
+				str(before_relative),
+			]
+		)
+		_f23_log(
+			"F23_SELECTION_CHECK",
+			"selection_matches=%s selection_ids=%s" % [
+				str(selection_matches),
+				str(_f23_selection_ids()),
+			]
+		)
+		_f23_log(
+			"F23_CONNECTOR_CHECK",
+			"applied=false connector_records=%s" % [str(_f23_connector_records(new_connectors))]
+		)
+		call_deferred("_f23_log_final_stability")
+		return
+
+	var correction_delta: Vector2 = _f23_pending["correction_delta"]
+	for window: WindowContainer in new_windows:
+		window.position += correction_delta
+		window.moved.emit()
+	for connector: Connector in new_connectors:
+		for point_index: int in connector.custom_points.size():
+			connector.custom_points[point_index] = connector.custom_points[point_index] + correction_delta
+		connector.update_points()
+
+	var after_records: Array = _f23_window_records(new_windows)
+	var after_relative: Array = _f23_relative_offsets(new_windows)
+	var relative_layout_preserved: bool = _f23_relative_layout_matches(before_relative, after_relative)
+	var selection_preserved: bool = _f23_selection_matches(new_windows)
+	_f23_pending["correction_applied"] = true
+	_f23_pending["expected_positions"] = _f23_position_map(new_windows)
+	_f23_log(
+		"F23_CORRECTION_DECISION",
+		"applied=true reason=all_guards_passed correction_delta=%s" % [str(correction_delta)]
+	)
+	_f23_log("F23_AFTER_CORRECTION", "applied=true window_records=%s" % [str(after_records)])
+	_f23_log(
+		"F23_RELATIVE_LAYOUT_CHECK",
+		"applied=true preserved=%s before=%s after=%s" % [
+			str(relative_layout_preserved),
+			str(before_relative),
+			str(after_relative),
+		]
+	)
+	_f23_log(
+		"F23_SELECTION_CHECK",
+		"selection_matches=%s selection_ids=%s" % [
+			str(selection_preserved),
+			str(_f23_selection_ids()),
+		]
+	)
+	_f23_log(
+		"F23_CONNECTOR_CHECK",
+		"applied=true connector_records=%s" % [str(_f23_connector_records(new_connectors))]
+	)
+	call_deferred("_f23_log_final_stability")
+
+
+func _f23_get_correction_stop_reason(
+	new_windows: Array[WindowContainer],
+	new_connectors: Array[Connector],
+	selection_matches: bool,
+	windows_valid: bool,
+	connectors_valid: bool
+) -> String:
+	if not _f23_pending["rect_valid"]:
+		return "STOP_INVALID_TEMPLATE_RECT"
+	if not _f23_pending["old_bound_clamp"]:
+		return "SKIP_NO_OLD_BOUND_CLAMP"
+	if not _f23_pending["expanded_differs"]:
+		return "SKIP_EXPANDED_CANDIDATE_MATCHES_OLD"
+	var correction_delta: Vector2 = _f23_pending["correction_delta"]
+	if not is_finite(correction_delta.x) or not is_finite(correction_delta.y):
+		return "STOP_NONFINITE_CORRECTION_DELTA"
+	if correction_delta.is_zero_approx():
+		return "SKIP_ZERO_CORRECTION_DELTA"
+	if new_windows.size() != _f23_pending["expected_window_count"]:
+		return "STOP_NEW_WINDOW_COUNT_MISMATCH"
+	if new_connectors.size() != _f23_pending["expected_connector_count"]:
+		return "STOP_NEW_CONNECTOR_COUNT_MISMATCH"
+	if not windows_valid:
+		return "STOP_INVALID_NEW_WINDOW"
+	if not connectors_valid:
+		return "STOP_INVALID_NEW_CONNECTOR"
+	if not selection_matches:
+		return "STOP_SELECTION_SET_MISMATCH"
+	return ""
+
+
+func _f23_expected_window_count(data: Dictionary) -> int:
+	var window_data = data.get("windows", [])
+	if not (window_data is Array):
+		return 0
+	var count: int = 0
+	for window_entry in window_data:
+		if not (window_entry is Dictionary):
+			continue
+		var filename: String = str(window_entry.get("filename", ""))
+		if not filename.is_empty() and ResourceLoader.exists("res://scenes/windows/" + filename):
+			count += 1
+	return count
+
+
+func _f23_expected_connector_count(data: Dictionary) -> int:
+	var connector_data = data.get("connectors", {})
+	return connector_data.size() if connector_data is Dictionary else 0
+
+
+func _f23_capture_window_ids() -> Dictionary:
+	var ids: Dictionary = {}
+	var windows_node: Node = get_node_or_null("Windows")
+	if not windows_node:
+		return ids
+	for child in windows_node.get_children():
+		if child is WindowContainer:
+			ids[child.get_instance_id()] = true
+	return ids
+
+
+func _f23_capture_connector_ids() -> Dictionary:
+	var ids: Dictionary = {}
+	var connectors_node: Node = get_node_or_null("Connectors")
+	if not connectors_node:
+		return ids
+	for child in connectors_node.get_children():
+		if child is Connector:
+			ids[child.get_instance_id()] = true
+	return ids
+
+
+func _f23_collect_new_windows() -> Array[WindowContainer]:
+	var new_windows: Array[WindowContainer] = []
+	var before_ids: Dictionary = _f23_pending.get("before_window_ids", {})
+	var windows_node: Node = get_node_or_null("Windows")
+	if not windows_node:
+		return new_windows
+	for child in windows_node.get_children():
+		if child is WindowContainer and not before_ids.has(child.get_instance_id()):
+			new_windows.append(child)
+	return new_windows
+
+
+func _f23_collect_new_connectors() -> Array[Connector]:
+	var new_connectors: Array[Connector] = []
+	var before_ids: Dictionary = _f23_pending.get("before_connector_ids", {})
+	var connectors_node: Node = get_node_or_null("Connectors")
+	if not connectors_node:
+		return new_connectors
+	for child in connectors_node.get_children():
+		if child is Connector and not before_ids.has(child.get_instance_id()):
+			new_connectors.append(child)
+	return new_connectors
+
+
+func _f23_windows_are_valid(windows_to_check: Array[WindowContainer]) -> bool:
+	for window: WindowContainer in windows_to_check:
+		if not is_instance_valid(window) or window.get_parent() != get_node_or_null("Windows"):
+			return false
+	return true
+
+
+func _f23_connectors_are_valid(connectors_to_check: Array[Connector]) -> bool:
+	for connector: Connector in connectors_to_check:
+		if not is_instance_valid(connector) or connector.get_parent() != get_node_or_null("Connectors"):
+			return false
+	return true
+
+
+func _f23_selection_matches(new_windows: Array[WindowContainer]) -> bool:
+	if Globals.selections.size() != new_windows.size():
+		return false
+	for selected: WindowContainer in Globals.selections:
+		if not new_windows.has(selected):
+			return false
+	return true
+
+
+func _f23_window_records(windows_to_log: Array[WindowContainer]) -> Array:
+	var records: Array = []
+	for window: WindowContainer in windows_to_log:
+		if records.size() >= F23_MAX_LOG_RECORDS:
+			break
+		records.append({
+			"instance_id": window.get_instance_id(),
+			"name": window.name,
+			"path": str(window.get_path()),
+			"local": window.position,
+			"size": window.size,
+		})
+	return records
+
+
+func _f23_connector_records(connectors_to_log: Array[Connector]) -> Array:
+	var records: Array = []
+	for connector: Connector in connectors_to_log:
+		if records.size() >= F23_MAX_LOG_RECORDS:
+			break
+		records.append({
+			"instance_id": connector.get_instance_id(),
+			"path": str(connector.get_path()),
+			"custom_point_count": connector.custom_points.size(),
+			"custom_points": connector.custom_points,
+		})
+	return records
+
+
+func _f23_relative_offsets(windows_to_check: Array[WindowContainer]) -> Array:
+	var offsets: Array = []
+	if windows_to_check.is_empty():
+		return offsets
+	var anchor: Vector2 = windows_to_check[0].position
+	for window: WindowContainer in windows_to_check:
+		if offsets.size() >= F23_MAX_LOG_RECORDS:
+			break
+		offsets.append({
+			"instance_id": window.get_instance_id(),
+			"offset": window.position - anchor,
+		})
+	return offsets
+
+
+func _f23_relative_layout_matches(before: Array, after: Array) -> bool:
+	if before.size() != after.size():
+		return false
+	for index: int in before.size():
+		if before[index].get("instance_id", -1) != after[index].get("instance_id", -1):
+			return false
+		var before_offset: Vector2 = before[index].get("offset", Vector2.ZERO)
+		var after_offset: Vector2 = after[index].get("offset", Vector2.ZERO)
+		if not before_offset.is_equal_approx(after_offset):
+			return false
+	return true
+
+
+func _f23_position_map(windows_to_capture: Array[WindowContainer]) -> Dictionary:
+	var positions: Dictionary = {}
+	for window: WindowContainer in windows_to_capture:
+		positions[window.get_instance_id()] = window.position
+	return positions
+
+
+func _f23_selection_ids() -> Array:
+	var ids: Array = []
+	for selected: WindowContainer in Globals.selections:
+		ids.append(selected.get_instance_id())
+	return ids
+
+
+func _f23_log_final_stability() -> void:
+	if _f23_pending.is_empty():
+		return
+	var new_windows: Array[WindowContainer] = _f23_collect_new_windows()
+	var expected_positions: Dictionary = _f23_pending.get("expected_positions", {})
+	var stable: bool = new_windows.size() == expected_positions.size()
+	for window: WindowContainer in new_windows:
+		if not expected_positions.has(window.get_instance_id()):
+			stable = false
+			continue
+		var expected_position: Vector2 = expected_positions[window.get_instance_id()]
+		if not window.position.is_equal_approx(expected_position):
+			stable = false
+	_f23_log(
+		"F23_FINAL_STABILITY",
+		"correction_applied=%s stable=%s final_window_records=%s" % [
+			str(_f23_pending.get("correction_applied", false)),
+			str(stable),
+			str(_f23_window_records(new_windows)),
+		]
+	)
+	_f23_pending.clear()
+
+
+func _f23_log(label: String, details: String) -> void:
+	ModLoaderLog.info("[F23][%s] %s" % [label, details], F23_LOG_NAME)
 
 
 func _count_required_windows(data: Dictionary) -> int:

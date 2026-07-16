@@ -1,9 +1,9 @@
 {
 	"name": "ExpandedWorkspace",
 	"namespace": "Nekochan",
-	"version_number": "0.2.25",
+	"version_number": "0.2.26",
 	"website_url": "",
-	"description": "Phase 2C-F21 development diagnostic: template pre-placement old-area observation.",
+	"description": "Phase 2C-F23 development canary: guarded template pre-placement expanded-bounds correction.",
 	"dependencies": [],
 	"extra": {
 		"godot": {

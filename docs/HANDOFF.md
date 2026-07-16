@@ -6,13 +6,21 @@
 
 ## 0. 最新再開ポイント
 
+* **Phase 2C-F23 / template pre-placement fix canary**:
+  * **Status: `F23_TEMPLATE_PREPLACEMENT_FIX_CANARY_READY_FOR_USER_TEST`**
+  * Current branch: `dev/phase-2c-f23-template-preplacement-fix-canary` from F22 plan commit `843dba109c5c7f475992c697097679da528c6c78` (`docs: plan template pre-placement fix`).
+  * The approved Candidate A implementation adds one `Desktop.paste()` post-super transaction. It calculates raw/old/expanded targets, snapshots direct-child window and connector IDs, and corrects only the newly pasted set by the old-to-expanded local delta after all count, validity, connector, and selection guards pass.
+  * Any ambiguity is fail-closed: F23 logs a `SKIP` or `STOP` reason and moves nothing. It does not copy vanilla `Desktop.paste()`, mutate template/save data, change node limit/space cap, or touch F6/F7/F9/F11/F12/F14/F17 or group resize.
+  * Local development artifact: `dist/Nekochan-ExpandedWorkspace-0.2.26.zip`, `25749` bytes, `15` files, ZIP root `mods-unpacked`, SHA-256 `e600976a0407b78117473f06f16265442e145b3fe0225094a369974dea733c71`. ZIP allowlist and forbidden-entry audit pass.
+  * F23 report: `docs/PHASE_2C_F23_TEMPLATE_PREPLACEMENT_FIX_CANARY_REPORT.md`. User runtime verification is pending; do not begin cleanup, clean integration, full regression, release integration, push, tag, Release, or Workshop work.
+
 * **Phase 2C-F22 / template pre-placement old-bound fix plan**:
-  * **Status: `FIX_PLAN_REQUIRED`**
+  * **Status: `F22_TEMPLATE_PREPLACEMENT_FIX_PLAN_APPROVED_FOR_F23_CANARY`**
   * Current branch: `dev/phase-2c-f22-template-preplacement-fix-plan` from F21 result commit `b2d02f507115f7d5ee275dd70db00c035562fd2c` (`docs: record template pre-placement diagnosis`).
   * F21 confirms `TEMPLATE_CAMERA_SOURCE_OLD_BOUND_CLAMPED`: the camera-derived raw target is valid in the expanded area, but immediate and deferred observed pasted positions exactly equal the old `10000`-bound candidate.
   * F22 compares three paths. Candidate A is preferred only as a future guarded `0.2.26` post-super delta canary: identify new direct-child windows and connectors by pre/post instance-ID snapshots, require count and selection agreement, then translate only that pasted set by the old-to-expanded delta. It preserves the vanilla paste body and fails closed on any ambiguity.
   * Candidate B, a copied/rewritten paste body, is rejected for the first canary due to compatibility and vanilla-derived-code risk. Candidate C, a known limitation, remains the fallback if Candidate A cannot preserve the exact pasted set safely.
-  * F22 plan: `docs/PHASE_2C_F22_TEMPLATE_PREPLACEMENT_OLD_BOUND_FIX_PLAN.md`. The only next action is approval to implement the bounded `0.2.26` Candidate A fix canary. Do not implement it, create an artifact, clean diagnostics, start clean integration, push, tag, release, or publish without that approval.
+  * F22 plan: `docs/PHASE_2C_F22_TEMPLATE_PREPLACEMENT_OLD_BOUND_FIX_PLAN.md`. Its bounded `0.2.26` Candidate A canary is approved and implemented for user test; do not widen it, clean diagnostics, start clean integration, push, tag, release, or publish.
 
 * **Phase 2C-F21 / template pre-placement old-area QoL diagnostic result**:
   * **Status: `TEMPLATE_CAMERA_SOURCE_OLD_BOUND_CLAMPED_CONFIRMED`**
