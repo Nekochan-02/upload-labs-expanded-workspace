@@ -2,10 +2,56 @@
 
 ## Status
 
-`F17_CANARY_READY_FOR_USER_TEST`
+`F17_NOT_EXECUTED_ARTIFACT_MISMATCH`
 
 F17 is a local development canary, not a release candidate. Do not publish,
 tag, push to public master, upload to Workshop, or modify v0.2.9.
+
+## Test Validity
+
+The user correctly reported the intended F17 procedure, including no prior
+top-left interaction and no save after the failure. However, the actual game
+session did not load F17. `godot.log` and `modloader.log` at `18:20:44` show
+`Nekochan-ExpandedWorkspace-0.2.23.zip`, F16 registration text, and
+`ExpandedWorkspace v0.2.23 canary loaded`.
+
+The live Mod folder inspection after game exit likewise contains only
+`Nekochan-ExpandedWorkspace-0.2.23.zip` (21846 bytes, manifest version
+`0.2.23`); there is no `0.2.24` package. Therefore this is an installation
+mismatch, not an F17 runtime result.
+
+## Runtime Evidence
+
+There are zero `[F17]` lines in both current game and Mod Loader logs. All
+required F17 checkpoints are consequently `NOT EXECUTED`:
+
+- `F17_TARGET_EDGE_SELECTED`
+- `F17_BEFORE_CORRECTION`
+- `F17_CORRECTION_DECISION`
+- `F17_AFTER_CORRECTION`
+- `F17_AFTER_RELEASE`
+- `F17_ONE_FRAME_AFTER_RELEASE`
+
+The observed session contains F16/F13 evidence for `group17`, not F17:
+
+- edge: `top-right`; flags: right/top true; no prior top-left F17 target can be
+  evaluated because F17 was not loaded;
+- pre-resize frame: position `(14750,18650)`, size/minimum `(300,200)`;
+- F13 post-vanilla state: size `(20,200)`,
+  `custom_minimum_size=(-4750,200)`, matching the visible width collapse;
+- group remains inside tree and visible at the same position, so no old-bound
+  position jump occurred in this F16 session;
+- F15 reports `contained_window_count=0`; the F13 `child_count=3` is internal
+  group scene structure, not evidence of two contained user nodes. Connection
+  and user-node state are not testable from this session.
+
+## Canary Verdict
+
+`BLOCKED`
+
+F17 is neither PASS nor FAIL because its artifact did not run. The visual
+collapse confirms the pre-existing F16 path remains unsafe, but it cannot
+classify F17 correction activation, target selection, or post-correction state.
 
 ## F16 Handling
 
@@ -90,21 +136,22 @@ The repository build allowlist and the resulting ZIP inspection both passed.
 
 | Test | Result |
 |---|---|
-| Top-right target captured | NOT TESTED |
-| Top-left did not consume target | NOT TESTED |
-| Correction branch evaluated on right/top-right | NOT TESTED |
-| Width does not collapse to 20 | NOT TESTED |
-| `custom_minimum_size.x` non-negative | NOT TESTED |
-| Group remains valid/visible | NOT TESTED |
-| Children remain | NOT TESTED |
-| Connection/state remain | NOT TESTED |
-| Old-bound jump absent | NOT TESTED |
+| Top-right target captured | NOT EXECUTED: F17 not loaded |
+| Top-left did not consume target | NOT EXECUTED: F17 not loaded |
+| Correction branch evaluated on right/top-right | NOT EXECUTED: F17 not loaded |
+| Width does not collapse to 20 | NOT EXECUTED: F17 not loaded; F16 visual/log result collapsed to 20 |
+| `custom_minimum_size.x` non-negative | NOT EXECUTED: F17 not loaded; F16 logged `-4750` |
+| Group remains valid/visible | NOT EXECUTED: F17 not loaded; F16 logged true/true |
+| Children remain | NOT EXECUTED: F17 not loaded |
+| Connection/state remain | NOT EXECUTED: F17 not loaded |
+| Old-bound jump absent | NOT EXECUTED: F17 not loaded; F16 position did not jump |
 
 Codex has not run the game and does not assign runtime PASS status.
 
 ## User Test Steps
 
-1. Install only `Nekochan-ExpandedWorkspace-0.2.24.zip`.
+1. Before launch, confirm the live Mod folder contains only
+   `Nekochan-ExpandedWorkspace-0.2.24.zip`; remove the `0.2.23` package.
 2. Move to the expanded area and create a group beyond the old `10000` boundary.
 3. Place exactly two nodes inside and add one connection if convenient.
 4. Do not touch top-left. Use `top-right` first with little or zero mouse delta.

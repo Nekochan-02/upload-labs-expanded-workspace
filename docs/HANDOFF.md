@@ -153,10 +153,11 @@
   * The next only action is the F17 plan: `docs/PHASE_2C_F17_RIGHT_SIDE_RESIZE_COLLAPSE_TARGETED_PLAN.md`. It decouples correction activation from F15 target acquisition and reserves logging for top-right. Do not implement another fix, change F14/F6/F7/F9/F11/F12, resume persistence, or begin regression/release work.
   * Local development artifact: `dist/Nekochan-ExpandedWorkspace-0.2.23.zip`, `21846 bytes`, `15` files, ZIP root `mods-unpacked`, SHA-256 `d124dee730ff43178f1fb5c0698cbc557312f945739b1ea310e054124fce1ebf`. Source/ZIP publish-safety audit categories are all zero.
 * **Phase 2C-F17 / right-side resize collapse targeted canary**:
-  * **Status: `F17_CANARY_READY_FOR_USER_TEST`**
+  * **Status: `F17_NOT_EXECUTED_ARTIFACT_MISMATCH`**
   * Plan: `docs/PHASE_2C_F17_RIGHT_SIDE_RESIZE_COLLAPSE_TARGETED_PLAN.md`; report: `docs/PHASE_2C_F17_RIGHT_SIDE_RESIZE_COLLAPSE_TARGETED_REPORT.md`.
   * F17 removes the F16 dependency on F15's one-target diagnostic acquisition. Guarded correction now evaluates for every right/bottom resize after vanilla processing; only F17 logging is limited to the first `top-right` or `right` sequence. Top-left cannot consume the F17 target.
-  * `0.2.24` is a local development canary only: `dist/Nekochan-ExpandedWorkspace-0.2.24.zip`, `22115` bytes, `15` files, ZIP root `mods-unpacked`, SHA-256 `942f67e0e0535b208a6ecc67d1d13cd9baf714035a8471dcdad55926373e7e7c`. User testing must begin with a top-right resize beyond the old boundary and must not save after failure. Group persistence, full regression, release integration, public push, Release/tag/Workshop operation, and v0.2.9 artifact operations remain deferred.
+  * The reported F17 test is invalid: game and Mod Loader logs at `18:20:44` loaded `Nekochan-ExpandedWorkspace-0.2.23.zip` and F16 registration text, with zero `[F17]` lines. Live Mod folder inspection after exit also found only `0.2.23`; the observed `top-right` collapse to width `20` and minimum x `-4750` is F16 evidence, not F17 evidence.
+  * `0.2.24` remains a local development canary only: `dist/Nekochan-ExpandedWorkspace-0.2.24.zip`, `22115` bytes, `15` files, ZIP root `mods-unpacked`, SHA-256 `942f67e0e0535b208a6ecc67d1d13cd9baf714035a8471dcdad55926373e7e7c`. The single next action is to install only that artifact, verify startup logs show v0.2.24/F17, then repeat the top-right test without saving after failure. Group persistence, full regression, release integration, public push, Release/tag/Workshop operation, and v0.2.9 artifact operations remain deferred.
 * **Phase 2A 検証状態**:
   * **Status: `LIMIT_RELAXATION_COMPLETE_USER_VERIFIED`**
   * Phase 2A-R2で、通常の手動配置は500個を超えて配置できることをユーザー実機で確認済み。
