@@ -6,6 +6,15 @@
 
 ## 0. 最新再開ポイント
 
+* **Phase 2C-F20 / targeted regression plan**:
+  * **Status: `TARGETED_REGRESSION_PLAN_REQUIRED`**
+  * Current branch: `dev/phase-2c-f20-targeted-regression-plan` at F19 commit `bb0ff6d858f5fd6d4dffddc75e48ccfc28d37401` (`docs: record post-F12 scope decision plan`).
+  * F20 is docs-only. It defines, but does not execute, the shortest targeted regression pass for the diagnostic-heavy `0.2.24` development canary.
+  * Required-before-clean-integration checks are clean installation/loader, primary grid seam, click and drag placement, existing-node movement, single-node persistence, group right/top-right resize smoke, and group persistence with relative layout plus connection/state preservation.
+  * Required-before-RC additions are selection/deselection, group movement, node-limit `1000`, space-upgrade-cap `200`, and clean-install/startup smoke on the future clean RC artifact.
+  * Do not execute regression, modify runtime code, clean diagnostics, build, generate artifacts, bump versions, push, merge, tag, release, or publish without separate approval.
+  * F20 plan: `docs/PHASE_2C_F20_TARGETED_REGRESSION_PLAN.md`.
+
 * **Phase 2C-F19 / post-F12 scope decision**:
   * **Status: `F19_POST_F12_SCOPE_DECISION_PLAN_READY`**
   * Current branch: `dev/phase-2c-f19-post-f12-scope-decision`.
