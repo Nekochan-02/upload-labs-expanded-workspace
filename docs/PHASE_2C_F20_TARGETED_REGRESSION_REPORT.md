@@ -30,6 +30,7 @@ merge, tag, Release, or Workshop publication.
 | Group resize top-right | PASS; no jump or width collapse | F14/F17 record the top-right branch through release with a stable rect and no collapse correction required | PASS |
 | Group resize right | PASS; no jump or width collapse | Visual evidence only; current target diagnostics logged `top-right`, not standalone `right` | PASS (visual) |
 | Group persistence | PASS for frame, two children, layout, membership, selectability, and connection/state | F12 G6-G11 records exact local positions, zero child relative deltas, membership true, and `connector_count=1` | PASS |
+| Group movement across old boundary | PASS: frame and two children cross together, relative layout and one connection/state remain visible, group selection and empty-click deselection pass, and no old-bound jump occurs | User visual evidence; latest session confirms single-Mod load and expected extension installation. Current canary has no dedicated group-movement telemetry. | PASS |
 | Node limit `1000` | PASS | User smoke result; no dedicated F20 marker exists | PASS |
 | Space upgrade cap `200` | PASS: UI display, cap behavior, and purchase/upgrade flow | Latest single-Mod session logs R4 applied `(100 -> 200)` during `mod_ready`; user confirmed no stop at `100` and no error UI | PASS |
 
@@ -72,6 +73,14 @@ applies successfully. It is a non-fatal Mod Loader baseline path error, not an
 ExpandedWorkspace load or extension failure. Record it for later environment
 review, but do not classify it as an F20 Mod stop condition.
 
+The group-movement smoke's latest session records `0.2.24` as the sole
+load-order entry and installs the expected `desktop.gd` and `window_group.gd`
+extensions. No group-movement diagnostic line is emitted by the current
+canary, so frame movement, child following, relative layout, connection/state,
+and selection results are visual evidence. `[F12][STOP]` in that startup is a
+save/load diagnostic skip with no eligible restored group; this smoke did not
+perform save, restart, or load and the line does not assess movement.
+
 ## Stop-Condition Assessment
 
 No F20 stop condition was observed for the Mod under test:
@@ -99,7 +108,7 @@ paste/schematic runtime change is authorized by this report.
 | Item | Status |
 |---|---|
 | Space upgrade cap `200` UI/purchase smoke | PASS; no `100` cap stop observed |
-| Group movement across old boundary | Required before RC; not reported in this F20 run |
+| Group movement across old boundary | PASS; no old-bound clamp/jump or group desynchronization observed |
 | Fresh clean-install smoke on a future clean RC artifact | Required before RC; not applicable to diagnostic `0.2.24` |
 | Connector-point movement smoke | Optional; not reported |
 | All-edge and post-load group-resize matrix | Deferred |
@@ -107,7 +116,7 @@ paste/schematic runtime change is authorized by this report.
 
 ## Next Action
 
-Record and commit the docs-only space-cap smoke result.
+Record and commit the docs-only group-movement smoke result.
 
 ## Explicit Non-Actions
 
