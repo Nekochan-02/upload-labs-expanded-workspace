@@ -7,13 +7,15 @@
 ## 0. 最新再開ポイント
 
 * **Phase 2C-F27 / clean integration RC**:
-  * **Status: `F27_CLEAN_INTEGRATION_RC_READY_FOR_USER_TEST`**
+  * **Status: `F27_CLEAN_RC_SMOKE_BLOCKED`**
   * Current branch: `dev/phase-2c-f27-clean-integration-0.2.28` from F26 plan commit `ac40b89` (`docs: plan diagnostic cleanup and clean integration`).
   * F27 removes the active F6-F25 checkpoint telemetry, diagnostic acquisition flags, and pure resize observers while retaining verified functional corrections. F11 now uses a small functional deferred-local-alignment helper; it is not a diagnostic observer.
   * F25 now applies its direct-child, selection, resource-ownership, and endpoint guards for each applicable old-bound template paste. It fails closed without verbose diagnostics and emits at most one concise guard warning per session.
   * Manifest/startup confirmation are `0.2.28`. Local artifact: `dist/Nekochan-ExpandedWorkspace-0.2.28.zip`, `13481` bytes, `14` files, ZIP root `mods-unpacked`, SHA-256 `53cf75fafd712c35b13a2c116e6a6f48baf00767671dac5f50c7d1dd092172ca`.
   * Static checks pass: no active F checkpoint labels, blocked extension references, `get_position_snapped` override, save/schema change, forbidden tracked path, or forbidden ZIP entry. The ZIP manifest is `0.2.28`.
-  * All `0.2.28` runtime smoke rows remain `NOT TESTED`. Do not push, merge, tag, Release, Workshop publish, or run release integration. The next action is for the user to install only `0.2.28` and run the clean RC smoke.
+  * The user started the `0.2.28` clean RC smoke and found `EXPANDED_AREA_RANGE_SELECTION_NOT_WORKING`: shift + drag range selection is PASS in the old area but FAIL in the expanded area. This is non-fatal but a core multi-node workflow QoL blocker; do not mark the clean RC smoke PASS.
+  * Initial range-selection classification is `RANGE_SELECTION_UNRESOLVED`. The source may fail at input/shift detection, selection-rectangle creation or coordinate domain, old-bound clamp, hit-test coverage, final result application, or an F27 cleanup regression. No cause is asserted yet.
+  * Public push, merge, tag, Release, Workshop publish, and release integration remain blocked. The next action after committing this blocker record is a docs-only F28 expanded-area range-selection diagnostic plan.
   * F27 report: `docs/PHASE_2C_F27_CLEAN_INTEGRATION_RC_REPORT.md`.
 
 * **Phase 2C-F26 / diagnostic cleanup and clean integration plan**:

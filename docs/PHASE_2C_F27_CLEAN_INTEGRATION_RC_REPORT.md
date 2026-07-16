@@ -1,18 +1,27 @@
 # Phase 2C-F27: Clean Integration RC Report
 
-Status: `F27_CLEAN_INTEGRATION_RC_READY_FOR_USER_TEST`
+Status: `F27_CLEAN_RC_SMOKE_BLOCKED`
 
 F27 removes diagnostic-heavy canary reporting and integrates the verified
-runtime corrections into the local `0.2.28` clean RC candidate. This report
-covers static source and artifact verification only. No runtime test or full
+runtime corrections into the local `0.2.28` clean RC candidate. Static source
+and artifact verification passed. The user then started the clean RC smoke and
+identified a new expanded-area range-selection blocker. No runtime test or full
 regression was run by Codex.
 
 ## 1. Result
 
-`F27_CLEAN_INTEGRATION_RC_READY_FOR_USER_TEST`
+`F27_CLEAN_RC_SMOKE_BLOCKED`
 
-The local clean RC artifact is ready for the user smoke test. Runtime gates are
-not closed by F27; every runtime row below remains `NOT TESTED` for `0.2.28`.
+The local clean RC artifact was supplied for user smoke testing, but it is not
+release-ready. In the old area, shift + drag range selection passes. In the
+expanded area, the same operation fails to select the intended range.
+
+Classification: `EXPANDED_AREA_RANGE_SELECTION_NOT_WORKING`.
+
+This is non-fatal but blocks the RC by default because it affects a core
+multi-node workflow. Public push, tag, Release, and Workshop publication remain
+blocked until the issue is fixed and smoke-tested or explicitly accepted as a
+known limitation.
 
 ## 2. Git Topology
 
@@ -154,6 +163,25 @@ fourteen intended Mod GDScript/metadata files under one `mods-unpacked` root.
 | Template connection/state preserved | NOT TESTED |
 | Manual move after template paste | NOT TESTED |
 | Unrelated windows/connectors untouched after template paste | NOT TESTED |
+| Shift + drag range selection in old area | PASS; user smoke observation |
+| Shift + drag range selection in expanded area | FAIL; user smoke observation |
+
+## 10.1 Clean RC Smoke Blocker
+
+The user began the `0.2.28` clean RC smoke with only the clean RC artifact
+installed and found the following behavior:
+
+| Area | Shift + drag range selection |
+|---|---|
+| Old workspace area | PASS |
+| Expanded workspace area | FAIL |
+
+The issue is not yet attributed to input state, selection rectangle creation,
+coordinate conversion, old-bound clamping, hit-testing, result application, or
+the F27 cleanup. Initial classification is `RANGE_SELECTION_UNRESOLVED`.
+
+F28 is required as a docs-only source-analysis and diagnostic plan before any
+runtime diagnostic or fix work. Do not mark the overall clean RC smoke PASS.
 
 ## 11. User Test Steps
 
@@ -187,4 +215,5 @@ GitHub Release, Workshop publication, history rewrite, or force push occurred.
 
 ## 15. Next Recommended Action
 
-Install only `0.2.28` and run the clean RC smoke test.
+Create and approve the F28 expanded-area range-selection diagnostic plan. Do
+not publish or continue release integration.
