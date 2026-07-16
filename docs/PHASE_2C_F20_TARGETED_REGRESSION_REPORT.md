@@ -103,6 +103,16 @@ Vanilla pre-placement follows the camera. This is a confirmed known limitation
 of the expanded-area template/schematic path. It does not block F20, and no
 paste/schematic runtime change is authorized by this report.
 
+## F21 Scope Update
+
+The template/schematic behavior is now the active post-F20 QoL decision:
+pre-placement appears near the old workspace instead of the camera when the
+camera is in the expanded area. F21 static analysis identifies the old `10000`
+clamp in vanilla `Desktop.paste()` as the leading candidate. Diagnostic cleanup
+and clean-integration planning are deferred behind the bounded template
+pre-placement diagnostic decision. See
+`docs/PHASE_2C_F21_TEMPLATE_PREPLACEMENT_OLD_AREA_DIAGNOSTIC_PLAN.md`.
+
 ## Open RC Gates and Unexecuted Scope
 
 | Item | Status |

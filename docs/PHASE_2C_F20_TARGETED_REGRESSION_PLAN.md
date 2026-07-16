@@ -209,6 +209,10 @@ Template / schematic pre-placement at the old boundary is now a confirmed known
 limitation. See `docs/PHASE_2C_F20_TARGETED_REGRESSION_REPORT.md` for the
 full evidence and constraints.
 
+The next planning phase is F21 template pre-placement diagnosis. Do not begin
+diagnostic cleanup or clean-integration planning until F21 determines whether
+a bounded QoL fix is acceptable or the limitation is explicitly accepted.
+
 ## Explicit Non-Actions
 
 F20 does not change runtime code, generate or replace artifacts, build, run

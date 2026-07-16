@@ -6,6 +6,15 @@
 
 ## 0. 最新再開ポイント
 
+* **Phase 2C-F21 / template pre-placement old-area QoL diagnostic plan**:
+  * **Status: `DIAGNOSTIC_PLAN_REQUIRED`**
+  * Current branch: `dev/phase-2c-f21-template-preplacement-old-area` from accepted F20 HEAD `5db170b9466c97d7e9fe140875584fe9dea4ae01`.
+  * Confirmed QoL issue: when the camera is in the expanded area, recalled template/schematic pre-placement appears near the old workspace rather than near the camera. This is non-fatal but highly visible in a normal expanded-workspace workflow.
+  * Static source analysis identifies the leading candidate: vanilla `Desktop.paste()` derives a target from `Globals.camera_center` but clamps it to `Vector2(10000, 10000) - data.rect.size`. The current Mod `desktop.gd` delegates this anchor calculation to `super.paste(data)` and the Mod `schematics_tab.gd` only changes capacity UI.
+  * F21 classification remains `UNRESOLVED` until a bounded one-sequence diagnostic compares raw, old-clamped, expanded-clamped, preview, and final placement positions.
+  * Future `0.2.25` diagnostic artifact is a proposal only. Do not implement, build, test, clean diagnostics, begin clean integration, create an RC artifact, push, tag, release, or publish without separate approval.
+  * F21 plan: `docs/PHASE_2C_F21_TEMPLATE_PREPLACEMENT_OLD_AREA_DIAGNOSTIC_PLAN.md`.
+
 * **Phase 2C-F20 / targeted regression plan**:
   * **Status: `F20_TARGETED_REGRESSION_PASS_WITH_OPEN_RC_GATES`**
   * Current branch: `dev/phase-2c-f20-targeted-regression-plan` at F19 commit `bb0ff6d858f5fd6d4dffddc75e48ccfc28d37401` (`docs: record post-F12 scope decision plan`).
@@ -16,7 +25,7 @@
   * Latest single-Mod logs also contain a recurring non-fatal Mod Loader path error for `res://mods-unpacked/`; the zip still loads, all extensions install, and R4 applies. Record this as an environment baseline, not an ExpandedWorkspace stop condition.
   * Template/schematic pre-placement in the expanded area is a confirmed known limitation: it appears at the old-area boundary rather than the camera position. It is not an F20 stop condition and authorizes no runtime fix.
   * F20 report: `docs/PHASE_2C_F20_TARGETED_REGRESSION_REPORT.md`.
-  * Do not execute regression, modify runtime code, clean diagnostics, build, generate artifacts, bump versions, push, merge, tag, release, or publish without separate approval.
+  * Diagnostic cleanup and clean-integration planning are deferred behind F21 template pre-placement diagnosis. Do not execute regression, modify runtime code, clean diagnostics, build, generate artifacts, bump versions, push, merge, tag, release, or publish without separate approval.
   * F20 plan: `docs/PHASE_2C_F20_TARGETED_REGRESSION_PLAN.md`.
 
 * **Phase 2C-F19 / post-F12 scope decision**:
