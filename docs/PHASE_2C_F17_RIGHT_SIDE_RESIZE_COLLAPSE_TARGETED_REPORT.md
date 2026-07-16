@@ -169,8 +169,8 @@ Codex has not run the game and does not assign runtime PASS status.
 
 F17 has no further required runtime edge test. `bottom-right` and `bottom`
 remain optional future coverage, not a prerequisite for this canary conclusion.
-Do not resume F12 group persistence without a separately approved re-entry
-plan.
+F18 has created the required re-entry plan. Do not run F12 group persistence
+without separate approval of the Option A `0.2.24` test.
 
 ## Deferred Work
 

@@ -12,6 +12,21 @@ The F12 group persistence diagnostic was interrupted by a higher-priority group
 resize disappearance blocker discovered during user testing. Do not treat F12
 as PASS.
 
+## F18 Re-entry Gate
+
+F18 is now planning the narrow persistence re-entry gate. F14 verified the
+primary old-bound resize snap, and F17 verified top-right plus childless right
+width-collapse correction. Those results remove the known resize blockers from
+the F12 test path, but do not validate persistence itself.
+
+The F12 diagnostic remains present and unchanged in
+`extensions/scripts/desktop.gd`: it can correlate one saved group frame with
+one or two enclosed saved children, log G1-G11, compare exact local positions
+and relative deltas, and detect membership ambiguity. F18 recommends current
+`0.2.24` rather than a new `0.2.25` artifact because F17 did not modify the F12
+source and the re-entry test excludes resize. F12 remains `NOT TESTED` pending
+separate user approval of that test.
+
 User supplemental observation: an existing group moved to the expanded area
 persisted after save, exit, restart, and load. This is promising persistence
 evidence, but it is not a complete F12 pass because the group resize path is
