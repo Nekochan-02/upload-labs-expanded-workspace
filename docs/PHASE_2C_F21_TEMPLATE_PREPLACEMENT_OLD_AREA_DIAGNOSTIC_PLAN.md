@@ -1,11 +1,21 @@
 # Phase 2C-F21: Template Pre-placement Old-Area QoL Diagnostic Plan
 
-Status: `DIAGNOSTIC_PLAN_REQUIRED`
+Status: `F21_TEMPLATE_PREPLACEMENT_DIAGNOSTIC_CANARY_READY_FOR_USER_TEST`
 
-This is a docs-only diagnostic and scope plan. It does not authorize runtime
-code changes, a fix implementation, artifact generation, builds, runtime
-tests, diagnostic cleanup, clean integration, version changes, push, merge,
-tag, Release, Workshop publication, or history rewrite.
+Implementation authorization: the user approved the bounded `0.2.25`
+diagnostic canary after this plan's F21 docs-only commit. The authorization is
+limited to observation around `Desktop.paste()`, one template placement
+sequence, and T1-T8 checkpoints. It does not authorize a placement fix.
+
+Implementation record: `0.2.25` was packaged as a development diagnostic
+artifact. Runtime verification remains pending and classification remains
+`UNRESOLVED`.
+
+This plan was docs-only until the user separately approved the bounded `0.2.25`
+diagnostic implementation. That approval authorizes observation-only runtime
+code and a local development artifact, but not a fix, runtime test, diagnostic
+cleanup, clean integration, version changes, push, merge, tag, Release,
+Workshop publication, or history rewrite.
 
 ## Purpose
 
@@ -142,10 +152,10 @@ are deferred behind the F21 template pre-placement decision.
 
 ## Explicit Non-Actions
 
-F21 does not change runtime code, implement a fix, generate an artifact, build,
-run a runtime test, clean diagnostics, implement clean integration, bump a
-version, push, merge, tag, create a Release, publish to Workshop, rebase,
-amend, reset, or force push.
+F21 implements no pre-placement fix and performs no runtime test, diagnostic
+cleanup, clean integration, push, merge, tag, Release, Workshop publication,
+rebase, amend, reset, or force push. The only runtime change is the separately
+approved observation-only `0.2.25` diagnostic; its local artifact was built.
 
 ## Next Recommended Action
 

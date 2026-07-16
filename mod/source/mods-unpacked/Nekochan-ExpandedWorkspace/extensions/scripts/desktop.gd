@@ -10,6 +10,9 @@ const F6_OLD_WORKSPACE_SIZE: float = 10000.0
 const F12_LOG_NAME: String = "Nekochan-ExpandedWorkspace:F12"
 const F12_MAX_CHILDREN: int = 2
 const F12_OPENING_SETTLE_DELAY_SECONDS: float = 0.5
+const F21_LOG_NAME: String = "Nekochan-ExpandedWorkspace:F21"
+const F21_OLD_WORKSPACE_SIZE: Vector2 = Vector2(10000, 10000)
+const F21_MAX_WINDOW_RECORDS: int = 2
 
 var _expanded_workspace_drag_start_positions: Dictionary = {}
 var _f6_saved_restore_positions: Dictionary = {}
@@ -17,6 +20,8 @@ var _f6_saved_restore_metadata: Dictionary = {}
 var _f6_correlation_blocked: bool
 var _f6_stability_checks: Array = []
 var _f12_group_diagnostic: Dictionary = {}
+var _f21_sequence_consumed: bool
+var _f21_pending: Dictionary = {}
 
 
 func _enter_tree() -> void:
@@ -38,6 +43,18 @@ func _ready() -> void:
 
 
 func paste(data: Dictionary) -> void:
+	var f21_started: bool = _f21_begin_template_preplacement_diagnostic(data)
+	_paste_with_expanded_node_limit(data)
+
+	if f21_started:
+		_f21_log_template_runtime_checkpoint(
+			"T6_PREVIEW_INSTANCE_POSITION",
+			"immediate_after_super_paste"
+		)
+		call_deferred("_f21_log_template_final_checkpoint")
+
+
+func _paste_with_expanded_node_limit(data: Dictionary) -> void:
 	var required: int = _count_required_windows(data)
 	if required <= 0 or Globals.max_window_count + required <= Utils.MAX_WINDOW:
 		super.paste(data)
@@ -55,6 +72,185 @@ func paste(data: Dictionary) -> void:
 
 	var added: int = max(0, Globals.max_window_count - temporary_count)
 	Globals.max_window_count = before + added
+
+
+func _f21_begin_template_preplacement_diagnostic(data: Dictionary) -> bool:
+	if _f21_sequence_consumed:
+		return false
+
+	_f21_sequence_consumed = true
+	var rect_value = data.get("rect", Rect2())
+	var template_rect: Rect2 = rect_value if rect_value is Rect2 else Rect2()
+	var camera_center: Vector2 = Globals.camera_center
+	var raw_target: Vector2 = camera_center - (template_rect.size / 2.0)
+	var old_max: Vector2 = (F21_OLD_WORKSPACE_SIZE - template_rect.size).max(Vector2.ZERO)
+	var old_clamped: Vector2 = raw_target.clamp(Vector2.ZERO, old_max)
+	var expanded_max: Vector2 = WorkspaceAreaConfig.get_max_position(template_rect.size)
+	var expanded_clamped: Vector2 = raw_target.clamp(Vector2.ZERO, expanded_max)
+	var camera: Camera2D = get_viewport().get_camera_2d()
+	var camera_global: Vector2 = Vector2.ZERO
+	var camera_zoom: Vector2 = Vector2.ZERO
+	if camera:
+		camera_global = camera.global_position
+		camera_zoom = camera.zoom
+
+	_f21_pending = {
+		"before_window_ids": _f21_capture_window_ids(),
+		"camera_center": camera_center,
+		"raw_target": raw_target,
+		"old_clamped": old_clamped,
+		"expanded_clamped": expanded_clamped,
+		"immediate_instance_id": -1,
+	}
+
+	ModLoaderLog.info(
+		"[F21][T1_CAMERA_STATE] camera_center=%s camera_global=%s camera_zoom=%s viewport_rect=%s" % [
+			str(camera_center),
+			str(camera_global),
+			str(camera_zoom),
+			str(get_viewport().get_visible_rect()),
+		],
+		F21_LOG_NAME
+	)
+	ModLoaderLog.info(
+		"[F21][T2_TEMPLATE_DATA_BOUNDS] template_name=unavailable_at_paste window_count=%d group_window_count=%d rect_position=%s rect_size=%s" % [
+			_f21_template_window_count(data),
+			_f21_template_group_count(data),
+			str(template_rect.position),
+			str(template_rect.size),
+		],
+		F21_LOG_NAME
+	)
+	ModLoaderLog.info(
+		"[F21][T3_PREPLACEMENT_TARGET_RAW] camera_center=%s raw_target=%s template_anchor=%s" % [
+			str(camera_center),
+			str(raw_target),
+			str(template_rect.position),
+		],
+		F21_LOG_NAME
+	)
+	ModLoaderLog.info(
+		"[F21][T4_PREPLACEMENT_TARGET_CLAMPED_OLD] old_max=%s old_clamped=%s old_bound_clamp_detected=%s" % [
+			str(old_max),
+			str(old_clamped),
+			str(not raw_target.is_equal_approx(old_clamped)),
+		],
+		F21_LOG_NAME
+	)
+	ModLoaderLog.info(
+		"[F21][T5_PREPLACEMENT_TARGET_CLAMPED_EXPANDED] expanded_max=%s expanded_clamped=%s differs_from_old_candidate=%s" % [
+			str(expanded_max),
+			str(expanded_clamped),
+			str(not old_clamped.is_equal_approx(expanded_clamped)),
+		],
+		F21_LOG_NAME
+	)
+	return true
+
+
+func _f21_template_window_count(data: Dictionary) -> int:
+	var windows = data.get("windows", [])
+	return windows.size() if windows is Array else 0
+
+
+func _f21_template_group_count(data: Dictionary) -> int:
+	var groups: int = 0
+	var windows = data.get("windows", [])
+	if not (windows is Array):
+		return groups
+	for window_data in windows:
+		if window_data is Dictionary and str(window_data.get("filename", "")) == "window_group.tscn":
+			groups += 1
+	return groups
+
+
+func _f21_capture_window_ids() -> Dictionary:
+	var ids: Dictionary = {}
+	var windows_node: Node = get_node_or_null("Windows")
+	if not windows_node:
+		return ids
+	for child in windows_node.get_children():
+		if child is WindowContainer:
+			ids[child.get_instance_id()] = true
+	return ids
+
+
+func _f21_collect_new_window_records() -> Array:
+	var records: Array = []
+	var before_ids: Dictionary = _f21_pending.get("before_window_ids", {})
+	var windows_node: Node = get_node_or_null("Windows")
+	if not windows_node:
+		return records
+	for child in windows_node.get_children():
+		if not (child is WindowContainer):
+			continue
+		if before_ids.has(child.get_instance_id()):
+			continue
+		records.append({
+			"instance_id": child.get_instance_id(),
+			"name": child.name,
+			"local": child.position,
+			"global": child.global_position,
+			"size": child.size,
+		})
+		if records.size() >= F21_MAX_WINDOW_RECORDS:
+			break
+	return records
+
+
+func _f21_log_template_runtime_checkpoint(checkpoint: String, phase: String) -> void:
+	if _f21_pending.is_empty():
+		return
+	var records: Array = _f21_collect_new_window_records()
+	var first_record: Dictionary = records[0] if not records.is_empty() else {}
+	if checkpoint == "T6_PREVIEW_INSTANCE_POSITION" and not first_record.is_empty():
+		_f21_pending["immediate_instance_id"] = first_record["instance_id"]
+	ModLoaderLog.info(
+		"[F21][%s] phase=%s separate_preview_observed=false new_window_count=%d records=%s" % [
+			checkpoint,
+			phase,
+			records.size(),
+			str(records),
+		],
+		F21_LOG_NAME
+	)
+	_f21_log_offset_from_camera(checkpoint, phase, first_record)
+
+
+func _f21_log_template_final_checkpoint() -> void:
+	_f21_log_template_runtime_checkpoint(
+		"T7_FINAL_PLACEMENT_POSITION",
+		"one_deferred_after_super_paste"
+	)
+	_f21_pending.clear()
+
+
+func _f21_log_offset_from_camera(
+	checkpoint: String,
+	phase: String,
+	first_record: Dictionary
+) -> void:
+	var camera_center: Vector2 = _f21_pending.get("camera_center", Vector2.ZERO)
+	var raw_target: Vector2 = _f21_pending.get("raw_target", Vector2.ZERO)
+	var old_clamped: Vector2 = _f21_pending.get("old_clamped", Vector2.ZERO)
+	var expanded_clamped: Vector2 = _f21_pending.get("expanded_clamped", Vector2.ZERO)
+	var observed_local = first_record.get("local", Vector2.ZERO)
+	var observed_global = first_record.get("global", Vector2.ZERO)
+	ModLoaderLog.info(
+		"[F21][T8_OFFSET_FROM_CAMERA] source_checkpoint=%s phase=%s camera_center=%s raw_delta=%s old_candidate_delta=%s expanded_candidate_delta=%s observed_local=%s observed_local_delta=%s observed_global=%s observed_global_delta=%s" % [
+			checkpoint,
+			phase,
+			str(camera_center),
+			str(raw_target - camera_center),
+			str(old_clamped - camera_center),
+			str(expanded_clamped - camera_center),
+			str(observed_local),
+			str(observed_local - camera_center),
+			str(observed_global),
+			str(observed_global - camera_center),
+		],
+		F21_LOG_NAME
+	)
 
 
 func _count_required_windows(data: Dictionary) -> int:

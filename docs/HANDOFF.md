@@ -7,13 +7,16 @@
 ## 0. 最新再開ポイント
 
 * **Phase 2C-F21 / template pre-placement old-area QoL diagnostic plan**:
-  * **Status: `DIAGNOSTIC_PLAN_REQUIRED`**
+  * **Status: `F21_TEMPLATE_PREPLACEMENT_DIAGNOSTIC_CANARY_READY_FOR_USER_TEST`**
   * Current branch: `dev/phase-2c-f21-template-preplacement-old-area` from accepted F20 HEAD `5db170b9466c97d7e9fe140875584fe9dea4ae01`.
   * Confirmed QoL issue: when the camera is in the expanded area, recalled template/schematic pre-placement appears near the old workspace rather than near the camera. This is non-fatal but highly visible in a normal expanded-workspace workflow.
   * Static source analysis identifies the leading candidate: vanilla `Desktop.paste()` derives a target from `Globals.camera_center` but clamps it to `Vector2(10000, 10000) - data.rect.size`. The current Mod `desktop.gd` delegates this anchor calculation to `super.paste(data)` and the Mod `schematics_tab.gd` only changes capacity UI.
   * F21 classification remains `UNRESOLVED` until a bounded one-sequence diagnostic compares raw, old-clamped, expanded-clamped, preview, and final placement positions.
-  * Future `0.2.25` diagnostic artifact is a proposal only. Do not implement, build, test, clean diagnostics, begin clean integration, create an RC artifact, push, tag, release, or publish without separate approval.
+  * `dist/Nekochan-ExpandedWorkspace-0.2.25.zip` is the local development diagnostic artifact: `23577 bytes`, `15` files, ZIP root `mods-unpacked`, SHA-256 `b9363ac35b96d8df0645eec1e620328e9ce9296e266298e4ebe482307f7e5c2f`.
+  * User-approved `0.2.25` diagnostic canary implementation is limited to one `Desktop.paste()` observation sequence and T1-T8 checkpoints. It does not change the template anchor, preview, final placement, connector, selection, group, or save behavior. User verification is still required and all F21 runtime matrix rows remain `NOT TESTED`.
+  * Do not implement a fix, clean diagnostics, begin clean integration, create an RC artifact, push, tag, release, or publish without separate approval.
   * F21 plan: `docs/PHASE_2C_F21_TEMPLATE_PREPLACEMENT_OLD_AREA_DIAGNOSTIC_PLAN.md`.
+  * F21 report: `docs/PHASE_2C_F21_TEMPLATE_PREPLACEMENT_OLD_AREA_DIAGNOSTIC_REPORT.md`.
 
 * **Phase 2C-F20 / targeted regression plan**:
   * **Status: `F20_TARGETED_REGRESSION_PASS_WITH_OPEN_RC_GATES`**
