@@ -1,6 +1,6 @@
 # Phase 2C-F28: Expanded-Area Range Selection Diagnostic Plan
 
-Status: `F28_RANGE_SELECTION_DIAGNOSTIC_PLAN_REQUIRED`
+Status: `F28_RANGE_SELECTION_DIAGNOSTIC_PLAN_READY`
 
 Result: `F28_RANGE_SELECTION_DIAGNOSTIC_PLAN_READY` / `BLOCKED`
 
@@ -228,7 +228,8 @@ force push.
 
 ## 14. Next Recommended Action
 
-Approve implementation of the one bounded `0.2.29` expanded-area range
-selection diagnostic canary. Do not authorize a fix, cleanup, clean
-integration, RC artifact, public push, tag, Release, or Workshop operation at
-this stage.
+The approved F29 diagnostic implementation is recorded in
+`docs/PHASE_2C_F29_RANGE_SELECTION_DIAGNOSTIC_CANARY_REPORT.md`. The next
+action is one user-run expanded-area Shift + drag diagnostic attempt. Do not
+authorize a fix, cleanup, clean integration, RC artifact, public push, tag,
+Release, or Workshop operation at this stage.

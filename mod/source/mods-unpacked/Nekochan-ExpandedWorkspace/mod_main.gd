@@ -44,7 +44,10 @@ func _init() -> void:
 
 func _ready() -> void:
 	_apply_space_upgrade_limit("mod_ready")
-	ModLoaderLog.info("ExpandedWorkspace v0.2.28 loaded.", MOD_ID)
+	ModLoaderLog.info(
+		"ExpandedWorkspace v0.2.29 loaded; F29 range-selection diagnostic is armed for one attempt.",
+		MOD_ID
+	)
 
 
 func _apply_space_upgrade_limit(phase: String) -> void:

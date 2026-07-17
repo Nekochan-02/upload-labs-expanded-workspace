@@ -11,6 +11,11 @@ var _expanded_workspace_drag_start_positions: Dictionary = {}
 var _saved_restore_positions: Dictionary = {}
 var _restoration_correlation_blocked: bool
 var _template_correction_skip_reported: bool
+var _f29_selection_attempt_started: bool
+var _f29_selection_attempt_completed: bool
+var _f29_selection_start_screen: Vector2
+var _f29_selection_start_world: Vector2
+var _f29_selection_start_panel_world: Vector2
 
 
 func _enter_tree() -> void:
@@ -26,6 +31,19 @@ func _ready() -> void:
 		Signals.begin_drag.connect(_on_expanded_workspace_begin_drag)
 	if not Signals.drag_selection.is_connected(_on_expanded_workspace_drag_selection):
 		Signals.drag_selection.connect(_on_expanded_workspace_drag_selection)
+	_f29_log_armed_geometry()
+
+
+func _input(event: InputEvent) -> void:
+	if _f29_selection_attempt_completed or not (event is InputEventMouseButton):
+		return
+	if event.button_index != MOUSE_BUTTON_LEFT:
+		return
+	if event.is_pressed():
+		if _f29_is_selection_attempt_candidate(event):
+			_f29_capture_selection_start(event)
+	elif _f29_selection_attempt_started:
+		_f29_capture_selection_release(event)
 
 
 func paste(data: Dictionary) -> void:
@@ -335,3 +353,289 @@ func _apply_restoration_corrections() -> void:
 
 func _is_beyond_vanilla_bounds(saved_position: Vector2, vanilla_max_position: Vector2) -> bool:
 	return saved_position.x > vanilla_max_position.x or saved_position.y > vanilla_max_position.y
+
+
+func _f29_is_selection_attempt_candidate(event: InputEventMouseButton) -> bool:
+	if Globals.cur_screen != 0:
+		return false
+	return (
+		Globals.tool == Utils.tools.SELECT
+		or event.shift_pressed
+		or Input.is_action_pressed("multi_select")
+	)
+
+
+func _f29_capture_selection_start(event: InputEventMouseButton) -> void:
+	_f29_selection_attempt_started = true
+	_f29_selection_start_screen = event.position
+	_f29_selection_start_world = Utils.screen_to_world_pos(event.position)
+	_f29_selection_start_panel_world = _f29_panel_mouse_world()
+
+	var input_blocker: Control = get_node_or_null("InputBlocker") as Control
+	var selection_panel: Control = get_node_or_null("SelectionPanel") as Control
+	ModLoaderLog.info(
+		"[F29][R1_SELECTION_INPUT_START] tool=%s input_blocker_visible=%s input_blocker_global_position=%s input_blocker_size=%s selection_panel_visible=%s selection_panel_global_position=%s selection_panel_size=%s" % [
+			str(Globals.tool),
+			str(is_instance_valid(input_blocker) and input_blocker.visible),
+			_f29_control_global_position(input_blocker),
+			_f29_control_size(input_blocker),
+			str(is_instance_valid(selection_panel) and selection_panel.visible),
+			_f29_control_global_position(selection_panel),
+			_f29_control_size(selection_panel),
+		],
+		MOD_LOG_NAME
+	)
+	ModLoaderLog.info(
+		"[F29][R2_SHIFT_STATE] event_shift_pressed=%s multi_select_pressed=%s" % [
+			str(event.shift_pressed),
+			str(Input.is_action_pressed("multi_select")),
+		],
+		MOD_LOG_NAME
+	)
+	ModLoaderLog.info(
+		"[F29][R3_DRAG_START_SCREEN_WORLD] screen=%s utils_world=%s panel_world=%s camera_center=%s" % [
+			str(_f29_selection_start_screen),
+			str(_f29_selection_start_world),
+			str(_f29_selection_start_panel_world),
+			str(Globals.camera_center),
+		],
+		MOD_LOG_NAME
+	)
+
+
+func _f29_capture_selection_release(event: InputEventMouseButton) -> void:
+	var selection_panel: Control = get_node_or_null("SelectionPanel") as Control
+	var input_blocker: Control = get_node_or_null("InputBlocker") as Control
+	var end_screen: Vector2 = event.position
+	var end_world: Vector2 = Utils.screen_to_world_pos(end_screen)
+	var end_panel_world: Vector2 = _f29_panel_mouse_world()
+	var raw_rect: Rect2 = Rect2(
+		_f29_selection_start_panel_world,
+		end_panel_world - _f29_selection_start_panel_world
+	)
+	var normalized_raw_rect: Rect2 = raw_rect.abs()
+	var actual_rect: Rect2 = _f29_control_rect(selection_panel)
+	var old_bounds: Rect2 = Rect2(
+		Vector2.ZERO,
+		Vector2(VANILLA_WORKSPACE_SIZE, VANILLA_WORKSPACE_SIZE)
+	)
+	var expanded_bounds: Rect2 = Rect2(
+		Vector2.ZERO,
+		WorkspaceAreaConfig.get_workspace_size()
+	)
+	var old_candidate: Rect2 = normalized_raw_rect.intersection(old_bounds)
+	var expanded_candidate: Rect2 = normalized_raw_rect.intersection(expanded_bounds)
+	var raw_exceeds_old_bounds: bool = not old_bounds.encloses(normalized_raw_rect)
+	var actual_matches_old_candidate: bool = _f29_rect_equals(actual_rect, old_candidate)
+	var input_blocker_contains_end: bool = (
+		is_instance_valid(input_blocker)
+		and input_blocker.get_global_rect().has_point(end_panel_world)
+	)
+	var old_bound_limit_detected: bool = (
+		raw_exceeds_old_bounds and actual_matches_old_candidate
+	)
+	var selection_rect_drawn: bool = (
+		is_instance_valid(selection_panel)
+		and selection_panel.visible
+		and actual_rect.has_area()
+	)
+	var hit_test: Dictionary = _f29_collect_hit_test_candidates(actual_rect)
+
+	ModLoaderLog.info(
+		"[F29][R4_DRAG_CURRENT_SCREEN_WORLD] screen=%s utils_world=%s panel_world=%s camera_center=%s" % [
+			str(end_screen),
+			str(end_world),
+			str(end_panel_world),
+			str(Globals.camera_center),
+		],
+		MOD_LOG_NAME
+	)
+	ModLoaderLog.info(
+		"[F29][R5_SELECTION_RECT_RAW] raw=%s normalized_raw=%s" % [
+			str(raw_rect),
+			str(normalized_raw_rect),
+		],
+		MOD_LOG_NAME
+	)
+	ModLoaderLog.info(
+		"[F29][R6_SELECTION_RECT_AFTER_CLAMP] actual_used=%s old_bound_candidate=%s expanded_bound_candidate=%s raw_exceeds_old_bounds=%s input_blocker_contains_end=%s old_bound_limit_detected=%s" % [
+			str(actual_rect),
+			str(old_candidate),
+			str(expanded_candidate),
+			str(raw_exceeds_old_bounds),
+			str(input_blocker_contains_end),
+			str(old_bound_limit_detected),
+		],
+		MOD_LOG_NAME
+	)
+	ModLoaderLog.info(
+		"[F29][R7_SELECTION_RECT_DRAWN] visible=%s has_area=%s drawn=%s actual_used=%s" % [
+			str(is_instance_valid(selection_panel) and selection_panel.visible),
+			str(actual_rect.has_area()),
+			str(selection_rect_drawn),
+			str(actual_rect),
+		],
+		MOD_LOG_NAME
+	)
+	ModLoaderLog.info(
+		"[F29][R8_WINDOW_HIT_TEST_CANDIDATES] selectable_count=%d expanded_area_window_count=%d old_area_window_count=%d window_hit_ids=%s window_hit_count=%d connector_hit_ids=%s connector_hit_count=%d" % [
+			int(hit_test["selectable_count"]),
+			int(hit_test["expanded_area_window_count"]),
+			int(hit_test["old_area_window_count"]),
+			str(hit_test["window_hit_ids"]),
+			int(hit_test["window_hit_count"]),
+			str(hit_test["connector_hit_ids"]),
+			int(hit_test["connector_hit_count"]),
+		],
+		MOD_LOG_NAME
+	)
+	ModLoaderLog.info(
+		"[F29][R9_SELECTION_RESULT] computed_window_ids=%s computed_window_count=%d computed_connector_ids=%s computed_connector_count=%d" % [
+			str(hit_test["window_hit_ids"]),
+			int(hit_test["window_hit_count"]),
+			str(hit_test["connector_hit_ids"]),
+			int(hit_test["connector_hit_count"]),
+		],
+		MOD_LOG_NAME
+	)
+	call_deferred("_f29_capture_final_state", hit_test)
+
+
+func _f29_capture_final_state(hit_test: Dictionary) -> void:
+	if _f29_selection_attempt_completed:
+		return
+	_f29_selection_attempt_completed = true
+	var final_window_ids: Array[String] = _f29_node_ids(Globals.selections)
+	var final_connector_ids: Array[String] = _f29_node_ids(Globals.connector_selection)
+	var selection_applied: bool = _f29_expected_selection_present(
+		hit_test["window_hit_ids"],
+		hit_test["connector_hit_ids"],
+		final_window_ids,
+		final_connector_ids
+	)
+	ModLoaderLog.info(
+		"[F29][R10_SELECTION_FINAL_STATE] final_window_ids=%s final_window_count=%d final_connector_ids=%s final_connector_count=%d selection_applied=%s" % [
+			str(final_window_ids),
+			final_window_ids.size(),
+			str(final_connector_ids),
+			final_connector_ids.size(),
+			str(selection_applied),
+		],
+		MOD_LOG_NAME
+	)
+
+
+func _f29_log_armed_geometry() -> void:
+	var input_blocker: Control = get_node_or_null("InputBlocker") as Control
+	var selection_panel: Control = get_node_or_null("SelectionPanel") as Control
+	ModLoaderLog.info(
+		"[F29][RANGE_SELECTION] armed_for_one_attempt input_blocker_global_position=%s input_blocker_size=%s selection_panel_global_position=%s selection_panel_size=%s" % [
+			_f29_control_global_position(input_blocker),
+			_f29_control_size(input_blocker),
+			_f29_control_global_position(selection_panel),
+			_f29_control_size(selection_panel),
+		],
+		MOD_LOG_NAME
+	)
+
+
+func _f29_panel_mouse_world() -> Vector2:
+	var selection_panel: Control = get_node_or_null("SelectionPanel") as Control
+	if is_instance_valid(selection_panel):
+		return selection_panel.get_global_mouse_position()
+	return Utils.screen_to_world_pos(get_viewport().get_mouse_position())
+
+
+func _f29_control_rect(control: Control) -> Rect2:
+	if is_instance_valid(control):
+		return control.get_rect()
+	return Rect2()
+
+
+func _f29_control_global_position(control: Control) -> String:
+	if is_instance_valid(control):
+		return str(control.global_position)
+	return "MISSING"
+
+
+func _f29_control_size(control: Control) -> String:
+	if is_instance_valid(control):
+		return str(control.size)
+	return "MISSING"
+
+
+func _f29_collect_hit_test_candidates(selection_rect: Rect2) -> Dictionary:
+	var selectable_count: int
+	var expanded_area_window_count: int
+	var old_area_window_count: int
+	var window_hit_ids: Array[String] = []
+	var connector_hit_ids: Array[String] = []
+
+	for node: Node in get_tree().get_nodes_in_group("selectable"):
+		if not (node is WindowContainer):
+			continue
+		var window: WindowContainer = node
+		if not window.can_multi_select:
+			continue
+		selectable_count += 1
+		if _f29_window_is_in_expanded_area(window):
+			expanded_area_window_count += 1
+		else:
+			old_area_window_count += 1
+		if selection_rect.intersects(window.get_rect()):
+			window_hit_ids.append(_f29_node_id(window))
+
+	for node: Node in get_tree().get_nodes_in_group("connector_point"):
+		if node is Control and selection_rect.intersects(node.get_rect()):
+			connector_hit_ids.append(_f29_node_id(node))
+
+	return {
+		"selectable_count": selectable_count,
+		"expanded_area_window_count": expanded_area_window_count,
+		"old_area_window_count": old_area_window_count,
+		"window_hit_ids": window_hit_ids,
+		"window_hit_count": window_hit_ids.size(),
+		"connector_hit_ids": connector_hit_ids,
+		"connector_hit_count": connector_hit_ids.size(),
+	}
+
+
+func _f29_window_is_in_expanded_area(window: WindowContainer) -> bool:
+	return (
+		window.global_position.x + window.size.x > VANILLA_WORKSPACE_SIZE
+		or window.global_position.y + window.size.y > VANILLA_WORKSPACE_SIZE
+	)
+
+
+func _f29_node_ids(nodes: Array) -> Array[String]:
+	var ids: Array[String] = []
+	for node: Node in nodes:
+		if is_instance_valid(node):
+			ids.append(_f29_node_id(node))
+	return ids
+
+
+func _f29_node_id(node: Node) -> String:
+	return "%s#%d" % [node.name, node.get_instance_id()]
+
+
+func _f29_expected_selection_present(
+	expected_window_ids: Array,
+	expected_connector_ids: Array,
+	final_window_ids: Array[String],
+	final_connector_ids: Array[String]
+) -> bool:
+	for expected_id: String in expected_window_ids:
+		if not final_window_ids.has(expected_id):
+			return false
+	for expected_id: String in expected_connector_ids:
+		if not final_connector_ids.has(expected_id):
+			return false
+	return true
+
+
+func _f29_rect_equals(left: Rect2, right: Rect2) -> bool:
+	return (
+		left.position.is_equal_approx(right.position)
+		and left.size.is_equal_approx(right.size)
+	)

@@ -6,6 +6,17 @@
 
 ## 0. 最新再開ポイント
 
+* **Phase 2C-F29 / expanded-area range-selection diagnostic canary**:
+  * **Status: `F29_RANGE_SELECTION_DIAGNOSTIC_CANARY_READY_FOR_USER_TEST`**
+  * Current branch: `dev/phase-2c-f29-range-selection-diagnostic-canary` from F28 plan commit `7559eb9` (`docs: plan expanded-area range selection diagnostic`).
+  * `0.2.29` is a development diagnostic artifact only. It observes one candidate Shift + drag attempt without resizing InputBlocker/SelectionPanel, changing hit testing, mutating the selection result, or changing placement, movement, persistence, group resize, template placement, node limit, or space cap.
+  * The F29 sequence emits `[F29]` R1-R10 evidence: route geometry, Shift state, start/end screen and world coordinates, raw/actual/old/expanded rectangles, old-bound indication, rectangle visibility, candidate/hit IDs/counts, computed candidates, and final selection state. It stops logging after the first completed attempt.
+  * Local artifact: `dist/Nekochan-ExpandedWorkspace-0.2.29.zip`, `15523` bytes, `14` files, ZIP root `mods-unpacked`, SHA-256 `980af9f72e46dc92d48095525ec03598b16bcfb8da2ac8a931325be616c9186e`. ZIP manifest is `0.2.29`; R1-R10 labels occur once each; package forbidden-path/extension audit passes. The artifact is ignored and untracked.
+  * `git diff --check` passes. A local Godot CLI is unavailable, so Codex has not launched the game or run a runtime test.
+  * F27 remains `F27_CLEAN_RC_SMOKE_BLOCKED`: old-area Shift + drag PASS and expanded-area Shift + drag FAIL. No root cause or cleanup regression is asserted before user evidence.
+  * Next action: install only `Nekochan-ExpandedWorkspace-0.2.29.zip`, run one expanded-area Shift + drag diagnostic attempt, exit without saving after failure, and provide visual results plus `[F29]` / `[RANGE_SELECTION]` logs. Do not implement a fix, cleanup, clean integration, full regression, or release operation.
+  * F29 report: `docs/PHASE_2C_F29_RANGE_SELECTION_DIAGNOSTIC_CANARY_REPORT.md`.
+
 * **Phase 2C-F28 / expanded-area range-selection diagnostic plan**:
   * **Status: `F28_RANGE_SELECTION_DIAGNOSTIC_PLAN_READY`**
   * Current branch: `dev/phase-2c-f28-range-selection-diagnostic-plan` from F27 blocker-record commit `1b7a5e3` (`docs: record range selection smoke blocker`).
