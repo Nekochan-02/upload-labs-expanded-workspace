@@ -48,7 +48,7 @@ func _init() -> void:
 func _ready() -> void:
 	_apply_space_upgrade_limit("mod_ready")
 	ModLoaderLog.info(
-		"ExpandedWorkspace v0.2.38 loaded; F51 InputBlocker/Camera route diagnostic is armed.",
+		"ExpandedWorkspace v0.2.39 loaded; F53 InputBlocker coverage canary is armed.",
 		MOD_ID
 	)
 

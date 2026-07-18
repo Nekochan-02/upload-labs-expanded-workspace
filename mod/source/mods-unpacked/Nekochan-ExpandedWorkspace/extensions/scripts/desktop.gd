@@ -21,6 +21,8 @@ var _f51_old_guard_snapshot: Dictionary = {}
 var _f51_expected_area: String = "old_guard"
 var _f51_attempt_id: int
 var _f51_guard_failed: bool
+var _f53_coverage_applied: bool
+var _f53_coverage_blocked: bool
 
 
 func _enter_tree() -> void:
@@ -39,6 +41,7 @@ func _ready() -> void:
 	_f29_log_armed_geometry()
 	_f51_connect_input_blocker_observer()
 	_f51_log("B0_DIAGNOSTIC_ARMED", "passive=true base=0.2.29 expected_attempt_order=old_guard_then_expanded selection_panel_override=false")
+	call_deferred("_f53_apply_input_blocker_coverage")
 
 
 func _input(event: InputEvent) -> void:
@@ -655,6 +658,73 @@ func _f51_connect_input_blocker_observer() -> void:
 		input_blocker.gui_input.connect(_f51_record_input_blocker_gui)
 
 
+func _f53_apply_input_blocker_coverage() -> void:
+	if _f53_coverage_applied or _f53_coverage_blocked:
+		return
+
+	var input_blocker: Control = get_node_or_null("InputBlocker") as Control
+	var workspace_size: Vector2 = WorkspaceAreaConfig.get_workspace_size()
+	var expected_workspace_size: Vector2 = Vector2(
+		WorkspaceAreaConfig.MODDED_WORKSPACE_SIZE,
+		WorkspaceAreaConfig.MODDED_WORKSPACE_SIZE
+	)
+	var target_rect: Rect2 = Rect2(Vector2.ZERO, workspace_size)
+	var before_rect: Rect2 = input_blocker.get_global_rect() if is_instance_valid(input_blocker) else Rect2()
+	var parent_is_desktop: bool = is_instance_valid(input_blocker) and input_blocker.get_parent() == self
+	var workspace_matches_config: bool = workspace_size.is_equal_approx(expected_workspace_size)
+
+	if not is_instance_valid(input_blocker) or not parent_is_desktop or not workspace_matches_config:
+		_f53_coverage_blocked = true
+		_f53_log(
+			"C0_COVERAGE_APPLY",
+			"status=BLOCKED input_blocker_valid=%s parent_is_desktop=%s workspace_size=%s expected_workspace_size=%s before_rect=%s target_rect=%s" % [
+				str(is_instance_valid(input_blocker)),
+				str(parent_is_desktop),
+				str(workspace_size),
+				str(expected_workspace_size),
+				str(before_rect),
+				str(target_rect),
+			]
+		)
+		return
+
+	var before_position: Vector2 = input_blocker.position
+	var before_size: Vector2 = input_blocker.size
+	input_blocker.position = Vector2.ZERO
+	input_blocker.size = workspace_size
+
+	var actual_rect: Rect2 = input_blocker.get_global_rect()
+	if not _f53_rect_matches(actual_rect, target_rect):
+		input_blocker.position = before_position
+		input_blocker.size = before_size
+		_f53_coverage_blocked = true
+		_f53_log(
+			"C0_COVERAGE_APPLY",
+			"status=BLOCKED reason=actual_rect_mismatch before_rect=%s target_rect=%s actual_rect=%s restored_rect=%s" % [
+				str(before_rect),
+				str(target_rect),
+				str(actual_rect),
+				str(input_blocker.get_global_rect()),
+			]
+		)
+		return
+
+	_f53_coverage_applied = true
+	_f53_log(
+		"C0_COVERAGE_APPLY",
+		"status=APPLIED input_blocker_parent=Desktop workspace_size=%s before_rect=%s target_rect=%s actual_rect=%s" % [
+			str(workspace_size),
+			str(before_rect),
+			str(target_rect),
+			str(actual_rect),
+		]
+	)
+
+
+func _f53_rect_matches(left: Rect2, right: Rect2) -> bool:
+	return left.position.is_equal_approx(right.position) and left.size.is_equal_approx(right.size)
+
+
 func _f51_record_desktop_input(event: InputEvent) -> void:
 	if not (event is InputEventMouseButton):
 		return
@@ -718,8 +788,11 @@ func _f51_start_attempt(event: InputEventMouseButton, attempt_area: String) -> v
 	_f51_capture_control_state(event)
 	if attempt_area == "old_guard":
 		_f51_log("B1_OLD_AREA_GUARD_START", _f51_attempt_header())
+		_f53_log("C1_OLD_AREA_GUARD_START", _f51_attempt_header() + " " + _f51_input_blocker_state())
 	else:
 		_f51_log("B3_EXPANDED_TARGET_START", _f51_attempt_header())
+		_f53_log("C3_EXPANDED_TARGET_START", _f51_attempt_header() + " " + _f51_input_blocker_state())
+		_f53_log("C4_EXPANDED_HIT_TEST", _f51_attempt_header() + " " + _f51_input_blocker_hit_test(event))
 	_f51_log("B4_INPUT_STATE_AT_TARGET", _f51_attempt_header() + " " + _f51_input_state(event))
 	_f51_log("B5_INPUTBLOCKER_STATE_AND_GEOMETRY", _f51_attempt_header() + " " + _f51_input_blocker_state())
 	_f51_log("B6_INPUTBLOCKER_HIT_TEST", _f51_attempt_header() + " " + _f51_input_blocker_hit_test(event))
@@ -798,10 +871,36 @@ func _f51_finalize_attempt() -> void:
 			]
 		)
 		_f51_old_guard_snapshot = _f51_active_attempt.duplicate(true)
+		_f53_log(
+			"C2_OLD_AREA_GUARD_RESULT",
+			"%s rectangle_appeared=%s nodes_selected=%s camera_moved=%s guard_passed=%s" % [
+				_f51_attempt_header(),
+				str(rectangle_appeared),
+				str(nodes_selected),
+				str(_f51_active_attempt["camera_moved"]),
+				str(guard_passed),
+			]
+		)
+		if not guard_passed:
+			_f53_log("C7_FINAL_CLASSIFICATION", "classification=F53_INPUTBLOCKER_COVERAGE_OLD_GUARD_FAILED")
 	else:
 		_f51_log("B7_MAIN2D_ROUTE_SUMMARY", _f51_attempt_header() + " " + _f51_main2d_route_summary())
 		_f51_log("B8_CAMERA_ROUTE_SUMMARY", _f51_attempt_header() + " " + _f51_camera_route_summary())
 		_f51_log("B9_ROUTE_DIFF_OLD_VS_EXPANDED", _f51_route_difference_summary())
+		_f53_log("C5_VANILLA_ROUTE", _f51_attempt_header() + " " + _f51_main2d_route_summary() + " " + _f51_camera_route_summary())
+		_f53_log(
+			"C6_EXPANDED_SELECTION_RESULT",
+			"%s rectangle_appeared=%s nodes_selected=%s camera_moved=%s" % [
+				_f51_attempt_header(),
+				str(rectangle_appeared),
+				str(nodes_selected),
+				str(_f51_active_attempt["camera_moved"]),
+			]
+		)
+		_f53_log(
+			"C7_FINAL_CLASSIFICATION",
+			"classification=%s" % _f53_classify_attempt(rectangle_appeared, nodes_selected)
+		)
 	_f51_log(
 		"B10_INPUTBLOCKER_CAMERA_CLASSIFICATION",
 		"%s classification=%s input_blocker_reached=%s selection_panel_reached=%s camera_reached=%s" % [
@@ -836,6 +935,23 @@ func _f51_classify_attempt() -> String:
 	if bool(_f51_active_attempt["camera_reached"]) and not bool(_f51_active_attempt["input_blocker_reached"]):
 		return "EXPANDED_ROUTE_CAMERA_HANDLES_WHEN_GUI_MISSES"
 	return "EXPANDED_ROUTE_DIAGNOSTIC_INCONCLUSIVE"
+
+
+func _f53_classify_attempt(rectangle_appeared: bool, nodes_selected: bool) -> String:
+	if _f53_coverage_blocked or not _f53_coverage_applied:
+		return "F53_INPUTBLOCKER_COVERAGE_APPLY_FAILED"
+	var input_blocker: Control = get_node_or_null("InputBlocker") as Control
+	if not is_instance_valid(input_blocker):
+		return "F53_INPUTBLOCKER_COVERAGE_APPLY_FAILED"
+	var screen_position: Vector2 = _f51_active_attempt["screen_position"]
+	var panel_mouse_position: Vector2 = _f51_panel_mouse_position(screen_position)
+	if not input_blocker.get_global_rect().has_point(panel_mouse_position):
+		return "F53_INPUTBLOCKER_COVERAGE_ROUTE_NOT_RESTORED"
+	if not bool(_f51_active_attempt["input_blocker_reached"]) or not bool(_f51_active_attempt["selection_panel_reached"]):
+		return "F53_INPUTBLOCKER_COVERAGE_ROUTE_NOT_RESTORED"
+	if not rectangle_appeared or not nodes_selected or bool(_f51_active_attempt["camera_moved"]):
+		return "F53_INPUTBLOCKER_COVERAGE_SELECTION_FAILED"
+	return "F53_INPUTBLOCKER_COVERAGE_CANARY_PASS"
 
 
 func _f51_attempt_header() -> String:
@@ -936,3 +1052,7 @@ func _f51_route_difference_summary() -> String:
 
 func _f51_log(checkpoint: String, message: String) -> void:
 	ModLoaderLog.info("[F51][%s] %s" % [checkpoint, message], MOD_LOG_NAME)
+
+
+func _f53_log(checkpoint: String, message: String) -> void:
+	ModLoaderLog.info("[F53][%s] %s" % [checkpoint, message], MOD_LOG_NAME)
