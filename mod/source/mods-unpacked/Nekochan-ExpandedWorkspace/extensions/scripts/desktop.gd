@@ -16,6 +16,11 @@ var _f29_selection_attempt_completed: bool
 var _f29_selection_start_screen: Vector2
 var _f29_selection_start_world: Vector2
 var _f29_selection_start_panel_world: Vector2
+var _f51_active_attempt: Dictionary = {}
+var _f51_old_guard_snapshot: Dictionary = {}
+var _f51_expected_area: String = "old_guard"
+var _f51_attempt_id: int
+var _f51_guard_failed: bool
 
 
 func _enter_tree() -> void:
@@ -32,9 +37,12 @@ func _ready() -> void:
 	if not Signals.drag_selection.is_connected(_on_expanded_workspace_drag_selection):
 		Signals.drag_selection.connect(_on_expanded_workspace_drag_selection)
 	_f29_log_armed_geometry()
+	_f51_connect_input_blocker_observer()
+	_f51_log("B0_DIAGNOSTIC_ARMED", "passive=true base=0.2.29 expected_attempt_order=old_guard_then_expanded selection_panel_override=false")
 
 
 func _input(event: InputEvent) -> void:
+	_f51_record_desktop_input(event)
 	if _f29_selection_attempt_completed or not (event is InputEventMouseButton):
 		return
 	if event.button_index != MOUSE_BUTTON_LEFT:
@@ -639,3 +647,292 @@ func _f29_rect_equals(left: Rect2, right: Rect2) -> bool:
 		left.position.is_equal_approx(right.position)
 		and left.size.is_equal_approx(right.size)
 	)
+
+
+func _f51_connect_input_blocker_observer() -> void:
+	var input_blocker: Control = get_node_or_null("InputBlocker") as Control
+	if is_instance_valid(input_blocker) and not input_blocker.gui_input.is_connected(_f51_record_input_blocker_gui):
+		input_blocker.gui_input.connect(_f51_record_input_blocker_gui)
+
+
+func _f51_record_desktop_input(event: InputEvent) -> void:
+	if not (event is InputEventMouseButton):
+		return
+	var mouse_event: InputEventMouseButton = event
+	if mouse_event.button_index != MOUSE_BUTTON_LEFT:
+		return
+	if mouse_event.is_pressed():
+		if not _f51_active_attempt.is_empty() or _f51_guard_failed:
+			return
+		if not _f51_shift_candidate(mouse_event):
+			return
+		var attempt_area: String = _f51_area_for_screen_position(mouse_event.position)
+		if attempt_area != _f51_expected_area:
+			_f51_log(
+				"B10_INPUTBLOCKER_CAMERA_CLASSIFICATION",
+				"attempt_id=none expected_area=%s actual_area=%s classification=EXPANDED_ROUTE_DIAGNOSTIC_INCONCLUSIVE reason=attempt_order_mismatch" % [
+					_f51_expected_area,
+					attempt_area,
+				]
+			)
+			return
+		_f51_start_attempt(mouse_event, attempt_area)
+	elif not _f51_active_attempt.is_empty():
+		_f51_active_attempt["mouse_released"] = true
+		call_deferred("_f51_finalize_attempt")
+
+
+func _f51_shift_candidate(event: InputEventMouseButton) -> bool:
+	return (
+		event.shift_pressed
+		or Input.is_key_pressed(KEY_SHIFT)
+		or Input.is_action_pressed("multi_select")
+	)
+
+
+func _f51_area_for_screen_position(screen_position: Vector2) -> String:
+	var world_position: Vector2 = Utils.screen_to_world_pos(screen_position)
+	if world_position.x > VANILLA_WORKSPACE_SIZE or world_position.y > VANILLA_WORKSPACE_SIZE:
+		return "expanded"
+	return "old_guard"
+
+
+func _f51_start_attempt(event: InputEventMouseButton, attempt_area: String) -> void:
+	_f51_attempt_id += 1
+	var camera: Camera2D = get_node_or_null("../Camera2D") as Camera2D
+	_f51_active_attempt = {
+		"attempt_id": _f51_attempt_id,
+		"attempt_area": attempt_area,
+		"screen_position": event.position,
+		"world_position": Utils.screen_to_world_pos(event.position),
+		"camera_start_position": camera.position if is_instance_valid(camera) else Vector2.ZERO,
+		"input_blocker_reached": false,
+		"selection_panel_reached": false,
+		"main2d_gui_reached": false,
+		"main2d_unhandled_reached": false,
+		"camera_reached": false,
+		"camera_moved": false,
+		"selection_panel_visible_seen": false,
+		"mouse_released": false,
+	}
+	_f51_capture_control_state(event)
+	if attempt_area == "old_guard":
+		_f51_log("B1_OLD_AREA_GUARD_START", _f51_attempt_header())
+	else:
+		_f51_log("B3_EXPANDED_TARGET_START", _f51_attempt_header())
+	_f51_log("B4_INPUT_STATE_AT_TARGET", _f51_attempt_header() + " " + _f51_input_state(event))
+	_f51_log("B5_INPUTBLOCKER_STATE_AND_GEOMETRY", _f51_attempt_header() + " " + _f51_input_blocker_state())
+	_f51_log("B6_INPUTBLOCKER_HIT_TEST", _f51_attempt_header() + " " + _f51_input_blocker_hit_test(event))
+
+
+func _f51_record_input_blocker_gui(event: InputEvent) -> void:
+	if not _f51_is_active_pointer_event(event):
+		return
+	_f51_active_attempt["input_blocker_reached"] = true
+	_f51_active_attempt["selection_panel_reached"] = _f51_selection_panel_connection_exists()
+	_f51_capture_control_state(event)
+
+
+func _f51_record_main2d_route(route: String, event: InputEvent) -> void:
+	if not _f51_is_active_pointer_event(event):
+		return
+	_f51_active_attempt["main2d_%s_reached" % route] = true
+	_f51_capture_control_state(event)
+
+
+func _f51_record_camera_route(event: InputEvent, before_position: Vector2, after_position: Vector2) -> void:
+	if not _f51_is_active_pointer_event(event):
+		return
+	_f51_active_attempt["camera_reached"] = true
+	if not before_position.is_equal_approx(after_position):
+		_f51_active_attempt["camera_moved"] = true
+	_f51_capture_control_state(event)
+
+
+func _f51_is_active_pointer_event(event: InputEvent) -> bool:
+	if _f51_active_attempt.is_empty() or bool(_f51_active_attempt.get("mouse_released", false)):
+		return false
+	if event is InputEventMouseButton:
+		return event.button_index == MOUSE_BUTTON_LEFT
+	if event is InputEventMouseMotion:
+		return event.button_mask == MOUSE_BUTTON_LEFT
+	return false
+
+
+func _f51_capture_control_state(event: InputEvent) -> void:
+	var selection_panel: Control = get_node_or_null("SelectionPanel") as Control
+	if is_instance_valid(selection_panel) and selection_panel.visible:
+		_f51_active_attempt["selection_panel_visible_seen"] = true
+
+
+
+func _f51_finalize_attempt() -> void:
+	if _f51_active_attempt.is_empty():
+		return
+	var attempt_area: String = str(_f51_active_attempt["attempt_area"])
+	var camera: Camera2D = get_node_or_null("../Camera2D") as Camera2D
+	if is_instance_valid(camera) and not camera.position.is_equal_approx(_f51_active_attempt["camera_start_position"]):
+		_f51_active_attempt["camera_moved"] = true
+	var rectangle_appeared: bool = bool(_f51_active_attempt["selection_panel_visible_seen"])
+	var nodes_selected: bool = Globals.selections.size() > 0 or Globals.connector_selection.size() > 0
+	var classification: String = _f51_classify_attempt()
+	if attempt_area == "old_guard":
+		var guard_passed: bool = rectangle_appeared and nodes_selected and not bool(_f51_active_attempt["camera_moved"])
+		if not guard_passed:
+			classification = "EXPANDED_ROUTE_OLD_AREA_GUARD_FAILED"
+			_f51_guard_failed = true
+			_f51_expected_area = "blocked"
+		else:
+			_f51_expected_area = "expanded"
+		_f51_log(
+			"B2_OLD_AREA_GUARD_RESULT",
+			"%s rectangle_appeared=%s nodes_selected=%s camera_moved=%s guard_passed=%s classification=%s %s %s" % [
+				_f51_attempt_header(),
+				str(rectangle_appeared),
+				str(nodes_selected),
+				str(_f51_active_attempt["camera_moved"]),
+				str(guard_passed),
+				classification,
+				_f51_main2d_route_summary(),
+				_f51_camera_route_summary(),
+			]
+		)
+		_f51_old_guard_snapshot = _f51_active_attempt.duplicate(true)
+	else:
+		_f51_log("B7_MAIN2D_ROUTE_SUMMARY", _f51_attempt_header() + " " + _f51_main2d_route_summary())
+		_f51_log("B8_CAMERA_ROUTE_SUMMARY", _f51_attempt_header() + " " + _f51_camera_route_summary())
+		_f51_log("B9_ROUTE_DIFF_OLD_VS_EXPANDED", _f51_route_difference_summary())
+	_f51_log(
+		"B10_INPUTBLOCKER_CAMERA_CLASSIFICATION",
+		"%s classification=%s input_blocker_reached=%s selection_panel_reached=%s camera_reached=%s" % [
+			_f51_attempt_header(),
+			classification,
+			str(_f51_active_attempt["input_blocker_reached"]),
+			str(_f51_active_attempt["selection_panel_reached"]),
+			str(_f51_active_attempt["camera_reached"]),
+		]
+	)
+	_f51_active_attempt.clear()
+
+
+func _f51_classify_attempt() -> String:
+	if _f51_guard_failed:
+		return "EXPANDED_ROUTE_OLD_AREA_GUARD_FAILED"
+	if str(_f51_active_attempt.get("attempt_area", "")) != "expanded":
+		return "EXPANDED_ROUTE_DIAGNOSTIC_INCONCLUSIVE"
+	var input_blocker: Control = get_node_or_null("InputBlocker") as Control
+	if not is_instance_valid(input_blocker) or not input_blocker.visible:
+		return "EXPANDED_ROUTE_INPUTBLOCKER_HIDDEN"
+	var screen_position: Vector2 = _f51_active_attempt["screen_position"]
+	var panel_mouse_position: Vector2 = _f51_panel_mouse_position(screen_position)
+	if not input_blocker.get_global_rect().has_point(panel_mouse_position):
+		return "EXPANDED_ROUTE_INPUTBLOCKER_OUT_OF_BOUNDS"
+	if input_blocker.mouse_filter == Control.MOUSE_FILTER_IGNORE:
+		return "EXPANDED_ROUTE_INPUTBLOCKER_MOUSE_FILTER_BLOCKED"
+	if Globals.tool != Utils.tools.SELECT:
+		return "EXPANDED_ROUTE_TOOL_NOT_SELECT"
+	if bool(_f51_active_attempt["main2d_unhandled_reached"]) and bool(_f51_active_attempt["camera_reached"]):
+		return "EXPANDED_ROUTE_MAIN2D_FORWARDS_TO_CAMERA"
+	if bool(_f51_active_attempt["camera_reached"]) and not bool(_f51_active_attempt["input_blocker_reached"]):
+		return "EXPANDED_ROUTE_CAMERA_HANDLES_WHEN_GUI_MISSES"
+	return "EXPANDED_ROUTE_DIAGNOSTIC_INCONCLUSIVE"
+
+
+func _f51_attempt_header() -> String:
+	return "attempt_id=%s attempt_area=%s" % [
+		str(_f51_active_attempt.get("attempt_id", "none")),
+		str(_f51_active_attempt.get("attempt_area", "unknown")),
+	]
+
+
+func _f51_input_state(event: InputEventMouseButton) -> String:
+	return "raw_shift=%s multi_select=%s event_shift=%s globals_tool=%s select_value=%s tool_is_select=%s" % [
+		str(Input.is_key_pressed(KEY_SHIFT)),
+		str(Input.is_action_pressed("multi_select")),
+		str(event.shift_pressed),
+		str(Globals.tool),
+		str(Utils.tools.SELECT),
+		str(Globals.tool == Utils.tools.SELECT),
+	]
+
+
+func _f51_input_blocker_state() -> String:
+	var input_blocker: Control = get_node_or_null("InputBlocker") as Control
+	if not is_instance_valid(input_blocker):
+		return "input_blocker=MISSING"
+	return "visible=%s mouse_filter=%s position=%s global_position=%s size=%s rect=%s global_rect=%s" % [
+		str(input_blocker.visible),
+		str(input_blocker.mouse_filter),
+		str(input_blocker.position),
+		str(input_blocker.global_position),
+		str(input_blocker.size),
+		str(input_blocker.get_rect()),
+		str(input_blocker.get_global_rect()),
+	]
+
+
+func _f51_input_blocker_hit_test(event: InputEventMouseButton) -> String:
+	var input_blocker: Control = get_node_or_null("InputBlocker") as Control
+	var panel_mouse_position: Vector2 = _f51_panel_mouse_position(event.position)
+	var world_position: Vector2 = Utils.screen_to_world_pos(event.position)
+	if not is_instance_valid(input_blocker):
+		return "screen=%s world=%s panel_mouse=%s input_blocker_local=UNKNOWN inside_input_blocker=UNKNOWN" % [
+			str(event.position), str(world_position), str(panel_mouse_position)
+		]
+	return "screen=%s world=%s panel_mouse=%s input_blocker_local=%s inside_input_blocker=%s" % [
+		str(event.position),
+		str(world_position),
+		str(panel_mouse_position),
+		str(input_blocker.get_local_mouse_position()),
+		str(input_blocker.get_global_rect().has_point(panel_mouse_position)),
+	]
+
+
+func _f51_panel_mouse_position(screen_position: Vector2) -> Vector2:
+	var selection_panel: Control = get_node_or_null("SelectionPanel") as Control
+	if is_instance_valid(selection_panel):
+		return selection_panel.get_global_mouse_position()
+	return Utils.screen_to_world_pos(screen_position)
+
+
+func _f51_selection_panel_connection_exists() -> bool:
+	var input_blocker: Control = get_node_or_null("InputBlocker") as Control
+	var selection_panel: Control = get_node_or_null("SelectionPanel") as Control
+	if not is_instance_valid(input_blocker) or not is_instance_valid(selection_panel):
+		return false
+	return input_blocker.gui_input.is_connected(
+		Callable(selection_panel, "_on_input_blocker_gui_input")
+	)
+
+
+func _f51_main2d_route_summary() -> String:
+	return "main2d_gui_reached=%s main2d_unhandled_reached=%s input_blocker_reached=%s selection_panel_reached=%s" % [
+		str(_f51_active_attempt["main2d_gui_reached"]),
+		str(_f51_active_attempt["main2d_unhandled_reached"]),
+		str(_f51_active_attempt["input_blocker_reached"]),
+		str(_f51_active_attempt["selection_panel_reached"]),
+	]
+
+
+func _f51_camera_route_summary() -> String:
+	return "camera_reached=%s camera_moved=%s" % [
+		str(_f51_active_attempt["camera_reached"]),
+		str(_f51_active_attempt["camera_moved"]),
+	]
+
+
+func _f51_route_difference_summary() -> String:
+	if _f51_old_guard_snapshot.is_empty():
+		return "old_guard=UNAVAILABLE expanded=%s" % _f51_attempt_header()
+	return "old_input_blocker_reached=%s expanded_input_blocker_reached=%s old_selection_panel_reached=%s expanded_selection_panel_reached=%s old_camera_reached=%s expanded_camera_reached=%s" % [
+		str(_f51_old_guard_snapshot["input_blocker_reached"]),
+		str(_f51_active_attempt["input_blocker_reached"]),
+		str(_f51_old_guard_snapshot["selection_panel_reached"]),
+		str(_f51_active_attempt["selection_panel_reached"]),
+		str(_f51_old_guard_snapshot["camera_reached"]),
+		str(_f51_active_attempt["camera_reached"]),
+	]
+
+
+func _f51_log(checkpoint: String, message: String) -> void:
+	ModLoaderLog.info("[F51][%s] %s" % [checkpoint, message], MOD_LOG_NAME)
