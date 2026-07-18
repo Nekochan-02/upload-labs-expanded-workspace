@@ -2,11 +2,11 @@
 
 ## Result
 
-`F53_INPUTBLOCKER_COVERAGE_CANARY_READY_FOR_USER_TEST`
+`F53_INPUTBLOCKER_COVERAGE_CANARY_PASS`
 
-F53 is a bounded `0.2.39` development canary. It changes only the InputBlocker
-rect after vanilla Desktop initialization, then records one old-area guard and
-one expanded-area attempt.
+F53 is a bounded `0.2.39` development canary. It changed only the InputBlocker
+rect after vanilla Desktop initialization. The canonical old-area guard and the
+first expanded-area target both passed.
 
 ## Evidence And Runtime Delta
 
@@ -57,22 +57,35 @@ save change, WindowContainer extension, or `get_position_snapped` override.
 The ZIP is ignored and untracked. It contains no forbidden path or file type,
 and contains the one F53 position assignment and one F53 size assignment.
 
-## User Test Steps
+## User Test Result
 
-1. Install only `Nekochan-ExpandedWorkspace-0.2.39.zip`; confirm one Mod and manifest `0.2.39`.
-2. In the old area, Shift+drag around two or three selectable nodes. Require rectangle YES, nodes selected YES, and Camera moved NO.
-3. Only when the guard passes, repeat once in the expanded area beyond the old `10000` boundary.
-4. Confirm the post-correction InputBlocker rect, pointer inclusion, InputBlocker/SelectionPanel reachability, Camera result, rectangle, and selected nodes using `[F53]` C0-C7.
-5. Confirm normal click selection and empty-click deselection. Do not save after a failure.
+Only `Nekochan-ExpandedWorkspace-0.2.39.zip` loaded, with manifest `0.2.39`.
+
+| Check | Result |
+|---|---|
+| `C0_COVERAGE_APPLY` | PASS: actual global rect was `Rect2((0,0), (20000,20000))`. |
+| Old-area guard | PASS: rectangle `true`, nodes selected `true`, Camera moved `false`. |
+| First expanded target | PASS: pointer inside InputBlocker; InputBlocker and vanilla SelectionPanel reached; Camera moved `false`; rectangle and nodes selected `true`. |
+| Expanded classification | PASS: `F53_INPUTBLOCKER_COVERAGE_CANARY_PASS`. |
+| Normal click selection | User-confirmed PASS. |
+| Empty-click deselection | User-confirmed PASS. |
+
+The retained F51 observer also recorded expanded attempts after the canonical
+target. Attempt `3` recorded Camera movement while still recording rectangle
+and node selection; attempts `4` and `5` passed again. These occurred after
+the required target sequence, and the user observed no range-selection or
+normal-selection failure. Record this as diagnostic telemetry spillover, not a
+coverage-canary stop condition. Future diagnostic cleanup may make the observer
+strictly single-target; no cleanup is implemented by F53.
 
 ## Classification And Next Action
 
-Use `F53_INPUTBLOCKER_COVERAGE_CANARY_PASS` only when the coverage proof, old
-guard, expanded route, rectangle, node selection, and Camera conditions all
-pass. An old-guard failure blocks expanded success.
+The coverage proof, old guard, expanded route, rectangle, node selection,
+Camera condition, normal click selection, and empty-click deselection passed.
+An old-guard failure would have blocked expanded success.
 
-Next action: user installs only `0.2.39`, performs the guard then the expanded
-target, and provides visual results with `[F53]` lines.
+Next action: prepare a docs-only diagnostic-cleanup / clean-integration re-entry
+plan. Do not implement cleanup or clean integration from this report.
 
 `AGENTS.md` and `docs/HANDOFF.md` have pre-existing user edits. They are not
 staged, committed, or overwritten by F53.
