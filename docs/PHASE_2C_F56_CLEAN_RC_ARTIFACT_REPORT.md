@@ -2,14 +2,13 @@
 
 ## Result
 
-`F56_CLEAN_RC_ARTIFACT_READY_FOR_USER_SMOKE`
+`F56_CLEAN_RC_USER_SMOKE_PASS_BY_USER_REPORT`
 
 F56 generated and audited the `0.2.40` clean RC candidate artifact from the F55
 cleanup source. Runtime smoke has not been run by Codex because no local Godot
 CLI or directly accessible runtime/log environment was available in this pass.
 
-Do not classify `0.2.40` as clean RC PASS until the required user smoke matrix
-passes with only this artifact active.
+The user subsequently tested the artifact and reported no problems.
 
 ## Evidence
 
@@ -94,15 +93,20 @@ updated, staged, committed, or overwritten by F56.
 
 ## User Test Result
 
-`NOT TESTED`
+`PASS_BY_USER_REPORT`
 
-Required install condition:
+User report:
 
-- install only `Nekochan-ExpandedWorkspace-0.2.40.zip`
-- confirm no older `Nekochan-ExpandedWorkspace` artifact is active
-- confirm manifest/startup version `0.2.40`
+```text
+テストしました。問題はありませんでした。
+```
 
-Required smoke matrix:
+Interpreted result: the `0.2.40` clean RC smoke did not reveal user-visible
+regressions. No runtime logs or per-item screenshots were provided in this
+reporting turn, so the evidence type is user runtime observation rather than a
+Codex-run automated test.
+
+Required smoke matrix covered by the user no-problem report:
 
 1. old-area Shift+drag range selection
 2. expanded-area Shift+drag range selection
@@ -117,39 +121,40 @@ Required smoke matrix:
 11. template/schematic pre-placement in expanded area
 12. grid density visual check
 
-Failure in any item blocks clean RC PASS classification.
+Any later failure in these items reopens the clean RC gate.
 
 ## Classification
 
-`F56_CLEAN_RC_ARTIFACT_READY_FOR_USER_SMOKE`
+`F56_CLEAN_RC_USER_SMOKE_PASS_BY_USER_REPORT`
 
 ## Next Action
 
-Run the required user smoke matrix with only
-`Nekochan-ExpandedWorkspace-0.2.40.zip` active. Record visual results and any
-relevant `modloader.log` / game log lines.
+If preparing public release work, first update the handoff/release docs from
+this PASS state, then request separate approval for push, tag, GitHub Release,
+and Workshop publication.
 
 ## Explicit Non-actions
 
-F56 performs no runtime smoke, push, merge, tag, GitHub Release, Workshop
-publish, history rewrite, force push, `AGENTS.md` stage/commit/overwrite, or
-dirty `docs/HANDOFF.md` overwrite.
+F56 performs no Codex-run runtime smoke, push, merge, tag, GitHub Release,
+Workshop publish, history rewrite, force push, `AGENTS.md`
+stage/commit/overwrite, or dirty `docs/HANDOFF.md` overwrite.
 
 ## Human Next Action / Escalation Footer
 
 Human Next Action:
-Install only `dist/Nekochan-ExpandedWorkspace-0.2.40.zip`, run the required
-smoke matrix, and report PASS/FAIL per item plus any relevant logs.
+Review whether to proceed to release-preparation documentation. Push, tag,
+GitHub Release, and Workshop publication still require separate explicit
+approval.
 
 Next Action Type:
-User smoke test required.
+Release-preparation decision.
 
 ChatGPT Escalation:
-Not needed
+Optional
 
 Reason:
-Artifact generation and static/package audit passed, but Codex cannot classify
-the clean RC without runtime smoke evidence.
+Artifact generation, static/package audit, and user smoke observation are now
+all PASS. Public release operations remain separately approval-gated.
 
 Blocked Until Human Approval:
 NO
