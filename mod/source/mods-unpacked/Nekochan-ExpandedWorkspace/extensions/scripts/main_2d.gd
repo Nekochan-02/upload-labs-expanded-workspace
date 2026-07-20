@@ -19,20 +19,6 @@ func set_screen(screen: int) -> void:
 	_apply_visual_workspace_size()
 
 
-func _gui_input(event: InputEvent) -> void:
-	var desktop: Node = get_node_or_null("Desktop")
-	if is_instance_valid(desktop) and desktop.has_method("_f51_record_main2d_route"):
-		desktop._f51_record_main2d_route("gui", event)
-	super._gui_input(event)
-
-
-func _unhandled_input(event: InputEvent) -> void:
-	var desktop: Node = get_node_or_null("Desktop")
-	if is_instance_valid(desktop) and desktop.has_method("_f51_record_main2d_route"):
-		desktop._f51_record_main2d_route("unhandled", event)
-	super._unhandled_input(event)
-
-
 func _apply_expanded_desktop_area() -> void:
 	if screen_size.size() > 0:
 		screen_size[0] = WorkspaceAreaConfig.MODDED_WORKSPACE_SIZE

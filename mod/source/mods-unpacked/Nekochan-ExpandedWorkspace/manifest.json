@@ -1,7 +1,7 @@
 {
 	"name": "ExpandedWorkspace",
 	"namespace": "Nekochan",
-	"version_number": "0.2.39",
+	"version_number": "0.2.40",
 	"website_url": "",
 	"description": "Expanded workspace, capacity, persistence, and template placement fixes.",
 	"dependencies": [],

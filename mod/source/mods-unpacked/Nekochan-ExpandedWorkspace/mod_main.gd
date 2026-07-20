@@ -29,9 +29,6 @@ func _init() -> void:
 		"res://mods-unpacked/Nekochan-ExpandedWorkspace/extensions/scripts/desktop.gd"
 	)
 	ModLoaderMod.install_script_extension(
-		"res://mods-unpacked/Nekochan-ExpandedWorkspace/extensions/scripts/camera_2d.gd"
-	)
-	ModLoaderMod.install_script_extension(
 		"res://mods-unpacked/Nekochan-ExpandedWorkspace/extensions/scripts/schematics_tab.gd"
 	)
 	ModLoaderMod.install_script_extension(
@@ -48,7 +45,7 @@ func _init() -> void:
 func _ready() -> void:
 	_apply_space_upgrade_limit("mod_ready")
 	ModLoaderLog.info(
-		"ExpandedWorkspace v0.2.39 loaded; F53 InputBlocker coverage canary is armed.",
+		"ExpandedWorkspace v0.2.40 loaded.",
 		MOD_ID
 	)
 
