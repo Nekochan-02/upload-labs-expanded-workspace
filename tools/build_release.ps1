@@ -41,8 +41,8 @@ if ($LASTEXITCODE -ne 0) {
 
 $BlockedRelativePaths = @(
     'extensions/scenes/connector_point.gd',
-    'extensions/scenes/windows/window_base.gd',
     'extensions/scenes/windows/window_container.gd',
+    'extensions/scenes/windows/window_base.gd',
     'extensions/scenes/windows/window_indexed.gd'
 )
 

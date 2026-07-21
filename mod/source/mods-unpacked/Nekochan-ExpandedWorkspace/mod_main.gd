@@ -1,8 +1,8 @@
 extends Node
 
 # Mod: Nekochan-ExpandedWorkspace
-# Phase 2B-R3 Canary G: stable limits plus camera/visual, click-placement,
-# drag-placement, Desktop-level movement, and group-selection sync correction.
+# Clean RC integration of verified workspace, capacity, persistence, resize, and
+# guarded template placement corrections.
 # Do not register connector, window container, or window base/indexed area patches here.
 
 const MOD_ID: String = "Nekochan-ExpandedWorkspace"
@@ -40,16 +40,12 @@ func _init() -> void:
 	ModLoaderMod.install_script_extension(
 		"res://mods-unpacked/Nekochan-ExpandedWorkspace/extensions/scripts/paint.gd"
 	)
-	ModLoaderLog.info(
-		"Registered Phase 2B-R3 Canary G group-selection sync script extensions.",
-		MOD_ID
-	)
 
 
 func _ready() -> void:
 	_apply_space_upgrade_limit("mod_ready")
 	ModLoaderLog.info(
-		"ExpandedWorkspace v0.2.9 loaded. Target node limit: 1000. Space upgrade cap: 200. Group-selection sync canary.",
+		"ExpandedWorkspace v0.2.40 loaded.",
 		MOD_ID
 	)
 

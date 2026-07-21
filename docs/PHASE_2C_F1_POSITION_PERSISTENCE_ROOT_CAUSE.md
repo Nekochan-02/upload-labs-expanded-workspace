@@ -10,6 +10,34 @@ During v0.2.9 Release Candidate clean install verification, the user observed:
 
 The screenshot supplied with the report is consistent with nodes being visible around the old/new workspace boundary after reload. Exact node coordinates were not captured in the screenshot.
 
+## Current Classification
+
+Status: `ROOT_CAUSE_CONFIRMED_LIFECYCLE_CLAMP`
+
+Confirmed fact:
+
+- `WindowContainer._ready()` performs a post-load initialization clamp through `get_position_snapped(global_position)`.
+- The vanilla helper clamps against the old `10000` workspace bounds.
+
+Rejected repair hypothesis:
+
+- v0.2.10 tested the hypothesis that overriding only `WindowContainer.get_position_snapped(to)` would fix restored expanded-area positions.
+- User verification showed this did not fix persistence. A node placed in the expanded area still moved back to the old boundary after save, exit, restart, and load.
+- v0.2.10 also introduced a deselection regression, so the global `WindowContainer` Script Extension must not be promoted to a release fix.
+
+Confirmed F3 lifecycle evidence:
+
+- P2 saved position: `(19650.0, 19750.0)`
+- P3.5 after Desktop restoration / child-entered observation: `(19650.0, 19750.0)`
+- P4 deferred final: `(9650.0, 9750.0)`
+- P4 X matches `10000 - observed_width(350) = 9650`
+
+Therefore the coordinate change occurs after the first observable child-entered restoration checkpoints and before deferred final observation. The failure is now classified as a later lifecycle clamp, not save serialization and not the immediate Desktop restoration loop.
+
+Follow-up analysis: `docs/PHASE_2C_F2_0.2.10_REGRESSION_ANALYSIS.md`
+F3 evidence: `docs/PHASE_2C_F3_DESKTOP_RESTORATION_DIAGNOSTIC_REPORT.md`
+F4 canary plan: `docs/PHASE_2C_F4_RESTORATION_CORRECTION_PLAN.md`
+
 ## Release Impact
 
 Status: `BLOCKED_POSITION_PERSISTENCE`
@@ -150,16 +178,17 @@ This is why expanded-area placement works until restart, then fails after load.
 
 ## Candidate Minimal Patch Points
 
-Preferred patch candidate:
+Rejected v0.2.10 patch candidate:
 
 - Add a development-version Script Extension for `scenes/windows/window_container.gd`.
-- Override `get_position_snapped(to)` to clamp against `WorkspaceAreaConfig.get_max_position(size)` instead of the vanilla `10000` bounds.
-- Register this extension only in a new development build, not in v0.2.9.
+- Override only `get_position_snapped(to)` to clamp against `WorkspaceAreaConfig.get_max_position(size)`.
+- Result: failed user verification and introduced deselection regression.
 
-Alternative candidate if the inherited method override is not reliable for all concrete node scripts:
+Preferred next candidate direction:
 
-- Add a narrow `_ready()` post-super correction that captures the pre-super restored position and reapplies it through the expanded bounds after vanilla `_ready()` finishes.
-- This is higher risk because `_ready()` has more initialization behavior than `get_position_snapped(to)`.
+- Avoid a global `WindowContainer` replacement unless diagnostics prove it is safe.
+- Prefer a restoration-path-only correction in `desktop.gd` after raw saved position load and vanilla initialization, limited to windows restored from save data.
+- Do not affect active movement, placement, selection, save schema, node limits, camera, grid, background, or group-selection movement.
 
 Diagnostic candidate:
 
@@ -179,19 +208,13 @@ Diagnostic candidate:
 
 ## Recommended Fix
 
-Do not modify v0.2.9. Prepare a new development build such as `0.2.10-dev` after user approval of an implementation plan.
+Do not modify v0.2.9. Do not promote v0.2.10.
 
-Recommended first fix attempt:
+Recommended next step:
 
-1. Register a minimal `extensions/scenes/windows/window_container.gd` Script Extension.
-2. Implement only `get_position_snapped(to)` using `WorkspaceAreaConfig.get_max_position(size)`.
-3. Build as a development artifact, not as a release replacement.
-4. Verify:
-   - single-node expanded-area position retained after save/restart/load
-   - group frame position retained after save/restart/load
-   - group child positions retained
-   - connections retained
-   - node state, level, and cost retained
-   - existing v0.2.9 runtime placement/movement paths do not regress
+1. Treat v0.2.10 as failed development artifact evidence.
+2. Instrument or design a load-path-only diagnostic to prove where restored coordinates are changed.
+3. Prefer a narrower restored-window correction point over a global `WindowContainer.get_position_snapped(to)` override.
+4. Keep the next implementation plan separate from the failed F1 plan and require user approval before Mod code changes.
 
-If the minimal override does not affect all restored concrete nodes, stop and instrument `_ready()` before selecting a broader patch.
+If the next approach requires broad vanilla function copies, save schema changes, or another global base-class override without diagnostic proof, stop and re-plan.

@@ -18,7 +18,6 @@ func _on_add_pressed() -> void:
 	if _should_use_vanilla_limit():
 		super._on_add_pressed()
 		return
-
 	var before: int = Globals.max_window_count
 	Globals.max_window_count = Utils.MAX_WINDOW - 1
 	super._on_add_pressed()
@@ -29,7 +28,6 @@ func _on_window_selected(window: String) -> void:
 	if Data.is_mobile() or window.is_empty() or _should_use_vanilla_limit():
 		super._on_window_selected(window)
 		return
-
 	var before: int = Globals.max_window_count
 	Globals.max_window_count = Utils.MAX_WINDOW - 1
 	super._on_window_selected(window)
@@ -41,14 +39,12 @@ func add_window(window: String) -> void:
 		"res://scenes/windows/" + Data.windows[window].scene + ".tscn"
 	).instantiate()
 	instance.name = window
-
 	var target_position: Vector2 = _get_expanded_click_target(instance.size)
 	instance.global_position = target_position
 	Signals.create_window.emit(instance)
-
 	if is_instance_valid(instance):
 		instance.global_position = target_position
-		instance.call_deferred("move", target_position)
+		call_deferred("_apply_expanded_click_local_alignment", instance, target_position)
 
 
 func _should_use_vanilla_limit() -> bool:
@@ -63,3 +59,13 @@ func _restore_count_after_vanilla_call(before: int) -> void:
 func _get_expanded_click_target(window_size: Vector2) -> Vector2:
 	var target: Vector2 = Globals.camera_center - (window_size / 2.0)
 	return target.clamp(Vector2.ZERO, WorkspaceAreaConfig.get_max_position(window_size)).snappedf(50)
+
+
+func _apply_expanded_click_local_alignment(
+	window: WindowContainer,
+	target_position: Vector2
+) -> void:
+	if not is_instance_valid(window):
+		return
+	window.position = target_position
+	window.moved.emit()

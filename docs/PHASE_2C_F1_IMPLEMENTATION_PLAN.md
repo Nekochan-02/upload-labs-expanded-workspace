@@ -1,6 +1,15 @@
 # Phase 2C-F1 Implementation Plan
 
-Status: `AWAITING_USER_APPROVAL`
+Status: `FAILED_VERIFICATION_REGRESSION`
+
+Result:
+
+- v0.2.10 development artifact was built and tested by the user.
+- Position persistence remained `FAIL`.
+- Deselection regression was observed.
+- This plan must not be reused as the next implementation plan.
+
+Follow-up analysis: `docs/PHASE_2C_F2_0.2.10_REGRESSION_ANALYSIS.md`
 
 ## Purpose
 
@@ -19,7 +28,7 @@ Fix the v0.2.9 Release Candidate blocker where expanded-area node positions are 
 
 ## Development Version
 
-Use a separate development version, tentatively `0.2.10-dev`, for diagnostic or fix builds.
+Use separate development version `0.2.10` for diagnostic or fix builds. This is not a public release version until a replacement Release Candidate is explicitly approved.
 
 ## Proposed Patch
 
@@ -28,6 +37,12 @@ Use a separate development version, tentatively `0.2.10-dev`, for diagnostic or 
 3. Use `WorkspaceAreaConfig.get_max_position(size)` as the maximum bound.
 4. Register the extension in `mod_main.gd` for the development build only.
 5. Do not copy the vanilla `_ready()` body.
+
+Outcome:
+
+- Implemented in v0.2.10.
+- User verification rejected this patch as a fix.
+- The global `WindowContainer` Script Extension is now considered unsafe for release promotion because it coincided with a deselection regression.
 
 ## Validation Plan
 
@@ -59,6 +74,13 @@ Stop and re-evaluate if:
 - the patch requires copying a large vanilla function body
 - any existing v0.2.9 verified feature regresses
 
+Triggered stop conditions:
+
+- The method override did not fix restored concrete node positions.
+- An existing v0.2.9 behavior regressed: selected nodes could not be deselected by empty-area click or the options-menu `x` control.
+
 ## Approval
 
-Implementation has not started. User approval is required before Mod code changes.
+Approved by the user for the `0.2.10` development test implementation.
+
+Closed after failed verification. Any further Mod code change requires a new or updated implementation plan and user approval.

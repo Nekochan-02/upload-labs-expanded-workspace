@@ -4,8 +4,291 @@
 
 ---
 
+## 0. 最新再開ポイント
+
+* **Phase 2C-F29 / expanded-area range-selection diagnostic canary**:
+  * **Status: `F29_RANGE_SELECTION_DIAGNOSTIC_CANARY_READY_FOR_USER_TEST`**
+  * Current branch: `dev/phase-2c-f29-range-selection-diagnostic-canary` from F28 plan commit `7559eb9` (`docs: plan expanded-area range selection diagnostic`).
+  * `0.2.29` is a development diagnostic artifact only. It observes one candidate Shift + drag attempt without resizing InputBlocker/SelectionPanel, changing hit testing, mutating the selection result, or changing placement, movement, persistence, group resize, template placement, node limit, or space cap.
+  * The F29 sequence emits `[F29]` R1-R10 evidence: route geometry, Shift state, start/end screen and world coordinates, raw/actual/old/expanded rectangles, old-bound indication, rectangle visibility, candidate/hit IDs/counts, computed candidates, and final selection state. It stops logging after the first completed attempt.
+  * Local artifact: `dist/Nekochan-ExpandedWorkspace-0.2.29.zip`, `15523` bytes, `14` files, ZIP root `mods-unpacked`, SHA-256 `980af9f72e46dc92d48095525ec03598b16bcfb8da2ac8a931325be616c9186e`. ZIP manifest is `0.2.29`; R1-R10 labels occur once each; package forbidden-path/extension audit passes. The artifact is ignored and untracked.
+  * `git diff --check` passes. A local Godot CLI is unavailable, so Codex has not launched the game or run a runtime test.
+  * F27 remains `F27_CLEAN_RC_SMOKE_BLOCKED`: old-area Shift + drag PASS and expanded-area Shift + drag FAIL. No root cause or cleanup regression is asserted before user evidence.
+  * Next action: install only `Nekochan-ExpandedWorkspace-0.2.29.zip`, run one expanded-area Shift + drag diagnostic attempt, exit without saving after failure, and provide visual results plus `[F29]` / `[RANGE_SELECTION]` logs. Do not implement a fix, cleanup, clean integration, full regression, or release operation.
+  * F29 report: `docs/PHASE_2C_F29_RANGE_SELECTION_DIAGNOSTIC_CANARY_REPORT.md`.
+
+* **Phase 2C-F28 / expanded-area range-selection diagnostic plan**:
+  * **Status: `F28_RANGE_SELECTION_DIAGNOSTIC_PLAN_READY`**
+  * Current branch: `dev/phase-2c-f28-range-selection-diagnostic-plan` from F27 blocker-record commit `1b7a5e3` (`docs: record range selection smoke blocker`).
+  * `0.2.28` clean RC remains `F27_CLEAN_RC_SMOKE_BLOCKED`: user smoke found shift + drag range selection PASS in the old area and FAIL in the expanded area. Classification is `EXPANDED_AREA_RANGE_SELECTION_NOT_WORKING`; initial diagnostic classification remains `RANGE_SELECTION_UNRESOLVED`.
+  * Static evidence identifies the vanilla `multi_select` action as physical Shift, InputBlocker-to-SelectionPanel input routing, SelectionPanel rectangle/hit-test/result application, and a fixed vanilla InputBlocker rectangle. The mod expands Desktop, Background, and Lines but has no explicit InputBlocker or SelectionPanel resize. This is a diagnostic target, not a root-cause conclusion.
+  * F27's existing Desktop drag signal hooks remain present before and after cleanup. That does not rule out a cleanup regression because those hooks are not the complete range-selection path and no `0.2.27` comparison result exists.
+  * F28 is docs-only and proposes only one future `0.2.29` bounded diagnostic canary with R1-R10 evidence checkpoints. It does not implement a diagnostic or fix, generate an artifact, build, or run a test.
+  * Release/public operations remain blocked. Do not mark `0.2.28` release-ready unless the issue is fixed and smoke-tested or explicitly accepted as a known limitation.
+  * Next action: approve implementation of the `0.2.29` expanded-area range-selection diagnostic canary only. Do not authorize a fix, cleanup, clean integration, RC artifact, push, tag, Release, or Workshop operation.
+  * F28 plan: `docs/PHASE_2C_F28_RANGE_SELECTION_EXPANDED_AREA_DIAGNOSTIC_PLAN.md`.
+
+* **Phase 2C-F27 / clean integration RC**:
+  * **Status: `F27_CLEAN_RC_SMOKE_BLOCKED`**
+  * Current branch: `dev/phase-2c-f27-clean-integration-0.2.28` from F26 plan commit `ac40b89` (`docs: plan diagnostic cleanup and clean integration`).
+  * F27 removes the active F6-F25 checkpoint telemetry, diagnostic acquisition flags, and pure resize observers while retaining verified functional corrections. F11 now uses a small functional deferred-local-alignment helper; it is not a diagnostic observer.
+  * F25 now applies its direct-child, selection, resource-ownership, and endpoint guards for each applicable old-bound template paste. It fails closed without verbose diagnostics and emits at most one concise guard warning per session.
+  * Manifest/startup confirmation are `0.2.28`. Local artifact: `dist/Nekochan-ExpandedWorkspace-0.2.28.zip`, `13481` bytes, `14` files, ZIP root `mods-unpacked`, SHA-256 `53cf75fafd712c35b13a2c116e6a6f48baf00767671dac5f50c7d1dd092172ca`.
+  * Static checks pass: no active F checkpoint labels, blocked extension references, `get_position_snapped` override, save/schema change, forbidden tracked path, or forbidden ZIP entry. The ZIP manifest is `0.2.28`.
+  * The user started the `0.2.28` clean RC smoke and found `EXPANDED_AREA_RANGE_SELECTION_NOT_WORKING`: shift + drag range selection is PASS in the old area but FAIL in the expanded area. This is non-fatal but a core multi-node workflow QoL blocker; do not mark the clean RC smoke PASS.
+  * Initial range-selection classification is `RANGE_SELECTION_UNRESOLVED`. The source may fail at input/shift detection, selection-rectangle creation or coordinate domain, old-bound clamp, hit-test coverage, final result application, or an F27 cleanup regression. No cause is asserted yet.
+  * Public push, merge, tag, Release, Workshop publish, and release integration remain blocked. The next action after committing this blocker record is a docs-only F28 expanded-area range-selection diagnostic plan.
+  * F27 report: `docs/PHASE_2C_F27_CLEAN_INTEGRATION_RC_REPORT.md`.
+
+* **Phase 2C-F26 / diagnostic cleanup and clean integration plan**:
+  * **Status: `F26_DIAGNOSTIC_CLEANUP_CLEAN_INTEGRATION_PLAN_READY`**
+  * Current branch: `dev/phase-2c-f26-diagnostic-cleanup-clean-integration-plan` from the clean F25 result commit `4c6ef67` (`docs: record F25 connector ownership pass`).
+  * F26 is docs-only. It inventories every active F6-F25 canary diagnostic, separates functional lifecycle helpers from logging-only code, and maps the required preservation and smoke coverage for each affected source file.
+  * Required clean-RC preservation includes node limit `1000`, space cap `200`, `20000 x 20000` workspace, 50-unit grid density, click/drag local alignment, exact single/group persistence, group movement/resize corrections, and endpoint-owned template placement correction.
+  * The key cleanup distinction is that the F11 observer still performs the deferred local correction and must not be deleted merely because it has a diagnostic name. F25 endpoint ownership guards and correction also remain functional; coordinate/ID checkpoint output is the cleanup candidate.
+  * F26 recommends a future `0.2.28 clean RC` and `Nekochan-ExpandedWorkspace-0.2.28.zip`, but does not change the manifest, generate an artifact, run a test, or implement cleanup/integration.
+  * The approved cleanup/integration scope is implemented by F27. Runtime smoke, push, merge, tag, Release, and Workshop remain separately unauthorized.
+  * F26 plan: `docs/PHASE_2C_F26_DIAGNOSTIC_CLEANUP_CLEAN_INTEGRATION_PLAN.md`.
+
+* **Phase 2C-F25 / template connector ownership canary**:
+  * **Status: `F25_TEMPLATE_CONNECTOR_OWNERSHIP_CANARY_PASS`**
+  * Current branch: `dev/phase-2c-f25-template-connector-ownership-canary` from F24 plan commit `b87837d` (`docs: plan template connector guard refinement`).
+  * `0.2.27` replaces only F23's serialized/runtime connector count equality guard. It retains the direct-child pasted-window snapshot, expected window count, valid-parent, and selection-membership guards, then derives pasted resource IDs from the validated windows' `containers`.
+  * Each actual new direct-child Connector is classified from both `output_id` and `input_id`. F25 corrects only if every actual new connector is internal to the pasted resource set; any external, unowned, or ambiguous endpoint stops before moving a window. Only internal new connector custom points are translated and refreshed.
+  * One F25 sequence logs staged/actual connector counts, endpoint ownership, classification, decision, pre/post window and connector correction, relative layout, selection, and deferred stability. It also reports that pre-existing windows/connectors remained untouched.
+  * The valid user test loaded only `0.2.27`, reproduced staged/runtime connector counts `29/17`, and passed all F25 guards. All `17` runtime connectors were `INTERNAL_PASTED_CONNECTOR`; external, ambiguous, and unowned counts were `0`. Correction applied from old `(6750, 8950)` to expanded `(13069.54, 16520.61)` with delta `(6319.538, 7570.607)`.
+  * F25 confirms relative layout, connection/state, selection/deselection, manual movement, and visual placement near the expanded camera target. Deferred F25 stability records `unrelated_windows_untouched=true` and `unrelated_connectors_untouched=true`; no ExpandedWorkspace stop condition occurred.
+  * Local development artifact: `dist/Nekochan-ExpandedWorkspace-0.2.27.zip`, `26894` bytes, `15` files, ZIP root `mods-unpacked`, SHA-256 `cc78df30ca62db2ee3b12d3c504fac861fb379dc2f03cbace8329aebf04dd563`. Allowlisted package and forbidden-entry audit pass. F25 result docs were committed as `4c6ef67`; cleanup and clean integration remain pending the F26 plan approval.
+  * F25 report: `docs/PHASE_2C_F25_TEMPLATE_CONNECTOR_OWNERSHIP_CANARY_REPORT.md`.
+
+* **Phase 2C-F24 / template connector guard refinement plan**:
+  * **Status: `F24_TEMPLATE_CONNECTOR_GUARD_REFINEMENT_PLAN_READY`**
+  * Current branch: `dev/phase-2c-f24-template-connector-guard-plan` from F23 result commit `cc0b094` (`docs: record F23 template pre-placement blocked result`).
+  * Source analysis confirms that `Desktop.copy()` stages connector metadata by selected input membership, while `Desktop.paste()` instantiates connectors only for retained copied outputs. Therefore F23's serialized/runtime connector count mismatch (`29/17`) is expected-path evidence, not an object-identification failure.
+  * F24 recommends an endpoint-ownership guard for a separately approved `0.2.27` canary: collect resource IDs from the already validated pasted windows, classify each new direct-child connector by both endpoint IDs, and correct only if every observed new connector is internal to that exact set. `data.connectors.size()` becomes diagnostic-only.
+  * F24 is superseded by the separately approved and bounded F25 canary. Do not widen F25, clean diagnostics, begin clean integration, push, tag, Release, or Workshop work.
+  * F24 plan: `docs/PHASE_2C_F24_TEMPLATE_CONNECTOR_GUARD_REFINEMENT_PLAN.md`.
+
+* **Phase 2C-F23 / template pre-placement fix canary**:
+  * **Status: `F23_TEMPLATE_PREPLACEMENT_FIX_BLOCKED`**
+  * Current branch: `dev/phase-2c-f23-template-preplacement-fix-canary` from F22 plan commit `843dba109c5c7f475992c697097679da528c6c78` (`docs: plan template pre-placement fix`).
+  * The approved Candidate A implementation adds one `Desktop.paste()` post-super transaction. It calculates raw/old/expanded targets, snapshots direct-child window and connector IDs, and corrects only the newly pasted set by the old-to-expanded local delta after all count, validity, connector, and selection guards pass.
+  * Any ambiguity is fail-closed: F23 logs a `SKIP` or `STOP` reason and moves nothing. It does not copy vanilla `Desktop.paste()`, mutate template/save data, change node limit/space cap, or touch F6/F7/F9/F11/F12/F14/F17 or group resize.
+  * Local development artifact: `dist/Nekochan-ExpandedWorkspace-0.2.26.zip`, `25749` bytes, `15` files, ZIP root `mods-unpacked`, SHA-256 `e600976a0407b78117473f06f16265442e145b3fe0225094a369974dea733c71`. ZIP allowlist and forbidden-entry audit pass.
+  * The valid user test loaded only `0.2.26` and reached all F23 checkpoints. Window identity and selection passed (`18/18`, selection match true), but expected serialized connector entries `29` did not equal actual new connector objects `17`. F23 correctly emitted `STOP_NEW_CONNECTOR_COUNT_MISMATCH`, applied no correction, and left immediate/final placement at the old candidate `(6750, 8950)`.
+  * Visual relative layout, connection/state, selection/deselection, and manual move remained PASS. No unrelated node moved and no visible error occurred. This is a fail-closed F23 block, not evidence of an unsafe movement or an ExpandedWorkspace crash.
+  * F23 report: `docs/PHASE_2C_F23_TEMPLATE_PREPLACEMENT_FIX_CANARY_REPORT.md`. Its blocker is now analyzed by F24; do not implement another correction, begin cleanup, clean integration, full regression, release integration, push, tag, Release, or Workshop work.
+
+* **Phase 2C-F22 / template pre-placement old-bound fix plan**:
+  * **Status: `F22_TEMPLATE_PREPLACEMENT_FIX_PLAN_APPROVED_FOR_F23_CANARY`**
+  * Current branch: `dev/phase-2c-f22-template-preplacement-fix-plan` from F21 result commit `b2d02f507115f7d5ee275dd70db00c035562fd2c` (`docs: record template pre-placement diagnosis`).
+  * F21 confirms `TEMPLATE_CAMERA_SOURCE_OLD_BOUND_CLAMPED`: the camera-derived raw target is valid in the expanded area, but immediate and deferred observed pasted positions exactly equal the old `10000`-bound candidate.
+  * F22 compares three paths. Candidate A is preferred only as a future guarded `0.2.26` post-super delta canary: identify new direct-child windows and connectors by pre/post instance-ID snapshots, require count and selection agreement, then translate only that pasted set by the old-to-expanded delta. It preserves the vanilla paste body and fails closed on any ambiguity.
+  * Candidate B, a copied/rewritten paste body, is rejected for the first canary due to compatibility and vanilla-derived-code risk. Candidate C, a known limitation, remains the fallback if Candidate A cannot preserve the exact pasted set safely.
+  * F22 plan: `docs/PHASE_2C_F22_TEMPLATE_PREPLACEMENT_OLD_BOUND_FIX_PLAN.md`. Its bounded `0.2.26` Candidate A canary is approved and implemented for user test; do not widen it, clean diagnostics, start clean integration, push, tag, release, or publish.
+
+* **Phase 2C-F21 / template pre-placement old-area QoL diagnostic result**:
+  * **Status: `TEMPLATE_CAMERA_SOURCE_OLD_BOUND_CLAMPED_CONFIRMED`**
+  * Current branch: `dev/phase-2c-f21-template-preplacement-old-area` from accepted F20 HEAD `5db170b9466c97d7e9fe140875584fe9dea4ae01`.
+  * Confirmed QoL issue: when the camera is in the expanded area, recalled template/schematic pre-placement appears near the old workspace rather than near the camera. This is non-fatal but highly visible in a normal expanded-workspace workflow.
+  * Static source analysis identifies the leading candidate: vanilla `Desktop.paste()` derives a target from `Globals.camera_center` but clamps it to `Vector2(10000, 10000) - data.rect.size`. The current Mod `desktop.gd` delegates this anchor calculation to `super.paste(data)` and the Mod `schematics_tab.gd` only changes capacity UI.
+  * The first reported test visually reproduced old-area pre-placement and final placement but loaded `0.2.24`, so it supplied no F21 measurements. The valid retest loaded only `Nekochan-ExpandedWorkspace-0.2.25.zip`, emitted all T1-T8 checkpoints, and recorded camera center `(12074.19, 15876.0)`, raw target `(10449.19, 15351.0)`, old candidate `(6750.0, 8950.0)`, and expanded candidate `(10449.19, 15351.0)`.
+  * Classification is `TEMPLATE_CAMERA_SOURCE_OLD_BOUND_CLAMPED`: immediate and deferred observed group local positions both equal `(6750.0, 8950.0)`, exactly the old-bound candidate, while the expanded candidate preserves the camera-derived target. The data contains `18` windows including `1` group; its group frame proves the anchor outcome, although it is broader than the intended two-ordinary-node minimal shape.
+  * This is a confirmed QoL defect, not an ExpandedWorkspace stop condition. Its F22 docs-only minimal fix plan now exists; do not implement a fix, clean diagnostics, begin clean integration, create an RC artifact, push, tag, release, or publish without separate approval.
+  * `dist/Nekochan-ExpandedWorkspace-0.2.25.zip` is the local development diagnostic artifact: `23577 bytes`, `15` files, ZIP root `mods-unpacked`, SHA-256 `b9363ac35b96d8df0645eec1e620328e9ce9296e266298e4ebe482307f7e5c2f`.
+  * User-approved `0.2.25` diagnostic canary is limited to one `Desktop.paste()` observation sequence and T1-T8 checkpoints. It did not change the template anchor, preview, final placement, connector, selection, group, or save behavior.
+  * Do not implement a fix, clean diagnostics, begin clean integration, create an RC artifact, push, tag, release, or publish without separate approval.
+  * F21 plan: `docs/PHASE_2C_F21_TEMPLATE_PREPLACEMENT_OLD_AREA_DIAGNOSTIC_PLAN.md`.
+  * F21 report: `docs/PHASE_2C_F21_TEMPLATE_PREPLACEMENT_OLD_AREA_DIAGNOSTIC_REPORT.md`.
+
+* **Phase 2C-F20 / targeted regression plan**:
+  * **Status: `F20_TARGETED_REGRESSION_PASS_WITH_OPEN_RC_GATES`**
+  * Current branch: `dev/phase-2c-f20-targeted-regression-plan` at F19 commit `bb0ff6d858f5fd6d4dffddc75e48ccfc28d37401` (`docs: record post-F12 scope decision plan`).
+  * The user executed F20 on diagnostic-heavy `0.2.24`. Startup, grid/camera, click and drag placement, existing-node movement, selection/deselection, single-node persistence, group top-right/right resize, group persistence with connection/state, and node-limit `1000` all passed. No Mod stop condition was observed.
+  * Log evidence supports F6 exact-local stability, F7 grid geometry, F9/F11 settled local alignment, F12 group frame/children relative-layout and membership/connector preservation, and F14/F17 top-right resize. The right-side resize result is visual PASS; the current diagnostic target emitted top-right lines only.
+  * The `space` cap `200` UI/purchase smoke passes: cap behavior and purchase flow continue past `100` with no visible error. Group movement across the old boundary also passes: the frame and children cross together with relative layout, connection/state, group selection, and empty-click deselection intact. A future clean RC still requires its own clean-install/startup smoke check.
+  * The group-movement canary has no dedicated movement telemetry; the latest logs verify `0.2.24` is the single loaded Mod and expected extensions installed, while the movement result is user visual evidence. The startup F12 skip is unrelated because this smoke did not save/restart/load a group.
+  * Latest single-Mod logs also contain a recurring non-fatal Mod Loader path error for `res://mods-unpacked/`; the zip still loads, all extensions install, and R4 applies. Record this as an environment baseline, not an ExpandedWorkspace stop condition.
+  * Template/schematic pre-placement in the expanded area is a confirmed known limitation: it appears at the old-area boundary rather than the camera position. It is not an F20 stop condition and authorizes no runtime fix.
+  * F20 report: `docs/PHASE_2C_F20_TARGETED_REGRESSION_REPORT.md`.
+  * Diagnostic cleanup and clean-integration planning are deferred behind F21 template pre-placement diagnosis. Do not execute regression, modify runtime code, clean diagnostics, build, generate artifacts, bump versions, push, merge, tag, release, or publish without separate approval.
+  * F20 plan: `docs/PHASE_2C_F20_TARGETED_REGRESSION_PLAN.md`.
+
+* **Phase 2C-F19 / post-F12 scope decision**:
+  * **Status: `F19_POST_F12_SCOPE_DECISION_PLAN_READY`**
+  * Current branch: `dev/phase-2c-f19-post-f12-scope-decision`.
+  * Verified HEAD before F19 docs work: `4fe64b5abde9088f6556ff234d7af15104fbcf16`.
+  * `origin/master` remains `0489e834bb1eff79742081f32656ee43f04a2cb5`; the local development branch was ahead by 40 commits before F19.
+  * `0.2.24` / `Nekochan-ExpandedWorkspace-0.2.24.zip` is the current verified development canary. Size: `22115 bytes`; SHA-256: `942f67e0e0535b208a6ecc67d1d13cd9baf714035a8471dcdad55926373e7e7c`.
+  * `0.2.24` is diagnostic-heavy and is not a clean Release Candidate. `v0.2.9` remains unchanged and stale relative to verified fixes.
+  * Verified scope now includes F6 single-node exact local persistence, F7 primary line-grid density restoration, F9 click local alignment, F11 drag local alignment, F14 old-bound group resize snap, F17 right/top-right width-collapse correction, and F12 post-F17 group persistence.
+  * Next recommended action: create a targeted regression plan. Do not start full regression, release integration, diagnostic cleanup implementation, build, version bump, push, tag, GitHub Release, or Workshop publication.
+  * Scope decision plan: `docs/PHASE_2C_F19_POST_F12_SCOPE_DECISION_PLAN.md`.
+
+---
+
 ## 1. 現状のステータス要約
 
+* **Phase 2C-F2 / v0.2.10 regression state**:
+  * **Status: `FAILED_VERIFICATION_REGRESSION`**
+  * `0.2.10` development artifact was tested by the user with only this Mod installed.
+  * Position persistence is still `FAIL`: a node placed in the expanded area moved back to the old boundary after save, exit, restart, and load.
+  * Deselection regression observed: empty-area click and the node state/options menu `x` control did not clear selected nodes.
+  * Do not treat `0.2.10` as a Release Candidate. Do not create a Release, Draft Release, tag, Workshop upload, or replacement artifact from it.
+  * `v0.2.9` Draft Release remains blocked and must not be published. The `v0.2.9` artifact must not be changed, replaced, or deleted.
+  * The confirmed fact is that vanilla `WindowContainer._ready()` clamps restored positions through old `10000` bounds. The failed repair hypothesis is that overriding only `WindowContainer.get_position_snapped(to)` is sufficient.
+  * Follow-up analysis is `docs/PHASE_2C_F2_0.2.10_REGRESSION_ANALYSIS.md`.
+  * Next implementation must be based on a new approved plan, preferably a restoration-path-only diagnostic/fix rather than another global `WindowContainer` patch.
+* **Phase 2C-F3 / v0.2.11 desktop restoration diagnostic**:
+  * **Status: `DIAGNOSTIC_EVIDENCE_CAPTURED`**
+  * F3 diagnostic plan is `docs/PHASE_2C_F3_DESKTOP_RESTORATION_DIAGNOSTIC_PLAN.md`.
+  * Diagnostic report is `docs/PHASE_2C_F3_DESKTOP_RESTORATION_DIAGNOSTIC_REPORT.md`.
+  * Runtime basis is `0.2.9` behavior plus Desktop restoration checkpoint logging only.
+  * `WindowContainer` / `WindowBase` / `WindowIndexed` extensions are excluded and must remain excluded.
+  * No position fix is implemented. The artifact only logs P2/P3/P3.5/P4 restoration evidence for up to 3 saved windows beyond the old `10000` threshold.
+  * P3 immediately after `new_object.load(window_data)` is intentionally marked `UNOBSERVED` because observing it directly would require copying vanilla `Desktop._enter_tree()`.
+  * User tested v0.2.11. Empty-area deselect and menu `x` deselect are both OK, confirming the v0.2.10 selection regression disappeared when `window_container.gd` was excluded.
+  * F3 evidence target: `download_video0`, `window_download_video.tscn`, script `res://scenes/windows/window_download.gd`, size `(350.0, 272.0)`.
+  * F3 checkpoint result: P2 saved `(19650.0, 19750.0)`, P3.5 after restore/child-entered `(19650.0, 19750.0)`, P4 deferred final `(9650.0, 9750.0)`.
+  * Therefore the coordinate change occurs after P3.5 and before P4, not in save serialization and not in the immediate Desktop restoration loop.
+  * Next work must still not implement a position fix without a new approved plan. The next diagnostic/fix plan should target the post-P3.5/pre-P4 lifecycle point.
+* **Phase 2C-F4 / v0.2.12 restoration correction canary**:
+  * **Status: `PARTIAL_FIX_RESIDUAL_POSITION_DRIFT`**
+  * F4 plan is `docs/PHASE_2C_F4_RESTORATION_CORRECTION_PLAN.md`.
+  * F4 report is `docs/PHASE_2C_F4_RESTORATION_CORRECTION_REPORT.md`.
+  * Root cause classification is now `ROOT_CAUSE_CONFIRMED_LIFECYCLE_CLAMP`.
+  * Runtime basis is `0.2.9` verified behavior plus Desktop restoration-only deferred correction and F4 low-frequency checkpoint logging.
+  * `WindowContainer` / `WindowBase` / `WindowIndexed` extensions remain excluded. `get_position_snapped()` override remains forbidden.
+  * Correction snapshots saved positions before `super._enter_tree()` and uses saved `window.name` to correlate to `Windows/<window.name>`. Duplicate or empty saved names disable correction with `[F4][STOP]`.
+  * Correction targets only restored windows whose saved position exceeds `(Vector2.ONE * 10000) - restored_window.size`.
+  * Desired position is saved position clamped to `WorkspaceAreaConfig.get_max_position(restored_window.size)` and snapped to 50.
+  * Correction is one-shot deferred and uses `window.move(desired_position)`; no save schema, selection code, continuous monitor, or active gameplay movement patch is added.
+  * User tested v0.2.12. Old-boundary warp was not reproduced, but exact position persistence still failed: residual drift was visible after restart.
+  * F4 logs show SAVED/desired positions such as `server0 (19650.0, 19250.0)`, with BEFORE old-clamped to `(9650.0, 9250.0)`, then AFTER/STABILITY local position `(19560.07, 19059.62)`.
+  * F5 analysis is `docs/PHASE_2C_F5_POSITION_DRIFT_GRID_GEOMETRY_ANALYSIS.md`.
+  * F5 conclusion: F4 residual drift is caused by using `WindowContainer.move(saved_position)`, because vanilla `move(pos)` writes `global_position = pos` while save persistence writes local `position`.
+  * User also observed grid density/snap mismatch. F5 classifies the grid issue as `GRID_DENSITY_SCALE_MISMATCH` with snap mismatch consequence: current `Lines` scale is `(2, 2)`, so visual 50-unit vanilla grid spacing becomes 100 while window snap remains 50.
+  * v0.2.12 must not be treated as passing. Next implementation should first address exact local-position restoration, then restore vanilla-density grid coverage.
+* **Phase 2C-F6 / v0.2.13 exact local restoration canary**:
+  * **Status: `F6_SINGLE_NODE_EXACT_PERSISTENCE_VERIFIED`**
+  * F6 plan is `docs/PHASE_2C_F6_EXACT_LOCAL_RESTORATION_PLAN.md`; implementation report is `docs/PHASE_2C_F6_EXACT_LOCAL_RESTORATION_REPORT.md`.
+  * F5 confirmed that `WindowContainer.save()` persists local `position`, while F4 passed that local value to `WindowContainer.move()`, which writes `global_position`. This local/global coordinate mismatch caused F4 residual drift.
+  * F6 retains the one-shot deferred Desktop restoration timing but assigns `window.position = desired_position` directly. `desired_position` is saved local position clamped only to `WorkspaceAreaConfig.get_max_position(window.size)`; it is not re-snapped.
+  * F6 emits `window.moved` after assignment to retain the observed Desktop redraw/LOD update path. It does not use `move()`, `move_snapped()`, `global_position`, a WindowContainer/Base/Indexed extension, `get_position_snapped()`, or continuous correction.
+  * `Nekochan-ExpandedWorkspace-0.2.13.zip` was built locally as a development canary. SHA-256: `88908fec32fce7d407cc971428c7682dfd05c57f7f6b184e38f1e5e466582933`; ZIP root `mods-unpacked`; 13 files. No release, tag, Workshop publish, public-master push, or v0.2.9 artifact operation occurred.
+  * User verified empty-area deselect and menu x deselect as PASS. User also verified exact visual persistence for an individual node after save, exit, restart, and load.
+  * Final F6 log evidence covers three non-group targets. For `download_manager0` `(18300.0, 18000.0)`, `download_text0` `(18700.0, 18800.0)`, and `network0` `(17850.0, 17700.0)`, `clamp_delta` is zero and both AFTER and STABILITY local positions exactly equal SAVED_LOCAL. Details are in the F6 report.
+  * F6 has verified individual-node exact local persistence only. Group persistence is deliberately not a F6 PASS criterion. `GRID_DENSITY_SCALE_MISMATCH` remains isolated; grid code is unchanged. Do not start grid, group, full regression, or release integration without a new approved plan.
+* **Phase 2C-F7 / v0.2.14 vanilla-density grid canary**:
+  * **Status: `F7_GRID_DENSITY_VERIFIED_CLICK_ALIGNMENT_FAIL`**
+  * F7 plan is `docs/PHASE_2C_F7_GRID_DENSITY_RESTORATION_PLAN.md`; canary report is `docs/PHASE_2C_F7_GRID_DENSITY_RESTORATION_REPORT.md`.
+  * Root cause is `GRID_DENSITY_SCALE_MISMATCH`: the prior `(2, 2)` Lines scale rendered the vanilla 50-unit grid at a visible 100-unit interval while interaction snap stayed at 50.
+  * F7 restores root Lines scale to `(1, 1)` and creates three fresh runtime renderer tiles at `(10000, 0)`, `(0, 10000)`, and `(10000, 10000)`. Together with the root tile, coverage is `20000 x 20000` with vanilla origin and 50-unit geometry. It does not copy vanilla renderer bodies, scenes, resources, or live RenderingServer RID state.
+  * The instance count is a known 4x area multiplier. Expected counts range from 1600 Lines instances to 248704 Hexagon instances depending on the selected vanilla Lines type. No performance PASS is claimed.
+  * F6 Desktop restoration source is unchanged from its verification commit. Placement/movement/connector snap, selection, group movement, save schema, node limit, space cap, camera, and background paths are unchanged.
+  * `Nekochan-ExpandedWorkspace-0.2.14.zip` is a local development canary: SHA-256 `74043d10b5d455850be47ac0f3f7b6302f3764ec28d9ca6b4390f840256b7d49`, 12043 bytes, 13 files, ZIP root `mods-unpacked`. No release, tag, Workshop publication, public-master push, or v0.2.9 artifact operation occurred.
+  * Runtime evidence confirms expected Lines geometry: `workspace_size=(20000,20000)`, `renderer_scale=(1,1)`, `lines_minor=50_major=500`, origin `(0,0)`, coverage `(20000,20000)`, four tiles, and 1600 total Lines instances for tested `lines_type=0`.
+  * User verified old-area density, expanded-area density, and the old/new boundary as PASS. Drag placement and existing-node movement align to the visual grid; F6 single-node persistence also remains PASS.
+  * Click placement alignment is FAIL: a clicked node initially does not align to a grid line, but aligns when moved. This is a remaining click-placement workflow alignment defect, not evidence to change snap intervals or F7 renderer geometry. Do not implement a correction without a dedicated approved diagnostic plan.
+  * Startup is slightly heavier, while camera movement/zoom and grid display switching are PASS. Performance is acceptable for the tested Lines type only; higher-density renderer modes remain untested.
+  * Do not proceed to group persistence, full regression, or release integration. The single next action is a dedicated click-placement alignment diagnostic plan.
+* **Phase 2C-F8 / v0.2.15 click-placement coordinate diagnostic**:
+  * **Status: `DIAGNOSTIC_EVIDENCE_CAPTURED`**
+  * F8 plan: `docs/PHASE_2C_F8_CLICK_PLACEMENT_COORDINATE_DIAGNOSTIC_PLAN.md`; report: `docs/PHASE_2C_F8_CLICK_PLACEMENT_COORDINATE_DIAGNOSTIC_REPORT.md`.
+  * User result: initial click-placement grid alignment FAIL; the same node after one manual movement PASS. Save/restart/load was not tested in F8.
+  * F8 observed `download_text`: C3 target `(15400,18050)` is `TARGET_SNAP_CORRECT`; C8/C9 global position equals that target exactly. C5 global/local delta is approximately the window half-size, while the Windows parent transform origin is `(0,0)`.
+  * Classification: `VISUAL_ORIGIN_MISMATCH`. The new window's vanilla opening pivot/scale lifecycle leaves a non-grid local layout coordinate while the visual transform is active; this is distinct from F6 saved-local-as-global persistence drift. The deferred `move()` corrects C7 global y by `10.5` to the target and does not create a subsequent global drift.
+  * One unimplemented candidate for a separately approved canary: replace the click path's deferred global `move(target)` with a deferred local `position = target; moved.emit()` correction, using the F6-local-domain principle. Do not implement from F8 evidence alone because the settled opening-animation frame was not logged.
+  * It preserves the F7 click target calculation and assignments exactly. F7 Lines, F6 Desktop restoration, drag placement, existing movement, 50-unit snap behavior, save schema, node limit, space cap, camera, and background paths are unchanged.
+  * `Nekochan-ExpandedWorkspace-0.2.15.zip` is a local development diagnostic artifact: SHA-256 `4677776d803b53a13512f49434c691c2ec6dbc2e4790b1f6d9349903ea3eabe7`, 13113 bytes, 13 files, ZIP root `mods-unpacked`.
+  * The user must test one expanded-area click-created node, manually move it once, then provide the visual results and `[F8]` logs. Do not implement a click correction, alter F7/F6, start group persistence/full regression/release integration, publish, tag, push public master, or operate on v0.2.9 until that evidence is analyzed.
+* **Phase 2C-F9 / v0.2.16 click local-alignment canary**:
+  * **Status: `F9_CLICK_ALIGNMENT_VERIFIED_DRAG_ALIGNMENT_REGRESSION_OBSERVED`**
+  * F9 plan: `docs/PHASE_2C_F9_CLICK_LOCAL_ALIGNMENT_PLAN.md`; report: `docs/PHASE_2C_F9_CLICK_LOCAL_ALIGNMENT_REPORT.md`.
+  * F9 preserves F8 target calculation and every initial/post-create global assignment. At the existing final deferred correction point only, it replaces global `move(target)` with `window.position = target; window.moved.emit()`.
+  * One click-created window logs `F9_TARGET`, before/after local correction, next-deferred stability, and one 0.5-second opening-settle checkpoint. There is no `_process`, timer loop, or continuous correction.
+  * F6 Desktop restoration, F7 Lines/grid, drag placement, existing-node movement, snap interval, save schema, node limit, space cap, camera/background, group behavior, and blocked Window script extensions are unchanged.
+  * `Nekochan-ExpandedWorkspace-0.2.16.zip` is a local development canary: SHA-256 `24abbe45d5f407a3d3deed612a646621f015d8cad8d6709818a5a591fe5e0b4b`, 13004 bytes, 13 files, ZIP root `mods-unpacked`.
+  * Runtime evidence for `download_sound0`: target `(10350,13350)` is `TARGET_SNAP_CORRECT`; AFTER, next-deferred, and opening-settle local positions all exactly equal the target. The opening-settle global position also equals the target.
+  * User verified click alignment PASS immediately, after the opening tween, and after one manual movement. This verifies the F9 click local-domain correction.
+  * User separately observed drag placement visually misaligned. Drag source has no F9 code diff, but its user-visible preservation gate is FAIL. Do not modify drag speculatively, proceed to group/full regression/release integration, publish, tag, push public master, or operate on v0.2.9. The single next action is a dedicated drag-placement coordinate-domain diagnostic plan.
+* **Phase 2C-F10 / v0.2.17 drag-placement coordinate diagnostic**:
+  * **Status: `DRAG_DEFERRED_MOVE_COORDINATE_DOMAIN_MISMATCH_CONFIRMED`**
+  * F10 plan: `docs/PHASE_2C_F10_DRAG_PLACEMENT_COORDINATE_DIAGNOSTIC_PLAN.md`; report: `docs/PHASE_2C_F10_DRAG_PLACEMENT_COORDINATE_DIAGNOSTIC_REPORT.md`.
+  * F10 preserves the drag target calculation, global assignments, deferred `move(target)`, and `_finish_drag()`. It logs D1-D8 from the dragger and uses one self-freeing observer for D9-D11 because the dragger queues itself for deletion.
+  * F9 click correction, F6 restoration, F7 grid, snap interval, `Utils.screen_to_world_pos`, existing movement, group behavior, save schema, and blocked Window script extensions are unchanged.
+  * `Nekochan-ExpandedWorkspace-0.2.17.zip` is a local diagnostic artifact: SHA-256 `87dff32cbcc9f51455f2243e030b1adfd06e7375d6bbb4f933af20b5d44ea911`, 15099 bytes, 14 files, ZIP root `mods-unpacked`.
+  * User tested only v0.2.17 in the Mod folder. Expanded-area drag placement was visually `FAIL` immediately and after 0.5-1 seconds, then `PASS` after one manual movement. Save/restart/load was not tested.
+  * The supplied comparison images are labeled: image 1 is click placement and image 2 is drag placement. The F10 D1-D11 evidence applies only to the drag-created `download_text1` in image 2; image 1 is context for the verified F9 click path.
+  * F10 log target for `download_text1` is `(10950.0, 12100.0)`. D4 is `DRAG_TARGET_SNAP_CORRECT`: recompute delta is `(0.0, 0.0)` and snap units are exact `(219.0, 242.0)`, so `Utils.screen_to_world_pos` is not the observed source of offset.
+  * D9 and D10 retain local `(10775.0, 11974.5)`, offset `(-174.998, -125.499)` from target, while global equals target. D11 opening settle leaves both local and global at that same off-target local coordinate. This matches the F8 click local/global mismatch and explains the user-visible persistent off-grid result.
+  * Classification: `DRAG_DEFERRED_MOVE_COORDINATE_DOMAIN_MISMATCH`. The existing final deferred `move(target)` is the confirmed narrow correction surface; it writes the target in global rather than the persisted/visual local coordinate during the opening lifecycle.
+* **Phase 2C-F11 / v0.2.18 drag local-alignment canary**:
+  * **Status: `F11_DRAG_LOCAL_ALIGNMENT_VERIFIED`**
+  * F11 plan: `docs/PHASE_2C_F11_DRAG_LOCAL_ALIGNMENT_PLAN.md`; report: `docs/PHASE_2C_F11_DRAG_LOCAL_ALIGNMENT_REPORT.md`.
+  * F11 retains the F10 target calculation, `Utils.screen_to_world_pos`, clamp/snap, initial/post-create global assignments, and `_finish_drag()`. At only the existing final deferred correction point, it writes `instance.position = target` and emits `instance.moved` instead of calling `move(target)`.
+  * The dragger queues itself for deletion, so a self-freeing root observer performs the one deferred local assignment and logs `F11_TARGET`, before/after local correction, next-deferred stability, and one 0.5-second opening-settle checkpoint. It has no `_process`, loop, or continuous correction.
+  * F9 click alignment, F7 grid, F6 restoration, existing-node movement, group behavior, snap interval, save schema, and blocked Window script extensions are unchanged.
+  * User tested only `0.2.18`. Drag alignment is `PASS` immediately, after 0.5-1 seconds, and after one manual movement. Optional click placement is `PASS`; save/restart/load is `NOT TESTED`.
+  * Runtime sample `download_text3`: target `(11900.0, 12100.0)` is `TARGET_SNAP_CORRECT`; AFTER, next-deferred, and opening-settle local positions all exactly equal target. Two additional logged drag targets have the same local equality result.
+  * F11 therefore verifies the F10 correction hypothesis: the final deferred global `move(target)` was the defect, and deferred local assignment plus `moved.emit()` preserves local target equality through opening settle.
+  * Diagnostic follow-up: the one-target flag is per dragger instance, so three bounded sequences were emitted in the session. There is no continuous logging, but a future diagnostics-only cleanup should scope this to one target per game session before any wider canary.
+  * Do not proceed to group/full regression/release integration, publish, tag, push public master, or operate on v0.2.9.
+* **Phase 2C-F12 / v0.2.19 group persistence diagnostic canary**:
+  * **Status: `F12_INTERRUPTED_BY_GROUP_RESIZE_BLOCKER`**
+  * Plan: `docs/PHASE_2C_F12_GROUP_PERSISTENCE_DIAGNOSTIC_PLAN.md`; report: `docs/PHASE_2C_F12_GROUP_PERSISTENCE_DIAGNOSTIC_REPORT.md`.
+  * F12 is diagnostic-only and does not change F6 local restoration. It correlates exactly one saved expanded-area group frame with one or two saved fully enclosed child nodes, then compares frame/child saved local positions and child-to-frame relative local deltas before correction, after unchanged F6 correction, at the next deferred checkpoint, and at a one-shot 0.5-second opening-settle checkpoint.
+  * F12 logs `G1_SAVED_GROUP_FRAME_LOCAL` through `G11_OPENING_SETTLE_CHILDREN`, plus `[F12][STOP]` when a safe unambiguous group/child target cannot be selected. It has no `_process()`, every-frame logging, continuous monitor, group movement change, group resize change, save-schema change, WindowContainer/Base/Indexed extension, or `get_position_snapped()` override.
+  * `Nekochan-ExpandedWorkspace-0.2.19.zip` is a local development diagnostic artifact: SHA-256 `176b0b9871639d8c22eea0ae620b19e8840b64e2f1802a0a1a245600a5c193f7`, 16106 bytes, 14 files, ZIP root `mods-unpacked`.
+  * User interrupted F12 after finding `GROUP_RESIZE_EDGE_DRAG_DISAPPEARANCE_BLOCKER`: placing a new group, hovering an edge point, and starting an edge resize drag makes the group disappear. Do not classify F12 as PASS.
+  * Supplemental user observation: an existing group moved to the expanded area persisted after save, exit, restart, and load. This is promising but incomplete group persistence evidence because resize is now a blocker.
+  * Full regression, release integration, public master push, Release/tag/Workshop operation, and v0.2.9 artifact operation remain blocked.
+* **Phase 2C-F13 / group resize disappearance diagnostic plan**:
+  * **Status: `F13_DIAGNOSTIC_EVIDENCE_CAPTURED`**
+  * Plan: `docs/PHASE_2C_F13_GROUP_RESIZE_DISAPPEARANCE_PLAN.md`.
+  * Static analysis points to `scenes/windows/window_group.gd`: vanilla resize uses separate `resizing_left/right/top/bottom` flags and hard-coded `MAX_BOUNDS = Vector2(10000, 10000)`. The current Mod extension runs `super._process(delta)` and only corrects the `moving` path afterward, so edge resize remains on the old-boundary path.
+  * First diagnostic artifact candidate is `0.2.20`, scoped to one group and bounded R1-R5 checkpoints to classify whether the group is queue-freed, hidden, moved out of bounds, size-collapsed, invalid-rect, clipped, reparented/lost membership, render-only disappeared, or unresolved.
+  * User ran the minimal test with only `0.2.20`, did not save after disappearance, and exited. R3 evidence for `group12` shows that the first edge-resize process changes local/global frame position from `(18800,16600)` to `(9700,9800)` with zero mouse delta, while validity, visibility, alpha, scale, size/minimum `(300,200)`, parent, and child count `3` remain unchanged. The frame is not destroyed or hidden; it is snapped into the old workspace maximum and leaves the expanded-area camera view. Classification: `GROUP_NODE_MOVED_OUT_OF_BOUNDS`.
+  * The trigger is the original resize path's `move_snapped(new_rect.position)`, which reaches the inherited old-bound snap even though F13's existing correction deliberately runs only for `moving`. The one proposed future candidate is a `window_group.gd::move_snapped(to)` override active only while a resize flag is true: retain 50-unit snap, clamp `to` through `WorkspaceAreaConfig.get_max_position(size)`, call the existing move notification path, and delegate all non-resize calls to `super`. It avoids a `get_position_snapped()` override and leaves size calculation unchanged. It is not implemented.
+  * `docs/PHASE_2C_F13_GROUP_RESIZE_DISAPPEARANCE_REPORT.md` is the runtime evidence record. Do not proceed to a resize fix, F12 continuation, full regression, release integration, public master push, Release, tag, Workshop, or v0.2.9 artifact operation without a separately approved plan.
+* **Phase 2C-F14 / group resize expanded-bounds canary**:
+  * **Status: `F14_PRIMARY_OLD_BOUND_SNAP_VERIFIED_SIZE_CALCULATION_BLOCKER_REMAINS`**
+  * Plan: `docs/PHASE_2C_F14_GROUP_RESIZE_EXPANDED_BOUNDS_PLAN.md`; report: `docs/PHASE_2C_F14_GROUP_RESIZE_EXPANDED_BOUNDS_REPORT.md`.
+  * F14 uses the F13-proven `WindowGroup.move_snapped(to)` surface. Only while a resize flag is true, it replaces the inherited old-bound snap with the existing expanded maximum and 50-unit snap, then uses the existing `move` notification path. All non-resize calls delegate to `super.move_snapped(to)`.
+  * It does not alter group size calculation, normal group movement, F6/F7/F9/F11/F12 behavior, save schema, WindowContainer/Base/Indexed extensions, or `get_position_snapped()`. One F14 input/output/deferred/release diagnostic sequence is emitted for the first edge resize only.
+  * User verified the primary F13 left/top path: F14 input/output holds `(16850,18600)` under the expanded clamp; release leaves the group valid and visible at `(16550,18250)` with size `(600,550)`. The old-bound disappearance is fixed for this path.
+  * A separate populated group with two contained connected nodes later became abnormally thin and tall during resize. It was outside the one-target F14 logging budget, so no edge/formula cause is yet proven. Treat this as an unclassified group resize size-calculation blocker. The next and only action is an F15 dedicated diagnostic plan, not a size fix. Group persistence, full regression, release integration, public-master push, Release/tag/Workshop operation, and v0.2.9 artifact changes remain deferred.
+* **Phase 2C-F15 / populated group resize size-collapse diagnostic**:
+  * **Status: `F15_GROUP_SIZE_WIDTH_COLLAPSED_CONFIRMED`**
+  * Plan: `docs/PHASE_2C_F15_POPULATED_GROUP_RESIZE_SIZE_COLLAPSE_PLAN.md`; report: `docs/PHASE_2C_F15_POPULATED_GROUP_RESIZE_SIZE_COLLAPSE_REPORT.md`.
+  * F14's old-bound position-snap correction remains verified and must not be changed. F15 isolates the later thin/tall populated-group observation as a separate blocker; its tested `top-right` edge and geometry now identify a width-collapse cause, while no fix is implemented.
+  * The user tested only `0.2.22` with one populated group and one `top-right` resize. At S2/S3, zero mouse delta produces the old-bound candidate width `-3900` from left anchor `13900`; the expanded candidate remains `(800,650)`. At S4, actual frame width is `20` and `custom_minimum_size.x=-3900`, while both children and their bounding/relative geometry remain unchanged through S6. Classification: `GROUP_SIZE_WIDTH_COLLAPSED`.
+  * F14 continues to preserve frame local/global position `(13900,16250)` for the path. The collapse is a separate old-bound right-edge size-calculation defect, not a position snap, child-layout, edge-flag, or mouse-coordinate defect in the measured sequence.
+  * The sole future fix candidate is a new approved, `WindowGroup`-only post-vanilla correction for a non-positive old-bound right/bottom size when its expanded candidate is valid. Do not implement it yet; do not change F14, F6/F7/F9/F11/F12, save schema, group persistence, or release work.
+  * Local development artifact: `dist/Nekochan-ExpandedWorkspace-0.2.22.zip`, `20863 bytes`, `15` files, ZIP root `mods-unpacked`, SHA-256 `8f00f3c82429a88b4e8fea672baafe209c9e12946bc9bc4c295f05554d6fb84e`. It passed the source/ZIP publish-safety audit with all required categories at zero; it remains development-only.
+  * Do not save after a reproduced collapse. Do not resume F12 group persistence, full regression, release integration, public-master push, Release/tag/Workshop operation, or v0.2.9 artifact work.
+* **Phase 2C-F16 / populated group resize width-collapse fix canary**:
+  * **Status: `F16_TARGET_EDGE_MISMATCH_NOT_VERIFIED`**
+  * Plan: `docs/PHASE_2C_F16_POPULATED_GROUP_RESIZE_COLLAPSE_FIX_PLAN.md`; report: `docs/PHASE_2C_F16_POPULATED_GROUP_RESIZE_COLLAPSE_FIX_REPORT.md`.
+  * The user observed width collapse on the intended top-right path and also on right-side resize of a group without children; left-side paths remained normal. Children and connection/state remained; no save was made.
+  * Actual F16 logs cover only a normal top-left sequence: candidates and actual size/minimum remain valid, both guards are false, and no correction is applied. No F16 line covers the failing top-right/right/bottom path.
+  * Cause of the evidence gap: F16 begins only when F15's first eligible diagnostic target begins. The prior top-left resize consumed F15's one-target budget, so the intended top-right correction branch was neither activated nor logged. F16 is not verified; do not infer a correction failure from the absent target evidence.
+  * The next only action is the F17 plan: `docs/PHASE_2C_F17_RIGHT_SIDE_RESIZE_COLLAPSE_TARGETED_PLAN.md`. It decouples correction activation from F15 target acquisition and reserves logging for top-right. Do not implement another fix, change F14/F6/F7/F9/F11/F12, resume persistence, or begin regression/release work.
+  * Local development artifact: `dist/Nekochan-ExpandedWorkspace-0.2.23.zip`, `21846 bytes`, `15` files, ZIP root `mods-unpacked`, SHA-256 `d124dee730ff43178f1fb5c0698cbc557312f945739b1ea310e054124fce1ebf`. Source/ZIP publish-safety audit categories are all zero.
+* **Phase 2C-F17 / right-side resize collapse targeted canary**:
+  * **Status: `F17_RIGHT_SIDE_WIDTH_COLLAPSE_VERIFIED`**
+  * Plan: `docs/PHASE_2C_F17_RIGHT_SIDE_RESIZE_COLLAPSE_TARGETED_PLAN.md`; report: `docs/PHASE_2C_F17_RIGHT_SIDE_RESIZE_COLLAPSE_TARGETED_REPORT.md`.
+  * F17 removes the F16 dependency on F15's one-target diagnostic acquisition. Guarded correction now evaluates for every right/bottom resize after vanilla processing; only F17 logging is limited to the first `top-right` or `right` sequence. Top-left cannot consume the F17 target.
+  * The initial reported attempt was an invalid `0.2.23` artifact mismatch. The subsequent valid session loaded `0.2.24` and recorded all six `[F17]` checkpoints for `group18 edge=top-right`. Vanilla transiently produced size `20` and minimum x `-5250`; F17 directly evaluated the branch and restored both to `300` in the same resize sequence. Release and one-frame stability are `(700,350)` with no old-bound jump, while F13/F14 confirm valid/in-tree/visible state.
+  * A fresh session then recorded all six `[F17]` checkpoints for childless `group0 edge=right`. Vanilla transiently produced `20/-6000`; F17 evaluated and applied the width guard, restoring `300/300` in the same sequence. Release and one-frame stability are `(450,200)` without an old-bound jump, and F13/F14 again confirm valid/in-tree/visible state.
+  * After the primary correction, F15 captured a populated top-right sequence with two valid child nodes. Its intermediate vanilla collapse (`20/-3650`) is absent by release `(1000,700)`; user visual confirmation says children and connection/state remain. The F15 connector count is `0`, so connection persistence is user-verified rather than independently logged.
+  * `0.2.24` remains a local development canary only: `dist/Nekochan-ExpandedWorkspace-0.2.24.zip`, `22115` bytes, `15` files, ZIP root `mods-unpacked`, SHA-256 `942f67e0e0535b208a6ecc67d1d13cd9baf714035a8471dcdad55926373e7e7c`. F17 edge coverage is complete for its primary/secondary scope. The separately approved F18 Option A F12 re-entry test is now verified; full regression, release integration, public push, Release/tag/Workshop operation, and v0.2.9 artifact operations remain deferred.
+* **Phase 2C-F18 / F12 group-persistence re-entry gate plan**:
+  * **Status: `F12_GROUP_PERSISTENCE_REENTRY_VERIFIED_POST_F17`**
+  * Plan: `docs/PHASE_2C_F18_F12_GROUP_PERSISTENCE_REENTRY_PLAN.md`.
+  * The separately approved Option A test used only `0.2.24`. An empty group was enlarged through verified `top-right` setup resize before children were placed; it did not collapse. No resize or unnecessary group movement occurred after two children and one connection were placed.
+  * Actual F12/F6 evidence shows the frame restored from old-clamped `(9000, 9250)` to saved local `(18450, 18450)`. `download_text0` and `enhancer0` restored exactly to their saved locals, with saved-relative offsets `(100, 150)` and `(500, 250)` and zero relative delta through G6/G7, G8/G9, and G10/G11. Membership is true and connector count remains `1` after correction and at both stability checkpoints. No F12 stop or double-movement evidence was recorded.
+  * User visual verification confirms frame/child positions, relative layout, membership, connection/state, and group selectability after load. This verifies the narrow F12 save/load target, not full regression, release integration, public push, Release/tag/Workshop operation, or any v0.2.9 artifact action.
 * **Phase 2A 検証状態**:
   * **Status: `LIMIT_RELAXATION_COMPLETE_USER_VERIFIED`**
   * Phase 2A-R2で、通常の手動配置は500個を超えて配置できることをユーザー実機で確認済み。
@@ -179,6 +462,7 @@ Phase 2A-R4では、種類別配置可能数に関わる `space` アップグレ
   * Phase 2C-F1 clean install verificationでrelease blockerを確認。拡張領域へ配置した単体ノードおよびグループ配置/移動ノードが、save・終了・再起動・load後に旧領域と新領域の境界付近へ移動する。
   * 現在のrelease decisionは `BLOCKED_POSITION_PERSISTENCE`。v0.2.9 Draft Releaseをpublishしてはならない。v0.2.9 RC artifactはfailed RC evidenceとして保持する。
   * root causeは `docs/PHASE_2C_F1_POSITION_PERSISTENCE_ROOT_CAUSE.md` を参照。保存側では `position` を直接保存し、load時にraw positionを代入した後、`scenes/windows/window_container.gd::_ready()` が旧 `10000` boundsで共通clampする可能性が高い。
-  * 修正する場合は `docs/PHASE_2C_F1_IMPLEMENTATION_PLAN.md` をユーザー承認後に実施する。v0.2.9を再利用せず、`0.2.10-dev` 等のdevelopment buildで検証する。
+  * 修正する場合は `docs/PHASE_2C_F1_IMPLEMENTATION_PLAN.md` に従う。v0.2.9を再利用せず、`0.2.10` development buildで検証する。
+  * `0.2.10` development artifactを作成済み。`extensions/scenes/windows/window_container.gd` で `get_position_snapped(to)` のみを拡張boundsへ差し替える。artifactは `dist/Nekochan-ExpandedWorkspace-0.2.10.zip`、SHA-256 `ded8cd9f17ef30c088b7a8bb33272e2aae187c61830b409fdaf07c73d64f4e4f`。ユーザー実機検証は未実施。
 3. **パフォーマンスフットプリントの計測**:
    * グリッドを `MultiMesh` で描画する際、インスタンス数が16万個に増えたとき（2倍サイズ）の起動時プチフリーズの有無を確認する。
